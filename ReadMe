@@ -1,0 +1,5 @@
+A collection of tools useful for constitutive modeling. These tools are 
+intended to reduce the burden in creating a new constitutive model from 
+scratch enabling a faster turn-around for model development. These tools 
+should be as general as possible to avoid cluttering the database with 
+extraneous things.
