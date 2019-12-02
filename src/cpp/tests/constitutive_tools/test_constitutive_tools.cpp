@@ -1,4 +1,4 @@
-//Tests for error_tools
+//Tests for constitutive_tools
 
 #include<constitutive_tools.h>
 #include<sstream>

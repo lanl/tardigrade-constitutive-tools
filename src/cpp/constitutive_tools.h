@@ -40,7 +40,7 @@ namespace constitutiveTools{
 
     floatType deltaDirac(const unsigned int i, const unsigned int j);
 
-    errorTools::Node* computeGreenLagrangeStrain(const floatVector &deformationGradient, floatVector &E);
+    errorOut computeGreenLagrangeStrain(const floatVector &deformationGradient, floatVector &E);
 
 }
 
