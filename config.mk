@@ -16,7 +16,7 @@ CFLAGS=-std=gnu++11 -Wall -ansi -pedantic -O3 -I. -fmax-errors=5
 EIGEN=-I/projects/nathanm/usr/local/include/eigen-git-mirror
 
 # Set the root directory
-ROOTDIR=/projects/nathanm/constitutive_models
+ROOTDIR:=$(abspath $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))/../)
 
 # Add the location of the error_tools to the include and library
 ERRORSOURCE = $(ROOTDIR)/error_tools/src/cpp/error_tools.cpp
