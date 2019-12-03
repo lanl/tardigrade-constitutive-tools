@@ -73,7 +73,6 @@ int testRotateMatrix(std::ofstream &results){
     floatVector A = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     
     floatVector rotatedA;
-    std::cout << "entering rotateMatrix\n";
     errorOut ret = constitutiveTools::rotateMatrix(A, Q, rotatedA);
 
     if (ret){
