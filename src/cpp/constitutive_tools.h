@@ -40,6 +40,8 @@ namespace constitutiveTools{
 
     floatType deltaDirac(const unsigned int i, const unsigned int j);
 
+    errorOut rotateMatrix(const floatVector &A, const floatVector &Q, floatVector &rotatedA);
+
     errorOut computeGreenLagrangeStrain(const floatVector &deformationGradient, floatVector &E);
 
 }
