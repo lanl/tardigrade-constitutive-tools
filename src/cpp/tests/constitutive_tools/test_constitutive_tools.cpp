@@ -65,6 +65,11 @@ int testComputeGreenLagrangeStrain(std::ofstream &results){
 
     constitutiveTools::errorOut ret;
     ret = constitutiveTools::computeGreenLagrangeStrain(F, E);
+
+    if (ret){
+        results << "testComputeGreenLagrangeStrain (test 1) & False\n";
+        return 1;
+    }
     
     if (! vectorTools::fuzzyEquals(E, {0, 0, 0, 0, 0, 0, 0, 0, 0})){
         results << "testComputeGreenLagrangeStrain (test 1) & False\n";
@@ -76,6 +81,11 @@ int testComputeGreenLagrangeStrain(std::ofstream &results){
          0.98076420, 0.68482974, 0.4809319};
 
     ret = constitutiveTools::computeGreenLagrangeStrain(F, E);
+
+    if (ret){
+        results << "testComputeGreenLagrangeStrain (test 2) & False\n";
+        return 1;
+    }
 
     if (! vectorTools::fuzzyEquals(E, {0.37545786,  0.63379879,  0.43147034,
                                        0.63379879,  0.03425154,  0.34933978,
