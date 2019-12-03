@@ -38,6 +38,45 @@ namespace constitutiveTools{
         }
         return 0;
     }
+
+    errorOut rotateMatrix(const floatVector &A, const floatVector &Q, floatVector &rotatedA){
+        /*!
+         * Rotate a matrix A using the orthogonal matrix Q with the form
+         * A'_ij = Q_{Ii} A_{IJ} Q_{Jj}
+         * 
+         * TODO: Generalize to non square matrices
+         * 
+         * :param const floatVector &A: The matrix to be rotated
+         * :param const floatVector &Q: The rotation matrix
+         * :param floatVector &rotatedA: The rotated matrix
+         */
+
+        //Check the size of A
+        if (A.size() != Q.size()){
+            return new errorNode("rotateMatrix", "A and Q must have the same number of values");
+        }
+
+        //Set the dimension to be the square-root of the size of A
+        unsigned int dim = std::sqrt(A.size());
+        if (A.size() % dim != 0){
+            return new errorNode("rotateMatrix", "A must be square");
+        }
+
+        //Resize rotated A
+        rotatedA.resize(A.size());
+
+        for (unsigned int i=0; i<dim; i++){
+            for (unsigned int j=0; j<dim; j++){
+                for (unsigned int I=0; I<dim; I++){
+                    for (unsigned int J=0; J<dim; J++){
+                        rotatedA[i*dim + j] += Q[I*dim + i] * A[I*dim + J] * Q[J*dim + j];
+                    }
+                }
+            }
+        }
+
+        return NULL;
+    }
     
     errorOut computeGreenLagrangeStrain(const std::vector< floatType > &F,
                                         std::vector< floatType > &E){

@@ -5,6 +5,11 @@
 #include<fstream>
 #include<iostream>
 
+typedef constitutiveTools::errorOut errorOut;
+typedef constitutiveTools::floatType floatType;
+typedef constitutiveTools::floatVector floatVector;
+typedef constitutiveTools::floatMatrix floatMatrix;
+
 struct cout_redirect{
     cout_redirect( std::streambuf * new_buffer)
         : old( std::cout.rdbuf( new_buffer ) )
@@ -53,6 +58,62 @@ int testDeltaDirac(std::ofstream &results){
     
 }
 
+int testRotateMatrix(std::ofstream &results){
+    /*!
+     * Test the rotation of a matrix by an orthogonal rotation matrix..
+     * 
+     * :param std::ofstream &results: The output file
+     */
+
+
+    floatVector Q = {-0.44956296, -0.88488713, -0.12193405,
+                     -0.37866166,  0.31242661, -0.87120891,
+                      0.80901699, -0.3454915 , -0.47552826};
+
+    floatVector A = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    
+    floatVector rotatedA;
+    std::cout << "entering rotateMatrix\n";
+    errorOut ret = constitutiveTools::rotateMatrix(A, Q, rotatedA);
+
+    if (ret){
+        results << "testRotatedMatrix (test 1) & False\n";
+        return 1;
+    }
+
+    if (! vectorTools::fuzzyEquals( rotatedA, {-0.09485264, -3.38815017, -5.39748037,
+                                               -1.09823916,  2.23262233,  4.68884658,
+                                               -1.68701666,  6.92240128, 12.8622303})){
+        results << "testRotatedMatrix (test 1) & False\n";
+        return 1;
+    }
+
+    //Test rotation back to original frame
+    
+    floatVector QT(Q.size(), 0);
+    for (unsigned int i=0; i<3; i++){
+        for (unsigned int j=0; j<3; j++){
+            QT[3*j + i] = Q[3*i + j];
+        }
+    }
+
+    floatVector App;
+    ret = constitutiveTools::rotateMatrix(rotatedA, QT, App);
+
+    if (ret){
+        results << "testRotateMatrix (test 2) & False\n";
+        return 1;
+    }
+
+    if (! vectorTools::fuzzyEquals(A, App)){
+        results << "testRotateMatrix (test 2) & False\n";
+        return 1;
+    }
+
+    results << "testRotatedMatrix & True\n";
+    return 0;
+}
+
 int testComputeGreenLagrangeStrain(std::ofstream &results){
     /*!
      * Test the computation of the Green-Lagrange strain
@@ -60,8 +121,8 @@ int testComputeGreenLagrangeStrain(std::ofstream &results){
      * :param std::ofstream &results: The output file
      */
 
-    constitutiveTools::floatVector F = {1, 0, 0, 0, 1, 0, 0, 0, 1};
-    constitutiveTools::floatVector E;
+    floatVector F = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+    floatVector E;
 
     constitutiveTools::errorOut ret;
     ret = constitutiveTools::computeGreenLagrangeStrain(F, E);
@@ -102,6 +163,7 @@ int main(){
 
     //Run the tests
     testDeltaDirac(results);
+    testRotateMatrix(results);
     testComputeGreenLagrangeStrain(results);
 
     //Close the results file
