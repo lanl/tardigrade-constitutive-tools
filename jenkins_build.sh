@@ -17,15 +17,17 @@ set -Eeuxo pipefail
 
 # Clone dependencies
 cd ..
-for repodir in "${!deprepo[@]}"; do
-    if [ ! -d ${repodir} ]; then
-        all_proxy=${proxyout} git clone ${deprepo[$repodir]}
+for deprepodir in "${!deprepo[@]}"; do
+    if [ ! -d ${deprepodir} ]; then
+        all_proxy=${proxyout} git clone ${deprepo[$deprepodir]}
     else
-        cd ${repodir} && all_proxy=${proxyout} git pull
+        cd ${deprepodir} && all_proxy=${proxyout} git pull
         cd ..
     fi
 done
 # Perform repo tests
 cd ${workdir}/src/cpp/tests/${repo}/
-make clean
+if [ -f ${repo}.o ]; then
+    make clean
+fi
 make
