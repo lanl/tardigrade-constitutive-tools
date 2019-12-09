@@ -22,3 +22,4 @@ directory as this repo.
 
 * eigen: https://gitlab.com/libeigen/eigen
 * error\_tools: https://xcp-stash.lanl.gov/projects/MM/repos/error_tools
+* vector\_tools: https://xcp-stash.lanl.gov/projects/MM/repos/vector_tools
