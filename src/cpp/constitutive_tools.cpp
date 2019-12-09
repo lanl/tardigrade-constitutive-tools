@@ -135,4 +135,42 @@ namespace constitutiveTools{
         Ebar = E/(pow(J, 2./3)) + 0.5*(1/pow(J, 2./3) - 1)*eye;
         return NULL;
     }
+
+    errorOut mapPK2toCauchy(const floatVector &PK2Stress, const floatVector &deformationGradient, floatVector &cauchyStress){
+        /*!
+         * Map the PK2 stress to the current configuration resulting in the Cauchy stress.
+         * cauchy_ij = (1/det(F)) F_{iI} PK2_{IJ} F_{jJ}
+         * where F is the deformation gradient
+         * 
+         * :param const floatVector &PK2Stress: The Second Piola-Kirchoff stress
+         * :param const floatVector &deformationGradient: The total deformation gradient.
+         * :param floatVector &cauchyStress: The Cauchy stress.
+         */
+
+        if (PK2Stress.size() != 9){
+            return new errorNode("mapPK2toCauchy", "The cauchy stress must have nine components (3D)");
+        }
+
+        if (deformationGradient.size() != PK2Stress.size()){
+            return new errorNode("mapPK2toCauchy", "The deformation gradient and the PK2 stress don't have the same size");
+        }
+
+        //Compute the determinant of the deformation gradient
+        floatType detF = vectorTools::determinant(deformationGradient, 3, 3);
+
+        //Initialize the Cauchy stress
+        cauchyStress = floatVector(PK2Stress.size(), 0);
+
+        for (unsigned int i=0; i<3; i++){
+            for (unsigned int j=0; j<3; j++){
+                for (unsigned int I=0; I<3; I++){
+                    for (unsigned int J=0; J<3; J++){
+                        cauchyStress[3*i + j] += deformationGradient[3*i + I]*PK2Stress[3*I + J]*deformationGradient[3*j + J]/detF;
+                    }
+                }
+            }
+        }
+        return NULL;
+    }
+
 }

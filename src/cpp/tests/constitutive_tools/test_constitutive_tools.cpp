@@ -212,6 +212,43 @@ int testDecomposeGreenLagrangeStrain(std::ofstream &results){
     return 0;
 }
 
+int testMapPK2toCauchy(std::ofstream &results){
+    /*!
+     * Test the mapping of the PK2 stress from the reference 
+     * configuration to the current configuration.
+     * 
+     * :param std::ofstream &results: The output file
+     */
+    
+    floatVector F = {1.96469186, -2.13860665, -2.73148546,
+                     0.51314769,  2.1946897,  -0.7689354,
+                     4.80764198,  1.84829739, -0.19068099};
+
+    floatVector PK2 = {-1.07882482, -1.56821984,  2.29049707,
+                       -0.61427755, -4.40322103, -1.01955745,
+                        2.37995406, -3.1750827,  -3.24548244};
+
+    floatVector cauchy;
+
+    errorOut error = constitutiveTools::mapPK2toCauchy(PK2, F, cauchy);
+
+    if (error){
+        error->print();
+        results << "testMapPK2toCauchy & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(cauchy, {-2.47696057,  0.48015011, -0.28838671,
+                                            0.16490963, -0.57481137, -0.92071407,
+                                           -0.21450698, -1.22714923, -1.73532173})){
+        results << "testMapPK2toCauchy (test 1) & False\n";
+        return 1;
+    }
+
+    results << "testMapPK2toCauchy & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -229,6 +266,7 @@ int main(){
     testRotateMatrix(results);
     testComputeGreenLagrangeStrain(results);
     testDecomposeGreenLagrangeStrain(results);
+    testMapPK2toCauchy(results);
 
     //Close the results file
     results.close();
