@@ -111,4 +111,28 @@ namespace constitutiveTools{
         }
         return NULL;
     }
+
+    errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J){
+        /*!
+         * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts.
+         * where J    = det(F) = sqrt(det(2*E + I))
+         *       Ebar_IJ = 0.5*((1/(J**(2/3))) F_iI F_iJ - I_IJ) = (1/(J**(2/3)))*E_IJ
+         * 
+         * :param const floatVector &E: The Green-Lagrange strain tensor
+         * :param floatVector &Ebar: The isochoric Green-Lagrange strain tensor.
+         *     format = E11, E12, E13, E21, E22, E23, E31, E32, E33
+         * :param floatType &J: The Jacobian of deformation (det(F))
+         */
+
+        if (E.size() != 9){
+            return new errorNode("decomposeGreenLagrangeStrain", "the Green-Lagrange strain must be 3D");
+        }
+
+        //Construct the identity tensor
+        floatVector eye = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+
+        J = sqrt(vectorTools::determinant(2*E + eye, 3, 3));
+        Ebar = E/(pow(J, 2./3)) + 0.5*(1/pow(J, 2./3) - 1)*eye;
+        return NULL;
+    }
 }

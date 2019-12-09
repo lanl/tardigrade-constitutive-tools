@@ -158,6 +158,60 @@ int testComputeGreenLagrangeStrain(std::ofstream &results){
     return 0;
 }
 
+int testDecomposeGreenLagrangeStrain(std::ofstream &results){
+    /*!
+     * Test the decomposition of the Green-Lagrange strain into isochoric and 
+     * volumetric parts.
+     */
+
+    floatVector F = {0.69646919, 0.28613933, 0.22685145,
+                     0.55131477, 0.71946897, 0.42310646,
+                     0.98076420, 0.68482974, 0.4809319};
+
+    floatType J = vectorTools::determinant(F, 3, 3);
+    floatVector Fbar = F/pow(J, 1./3);
+
+    floatVector E, Ebar;
+    errorOut ret = constitutiveTools::computeGreenLagrangeStrain(Fbar, Ebar);
+
+    if (ret){
+        ret->print();
+        results << "testDecomposeGreenLagrangeStrain & False\n";
+        return 1;
+    }
+
+    ret = constitutiveTools::computeGreenLagrangeStrain(F, E);
+
+    if (ret){
+        ret->print();
+        results << "testDecomposeGreenLagrangeStrain & False\n";
+        return 1;
+    }
+
+    floatType JOut;
+    floatVector EbarOut;
+    ret = constitutiveTools::decomposeGreenLagrangeStrain(E, EbarOut, JOut);
+
+    if (ret){
+        ret->print();
+        results << "testDecomposeGreenLagrangeStrain & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(J, JOut)){
+        results << "testDecomposeGreenLagrangeStrain (test 1) & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(EbarOut, Ebar)){
+        results << "testDecomposeGreenLagrangeStrain (test 2) & False\n";
+        return 1;
+    }
+
+    results << "testDecomposeGreenLagrangeStrain & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -174,6 +228,7 @@ int main(){
     testDeltaDirac(results);
     testRotateMatrix(results);
     testComputeGreenLagrangeStrain(results);
+    testDecomposeGreenLagrangeStrain(results);
 
     //Close the results file
     results.close();

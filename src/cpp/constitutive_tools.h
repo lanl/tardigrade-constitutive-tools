@@ -44,6 +44,8 @@ namespace constitutiveTools{
 
     errorOut computeGreenLagrangeStrain(const floatVector &deformationGradient, floatVector &E);
 
+    errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J);
+
 }
 
 #endif
