@@ -249,6 +249,49 @@ int testMapPK2toCauchy(std::ofstream &results){
     return 0;
 }
 
+int testWLF(std::ofstream &results){
+    /*!
+     * Test the computation of the WLF function.
+     * 
+     * :param std::ofstream &results: The output file
+     */
+
+    floatType T = 145.;
+    floatType Tr = 27.5;
+    floatType C1 = 18.2;
+    floatType C2 = 282.7;
+    
+    floatType factor, dfactordT;
+
+    floatVector WLFParameters {Tr, C1, C2};
+
+    constitutiveTools::WLF(T, WLFParameters, factor);
+
+    if (!vectorTools::fuzzyEquals(factor, pow(10, -C1*(T - Tr)/(C2 + (T - Tr))))){
+        results << "testWLF (test 1) & False\n";
+        return 1;
+    }
+
+    floatType factor2;
+    constitutiveTools::WLF(T, WLFParameters, factor2, dfactordT);
+    
+    if (!vectorTools::fuzzyEquals(factor, factor2)){
+        results << "testWLF (test 2) & False\n";
+        return 1;
+    }
+
+    floatType delta = fabs(1e-6*T);
+    constitutiveTools::WLF(T + delta, WLFParameters, factor2);
+
+    if (!vectorTools::fuzzyEquals(dfactordT, (factor2 - factor)/delta)){
+        results << "testWLF (test 3) & False\n";
+        return 1;
+    }
+
+    results << "testWLF & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -267,6 +310,7 @@ int main(){
     testComputeGreenLagrangeStrain(results);
     testDecomposeGreenLagrangeStrain(results);
     testMapPK2toCauchy(results);
+    testWLF(results);
 
     //Close the results file
     results.close();
