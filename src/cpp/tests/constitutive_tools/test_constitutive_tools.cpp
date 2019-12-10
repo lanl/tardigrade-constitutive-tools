@@ -208,6 +208,15 @@ int testDecomposeGreenLagrangeStrain(std::ofstream &results){
         return 1;
     }
 
+    E = {-1, 0, 0, 0, 1, 0, 0, 0, 1};
+
+    ret = constitutiveTools::decomposeGreenLagrangeStrain(E, EbarOut, JOut);
+
+    if (!ret){
+        results << "testDecomposeGreenLagrangeStrain (test 3) & False\n";
+        return 1;
+    }
+
     results << "testDecomposeGreenLagrangeStrain & True\n";
     return 0;
 }

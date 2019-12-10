@@ -131,7 +131,12 @@ namespace constitutiveTools{
         //Construct the identity tensor
         floatVector eye = {1, 0, 0, 0, 1, 0, 0, 0, 1};
 
-        J = sqrt(vectorTools::determinant(2*E + eye, 3, 3));
+        floatType Jsq = vectorTools::determinant(2*E + eye, 3, 3);
+        if (Jsq<=0){
+            return new errorNode("decomposeGreenLagrangeStrain", "the determinant of the Green-Lagrange strain is negative");
+        }
+
+        J = sqrt(Jsq);
         Ebar = E/(pow(J, 2./3)) + 0.5*(1/pow(J, 2./3) - 1)*eye;
         return NULL;
     }
