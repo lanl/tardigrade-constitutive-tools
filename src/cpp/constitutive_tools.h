@@ -48,6 +48,10 @@ namespace constitutiveTools{
 
     errorOut mapPK2toCauchy(const floatVector &PK2Stress, const floatVector &deformationGradient, floatVector &cauchyStress);
 
+    errorOut WLF(const floatType &temperature, const floatVector &WLFParameters, floatType &factor);
+
+    errorOut WLF(const floatType &temperature, const floatVector &WLFParameters, floatType &factor, floatType &dfactordT);
+
 }
 
 #endif

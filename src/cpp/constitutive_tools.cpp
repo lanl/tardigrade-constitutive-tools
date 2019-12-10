@@ -173,4 +173,59 @@ namespace constitutiveTools{
         return NULL;
     }
 
+    errorOut WLF(const floatType &temperature, const floatVector &WLFParameters, floatType &factor){
+        /*!
+         * An implementation of the Williams-Landel-Ferry equation.
+         * 
+         * factor = 10**((-C1*(T - Tr))/(C2 + T - Tr))
+         * 
+         * where T is the temperature, Tr is the reference temperature, and C1 and C2 are parameters
+         * 
+         * :param const floatType &temperature: The temperature
+         * :param const floatVector &WLFParameters: The parameters for the function [Tr, C1, C2]
+         * :param floatType &factor: The shift factor
+         */
+
+        if (WLFParameters.size() != 3){
+            return new errorNode("WLF", "The parameters have the wrong number of terms");
+        }
+
+        floatType Tr = WLFParameters[0];
+        floatType C1 = WLFParameters[1];
+        floatType C2 = WLFParameters[2];
+
+        if (vectorTools::fuzzyEquals(C2 + (temperature - Tr), 0.)){
+            return new errorNode("WLF", "Zero in the denominator");
+        }
+
+        factor = pow(10., -C1*(temperature - Tr)/(C2 + (temperature - Tr)));
+
+        return NULL;
+    }
+
+    errorOut WLF(const floatType &temperature, const floatVector &WLFParameters, floatType &factor, floatType &dfactordT){
+        /*!
+         * An implementation of the Williams-Landel-Ferry equation that also returns the gradient w.r.t. T
+         *
+         * :param const floatType &temperature: The temperature
+         * :param const floatVector &WLFParameters: The parameters for the function [Tr, C1, C2]
+         * :param floatType &factor: The shift factor
+         * :param floatType &dfactordT: The derivative of the shift factor w.r.t. the temperature.
+         */
+
+        errorOut error = WLF(temperature, WLFParameters, factor);
+        if (error){
+            errorOut result = new errorNode("WLF", "error in computation of WLF factor");
+            result->addNext(error);
+            return result;
+        }
+
+        floatType Tr = WLFParameters[0];
+        floatType C1 = WLFParameters[1];
+        floatType C2 = WLFParameters[2];
+
+        dfactordT = std::log(10)*factor*(-C1/(C2 + temperature - Tr) + (C1*(temperature - Tr)/pow(C2 + temperature - Tr, 2)));
+
+        return NULL;
+    }
 }
