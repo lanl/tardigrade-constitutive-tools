@@ -364,6 +364,58 @@ int testWLF(std::ofstream &results){
     return 0;
 }
 
+int testComputeDGreenLagrangeStrainDF(std::ofstream &results){
+    /*!
+     * Test the computation of the gradient of the Green-Lagrange 
+     * strain w.r.t. the deformation gradient.
+     * 
+     * :param std::ofstream &results: The output file.
+     */
+
+    floatVector F = {0.69646919, 0.28613933, 0.22685145,
+                     0.55131477, 0.71946897, 0.42310646,
+                     0.98076420, 0.68482974, 0.4809319};
+
+    floatMatrix dEdF;
+
+    errorOut error = constitutiveTools::computeDGreenLagrangeStrainDF(F, dEdF);
+
+    if (error){
+        error->print();
+        results << "testComputeDGreenLagrangeStrainDF & False\n";
+        return 1;
+    }
+
+    floatVector E, E2;
+    error = constitutiveTools::computeGreenLagrangeStrain(F, E);
+
+    if (error){
+        error->print();
+        results << "testComputeDGreenLagrangeStrainDF & False\n";
+        return 1;
+    }
+
+    floatType eps = 1e-6;
+    for (unsigned int i=0; i<F.size(); i++){
+        floatVector delta(F.size(), 0);
+
+        delta[i] = fabs(eps*F[i]);
+
+        error = constitutiveTools::computeGreenLagrangeStrain(F + delta, E2);
+
+        floatVector gradCol = (E2 - E)/delta[i];
+
+        for (unsigned int j=0; j<gradCol.size(); j++){
+            if (!vectorTools::fuzzyEquals(gradCol[j], dEdF[j][i])){
+                results << "testComputeDGreenLagrangeStrainDF (test 1) & False\n";
+                return 1;
+            }
+        }
+    }
+    results << "testComputeDGreenLagrangeStrainDF & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -380,6 +432,7 @@ int main(){
     testDeltaDirac(results);
     testRotateMatrix(results);
     testComputeGreenLagrangeStrain(results);
+    testComputeDGreenLagrangeStrainDF(results);
     testDecomposeGreenLagrangeStrain(results);
     testMapPK2toCauchy(results);
     testWLF(results);
