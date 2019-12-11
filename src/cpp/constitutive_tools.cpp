@@ -116,7 +116,7 @@ namespace constitutiveTools{
         /*!
          * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts.
          * where J    = det(F) = sqrt(det(2*E + I))
-         *       Ebar_IJ = 0.5*((1/(J**(2/3))) F_iI F_iJ - I_IJ) = (1/(J**(2/3)))*E_IJ
+         *       Ebar_IJ = 0.5*((1/(J**(2/3))) F_iI F_iJ - I_IJ) = (1/(J**(2/3)))*E_IJ + 0.5(1/(J**(2/3)) - 1)*I_{IJ}
          * 
          * :param const floatVector &E: The Green-Lagrange strain tensor
          * :param floatVector &Ebar: The isochoric Green-Lagrange strain tensor.
@@ -138,6 +138,45 @@ namespace constitutiveTools{
 
         J = sqrt(Jsq);
         Ebar = E/(pow(J, 2./3)) + 0.5*(1/pow(J, 2./3) - 1)*eye;
+        return NULL;
+    }
+
+    errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J,
+                                          floatMatrix &dEbardE, floatVector &dJdE){
+        /*!
+         * Decompute the Green-Lagrange strain tensor into isochoric and volumetric parts.
+         * where J    = det(F) = sqrt(det(2*E + I))
+         *       Ebar_IJ = 0.5*((1/(J**(2/3))) F_iI F_iJ - I_IJ) = (1/(J**(2/3)))*E_IJ + 0.5(1/(J**(2/3)) - 1)*I_{IJ}
+         * 
+         * :param const floatVector &E: The Green-Lagrange strain tensor
+         * :param floatVector &Ebar: The isochoric Green-Lagrange strain tensor.
+         *     format = E11, E12, E13, E21, E22, E23, E31, E32, E33
+         * :param floatType &J: The Jacobian of deformation (det(F))
+         * :param floatMatrix &dEbardE: The derivative of the isochoric Green-Lagrange strain 
+         *     tensor w.r.t. the total strain tensor.
+         * :param floatMatrix &dJdE: The derivative of the jacobian of deformation w.r.t. the 
+         *     Green-Lagrange strain tensor.
+         */
+
+        errorOut error = decomposeGreenLagrangeStrain(E, Ebar, J);
+        if (error){
+            errorOut result = new errorNode("decomposeGreenLagrangeStrain", "Error in computation of the isochoric volumetric split");
+            result->addNext(error);
+            return result;
+        }
+
+        //Compute the derivative of the jacobian of deformation w.r.t. the Green-Lagrange strain
+        floatVector eye = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+        dJdE = J * vectorTools::inverse(2*E + eye, 3, 3);
+
+        //Compute the derivative of the isochoric part of the Green-Lagrange strain w.r.t. the Green-Lagrange strain
+        floatMatrix EYE = vectorTools::eye<floatType>(9);
+
+        floatType invJ23 = 1./pow(J, 2./3);
+        floatType invJ53 = 1./pow(J, 5./3);
+
+        dEbardE = invJ23*EYE - (2./3)*invJ53*vectorTools::dyadic(E, dJdE) - (1./3)*invJ53*vectorTools::dyadic(eye, dJdE);
+
         return NULL;
     }
 

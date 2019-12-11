@@ -208,12 +208,75 @@ int testDecomposeGreenLagrangeStrain(std::ofstream &results){
         return 1;
     }
 
-    E = {-1, 0, 0, 0, 1, 0, 0, 0, 1};
+    floatVector EbarOut2;
+    floatType JOut2;
+    floatMatrix dEbardE;
+    floatVector dJdE;
+    ret = constitutiveTools::decomposeGreenLagrangeStrain(E, EbarOut2, JOut2, dEbardE, dJdE);
 
-    ret = constitutiveTools::decomposeGreenLagrangeStrain(E, EbarOut, JOut);
+    if (ret){
+        ret->print();
+        results << "testDecomposeGreenLagrangeStrain & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(EbarOut, EbarOut2)){
+        results << "testDecomposeGreenLagrangeStrain (test 3) & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(JOut, JOut2)){
+        results << "testDecomposeGreenLagrangeStrain (test 4) & False\n";
+        return 1;
+    }
+
+    floatType eps = 1e-8;
+    for (unsigned int i=0; i<E.size(); i++){
+        floatVector delta(E.size(), 0);
+        delta[i] =  fabs(eps*E[i]);
+     
+        ret = constitutiveTools::decomposeGreenLagrangeStrain(E + delta, EbarOut2, JOut2);
+
+        if (ret){
+            ret->print();
+            results << "testDecomposeGreenLagrangeStrain (test 5) & False\n";
+            return 1;
+        }
+
+        if (!vectorTools::fuzzyEquals((JOut2 - JOut)/delta[i], dJdE[i], 1e-4, 1e-4)){
+            results << "testDecomposeGreenLagrangeStrain (test 6) & False\n";
+            return 1;
+        }
+    }
+
+    for (unsigned int i=0; i<E.size(); i++){
+        floatVector delta(E.size(), 0);
+        delta[i] = fabs(eps*E[i]);
+     
+        ret = constitutiveTools::decomposeGreenLagrangeStrain(E + delta, EbarOut2, JOut2);
+
+        if (ret){
+            ret->print();
+            results << "testDecomposeGreenLagrangeStrain (test 5) & False\n";
+            return 1;
+        }
+
+        floatVector gradCol = (EbarOut2 - EbarOut)/delta[i];
+
+        for (unsigned int j=0; j<gradCol.size(); j++){
+            if (!vectorTools::fuzzyEquals(gradCol[j], dEbardE[j][i], 1e-4, 1e-4)){
+                results << "testDecomposeGreenLagrangeStrain (test 7) & False\n";
+                return 1;
+            }
+        }
+    }
+
+    floatVector badE = {-1, 0, 0, 0, 1, 0, 0, 0, 1};
+
+    ret = constitutiveTools::decomposeGreenLagrangeStrain(badE, EbarOut, JOut);
 
     if (!ret){
-        results << "testDecomposeGreenLagrangeStrain (test 3) & False\n";
+        results << "testDecomposeGreenLagrangeStrain (test 8) & False\n";
         return 1;
     }
 
