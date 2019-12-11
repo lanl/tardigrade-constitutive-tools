@@ -46,6 +46,9 @@ namespace constitutiveTools{
 
     errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J);
 
+    errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J, 
+                                          floatMatrix &dEbardE, floatVector &dJdE);
+
     errorOut mapPK2toCauchy(const floatVector &PK2Stress, const floatVector &deformationGradient, floatVector &cauchyStress);
 
     errorOut WLF(const floatType &temperature, const floatVector &WLFParameters, floatType &factor);
