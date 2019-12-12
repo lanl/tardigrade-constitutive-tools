@@ -112,6 +112,38 @@ namespace constitutiveTools{
         return NULL;
     }
 
+    errorOut computeDGreenLagrangeStrainDF(const floatVector &F,
+                                        floatMatrix &dEdF){
+        /*!
+         * Compute the derivative of the Green-Lagrange strain w.r.t. the deformation gradient.
+         * dE_IJdFkK = 0.5 ( delta_{IK} F_{kJ} + F_{kI} delta_{JK})
+         * 
+         * Where F is the deformation gradient and delta is the kronecker delta. 
+         * 
+         * :params std::vector< floatType > &F: A reference to the deformation gradient.
+         * :params std::vector< floatType > &dEdF: The resulting gradient.
+         * 
+         * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
+         */
+
+        if (F.size() != 9){
+            return new errorNode("decomposeGreenLagrangeStrain", "the Green-Lagrange strain must be 3D");
+        }
+
+        dEdF = floatMatrix(F.size(), floatVector(F.size(), 0));
+        for (unsigned int I=0; I<3; I++){
+            for (unsigned int J=0; J<3; J++){
+                for (unsigned int k=0; k<3; k++){
+                    for (unsigned int K=0; K<3; K++){
+                        dEdF[3*I + J][3*k + K] = 0.5*(deltaDirac(I, K)*F[3*k + J] + F[3*k + I]*deltaDirac(J, K));
+                    }
+                }
+            }
+        }
+
+        return NULL;
+    }
+
     errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J){
         /*!
          * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts.
