@@ -78,16 +78,16 @@ namespace constitutiveTools{
         return NULL;
     }
     
-    errorOut computeGreenLagrangeStrain(const std::vector< floatType > &F,
-                                        std::vector< floatType > &E){
+    errorOut computeGreenLagrangeStrain(const floatVector &F,
+                                        floatVector &E){
         /*!
          * Compute the Green-Lagrange strain from the deformation gradient. The operation is:
          * E = 0.5 (F_{iI} F_{iJ} - delta_{IJ})
          * 
          * Where F is the deformation gradient and delta is the kronecker delta. 
          * 
-         * :params std::vector< floatType > &F: A reference to the deformation gradient.
-         * :params std::vector< floatType > &E: The resulting Green-Lagrange strain.
+         * :params floatVector &F: A reference to the deformation gradient.
+         * :params floatVector &E: The resulting Green-Lagrange strain.
          * 
          * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
          * The Green-Lagrange strain is organized as E11, E12, E13, E21, E22, E23, E31, E32, E33
@@ -120,8 +120,8 @@ namespace constitutiveTools{
          * 
          * Where F is the deformation gradient and delta is the kronecker delta. 
          * 
-         * :params std::vector< floatType > &F: A reference to the deformation gradient.
-         * :params std::vector< floatType > &dEdF: The resulting gradient.
+         * :params floatVector &F: A reference to the deformation gradient.
+         * :params floatVector &dEdF: The resulting gradient.
          * 
          * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
          */
