@@ -11,9 +11,12 @@ set -Eeuxo pipefail
 # Clone and update dependencies
 source update_dependencies.sh
 
-# Perform repo tests
+# Build repo tests
 cd ${workdir}/src/cpp/tests/${repo}/
 if [ -f ${repo}.o ]; then
     make clean
 fi
 make
+
+# Perform repo tests
+./test_${repo}
