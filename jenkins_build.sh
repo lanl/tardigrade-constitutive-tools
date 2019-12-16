@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
 
-repo='constitutive_tools'
-workdir=${PWD}
-declare -A deprepo 
-deprepo['eigen']='https://gitlab.com/libeigen/eigen.git'
-deprepo['error_tools']='ssh://git@xcp-stash.lanl.gov:7999/mm/error_tools.git'
-deprepo['vector_tools']='ssh://git@xcp-stash.lanl.gov:7999/mm/vector_tools.git'
-proxyout='proxyout.lanl.gov:8080'
-
 # Source the Intel compilers
 source /apps/intel2016/bin/ifortvars.sh -arch intel64 -platform linux
 
@@ -16,19 +8,15 @@ source /apps/intel2016/bin/ifortvars.sh -arch intel64 -platform linux
 # Have to do this after sourcing ifortvars.sh becuase the shell script has unbound variables
 set -Eeuxo pipefail
 
-# Clone dependencies
-cd ..
-for deprepodir in "${!deprepo[@]}"; do
-    if [ ! -d ${deprepodir} ]; then
-        all_proxy=${proxyout} git clone ${deprepo[$deprepodir]}
-    else
-        cd ${deprepodir} && all_proxy=${proxyout} git pull
-        cd ..
-    fi
-done
-# Perform repo tests
+# Clone and update dependencies
+source update_dependencies.sh
+
+# Build repo tests
 cd ${workdir}/src/cpp/tests/${repo}/
 if [ -f ${repo}.o ]; then
     make clean
 fi
 make
+
+# Perform repo tests
+./test_${repo}
