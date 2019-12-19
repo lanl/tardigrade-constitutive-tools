@@ -57,6 +57,9 @@ namespace constitutiveTools{
 
     errorOut WLF(const floatType &temperature, const floatVector &WLFParameters, floatType &factor, floatType &dfactordT);
 
+    errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt, 
+                               floatVector &A, const floatType alpha=0.5);
+
 }
 
 #endif

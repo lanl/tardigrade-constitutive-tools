@@ -416,6 +416,65 @@ int testComputeDGreenLagrangeStrainDF(std::ofstream &results){
     return 0;
 }
 
+int testMidpointEvolution(std::ofstream &results){
+    /*!
+     * Test the midpoint evolution algorithm.
+     * 
+     * :param std::ofstream &results: The output file
+     */
+
+    floatType Dt = 2.5;
+    floatVector Ap    = {9, 10, 11, 12};
+    floatVector DApDt = {1, 2, 3, 4};
+    floatVector DADt  = {5, 6, 7, 8};
+    floatVector A;
+
+    //Test implicit integration
+    errorOut error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A, 0);
+
+    if (error){
+        error->print();
+        results << "testMidpointEvolution & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(A, Ap + Dt*DADt)){
+        results << "testMidpointEvolution (test 1) & False\n";
+        return 1;
+    }
+
+    //Test explicit integration
+    error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A, 1);
+
+    if (error){
+        error->print();
+        results << "testMidpointEvolution & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(A, Ap + Dt*DApDt)){
+        results << "testMidpointEvolution (test 2) & False\n";
+        return 1;
+    }
+
+    //Test midpoint integration
+    error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A);
+
+    if (error){
+        error->print();
+        results << "testMidpointEvolution & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(A, Ap + Dt*0.5*(DApDt + DADt))){
+        results << "testMidpointEvolution (test 3) & False\n";
+        return 1;
+    }
+    
+    results << "testMidpointEvolution & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -436,6 +495,7 @@ int main(){
     testDecomposeGreenLagrangeStrain(results);
     testMapPK2toCauchy(results);
     testWLF(results);
+    testMidpointEvolution(results);
 
     //Close the results file
     results.close();
