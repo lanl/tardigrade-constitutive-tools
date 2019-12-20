@@ -70,6 +70,9 @@ namespace constitutiveTools{
 
     errorOut evolveF(const floatType &Dt, const floatVector &Fp, const floatVector &Lp, const floatVector &L, 
                      floatVector &F, const floatType alpha=0.5);
+
+    errorOut evolveF(const floatType &Dt, const floatVector &Fp, const floatVector &Lp, const floatVector &L,
+                     floatVector &F, floatMatrix &dFdL, const floatType alpha=0.5);
 }
 
 #endif
