@@ -592,11 +592,33 @@ namespace constitutiveTools{
          * any tensor).
          * 
          * :param const floatVector &A: The second order tensor
+         * :param const floatVector &Anorm: The unit normal in the direction of A
          */
 
         floatType norm = sqrt(vectorTools::inner(A, A));
         
         Anorm = A/norm;
+
+        return NULL;
+    }
+
+    errorOut computeUnitNormal(const floatVector &A, floatVector &Anorm, floatMatrix &dAnormdA){
+        /*!
+         * Compute the unit normal of a second order tensor (or strictly speaking any 
+         * tensor) and the gradient of that unit normal w.r.t. the tensor.
+         * 
+         * :param const floatVector &A: The second order tensor
+         * :param const floatVector &Anorm: The unit normal in the direction of A
+         * :param const floatMatrix &dAnormdA: The gradient of the unit normal w.r.t. A
+         */
+
+        floatType norm = sqrt(vectorTools::inner(A, A));
+        
+        Anorm = A/norm;
+
+        floatMatrix eye = vectorTools::eye<floatType>(A.size());
+
+        dAnormdA = eye - vectorTools::dyadic(Anorm, Anorm);
 
         return NULL;
     }
