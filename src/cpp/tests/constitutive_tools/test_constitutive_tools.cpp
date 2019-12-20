@@ -475,6 +475,45 @@ int testMidpointEvolution(std::ofstream &results){
     return 0;
 }
 
+int testComputeDFDt(std::ofstream &results){
+    /*!
+     * Test the computation of the total time derivative of the 
+     * deformation gradient.
+     * 
+     * :param std::ofstream &results: The output file
+     */
+
+    floatVector F = {0.69646919, 0.28613933, 0.22685145,
+                     0.55131477, 0.71946897, 0.42310646,
+                     0.98076420, 0.68482974, 0.4809319};
+
+    floatVector L = {0.57821272, 0.27720263, 0.45555826,
+                     0.82144027, 0.83961342, 0.95322334,
+                     0.4768852 , 0.93771539, 0.1056616};
+
+    floatVector answer = {1.00232848, 0.67686793, 0.46754712,
+                          1.96988645, 1.49191786, 1.00002629,
+                          0.95274131, 0.88347295, 0.55575157};
+
+    floatVector DFDt;
+
+    errorOut error = constitutiveTools::computeDFDt(L, F, DFDt);
+
+    if (error){
+        error->print();
+        results << "testComputeDFDt & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(DFDt, answer)){
+        results << "testComputeDFDt (test 1) & False\n";
+        return 1;
+    }
+
+    results << "testComputeDFDt & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -496,6 +535,7 @@ int main(){
     testMapPK2toCauchy(results);
     testWLF(results);
     testMidpointEvolution(results);
+    testComputeDFDt(results);
 
     //Close the results file
     results.close();

@@ -305,6 +305,38 @@ namespace constitutiveTools{
         return NULL;
     }
 
+    errorOut computeDFDt(const floatVector &velocityGradient, const floatVector &deformationGradient, floatVector &DFDt){
+        /*!
+         * Compute the total time derivative of the deformation gradient.
+         * 
+         * \dot{F}_{iI} = L_{ij} F_{jI}
+         * 
+         * :param const floatVector &velocityGradient: The velocity gradient L_{ij}
+         * :param const floatVector &deformationGradient: The deformation gradient F_{iI}
+         * :param floatVector &DFDt: The total time derivative of the deformation gradient
+         */
+
+        if (velocityGradient.size() != deformationGradient.size()){
+            return new errorNode("computeDFDt", "The velocity gradient and deformation gradient must have the same size");
+        }
+
+        if (velocityGradient.size() != 9){
+            return new errorNode("computeDFDt", "The velocity gradient must be 3D (9 values)");
+        }
+
+        DFDt = floatVector(velocityGradient.size(), 0);
+        unsigned int dim = 3;
+
+        for (unsigned int i=0; i<dim; i++){
+            for (unsigned int I=0; I<dim; I++){
+                for (unsigned int j=0; j<dim; j++){
+                    DFDt[dim*i + I] += velocityGradient[dim*i + j] * deformationGradient[dim*j + I];
+                }
+            }
+        }
+        return NULL;
+    }
+
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
                                floatVector &A, const floatType alpha){
         /*!
