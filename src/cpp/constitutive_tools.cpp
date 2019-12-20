@@ -316,16 +316,18 @@ namespace constitutiveTools{
          * :param floatVector &DFDt: The total time derivative of the deformation gradient
          */
 
+        //Assume 3D
+        unsigned int dim = 3;
+
         if (velocityGradient.size() != deformationGradient.size()){
             return new errorNode("computeDFDt", "The velocity gradient and deformation gradient must have the same size");
         }
 
-        if (velocityGradient.size() != 9){
-            return new errorNode("computeDFDt", "The velocity gradient must be 3D (9 values)");
+        if (velocityGradient.size() != dim*dim){
+            return new errorNode("computeDFDt", "The velocity gradient doesn't have enough entries");
         }
 
         DFDt = floatVector(velocityGradient.size(), 0);
-        unsigned int dim = 3;
 
         for (unsigned int i=0; i<dim; i++){
             for (unsigned int I=0; I<dim; I++){
@@ -334,6 +336,54 @@ namespace constitutiveTools{
                 }
             }
         }
+        return NULL;
+    }
+
+    errorOut computeDFDt(const floatVector &velocityGradient, const floatVector &deformationGradient, floatVector &DFDt,
+                         floatMatrix &dDFDtdL, floatMatrix &dDFDtdF){
+        /*!
+         * Compute the total time derivative of the deformation gradient
+         * and return the partial derivatives w.r.t. L and F.
+         * 
+         * \dot{F}_{iI} = L_{ij} F_{jI}
+         * \frac{\partial \dot{F}_{iI}}{\partial L_{kl}} = \delta_{ik} F{lI}
+         * \frac{\partial \dot{F}_{iI}}{\partial F_{kK}} = L_{ik} \delta{IK}
+         * 
+         * :param const floatVector &velocityGradient: The velocity gradient L_{ij}
+         * :param const floatVector &deformationGradient: The deformation gradient F_{iI}
+         * :param floatVector &DFDt: The total time derivative of the deformation gradient
+         */
+
+        //Assume 3D
+        unsigned int dim = 3;
+
+        errorOut error = computeDFDt(velocityGradient, deformationGradient, DFDt);
+
+        if (error){
+            errorOut result = new errorNode("computeDFDt (jacobian)", "error in computation of DFDt");
+            result->addNext(error);
+            return result;
+        }
+
+        //Form the identity tensor
+        floatVector eye(dim*dim, 0);
+        vectorTools::eye(eye);
+
+        //Form the partial w.r.t. L and F
+        dDFDtdL = floatMatrix(dim*dim, floatVector(dim*dim, 0));
+        dDFDtdF = dDFDtdL;
+
+        for (unsigned int i=0; i<dim; i++){
+            for (unsigned int I=0; I<dim; I++){
+                for (unsigned int k=0; k<dim; k++){
+                    for (unsigned int l=0; l<dim; l++){ //Note that we will use l = K for efficiency
+                        dDFDtdL[dim*i + I][dim*k + l] = eye[dim*i + k] * deformationGradient[dim*l + I];
+                        dDFDtdF[dim*i + I][dim*k + l] = velocityGradient[dim*i + k] * eye[dim*I + l];
+                    }
+                }
+            }
+        }
+
         return NULL;
     }
 
@@ -361,6 +411,30 @@ namespace constitutiveTools{
         }
 
         A = Ap + Dt*(alpha*DApDt + (1 - alpha)*DADt);
+        return NULL;
+    }
+
+    errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
+                               floatVector &A, floatMatrix &DADADt, const floatType alpha){
+        /*!
+         * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
+         * alpha=0 (implicit)
+         * alpha=1 (explicit)
+         * 
+         * :param const floatType &Dt: The change in time.
+         * :param const floatVector &Ap: The previous value of the vector
+         * :param const floatVector &DApDt: The previous time rate of change of the vector.
+         * :param const floatVector *DADt: The current time rate of change of the vector.
+         * :param floatVector &A: The current value of the vector.
+         * :param floatMatrix &DADADt: The derivative of the vector w.r.t. the rate of change of the vector.
+         * :param const floatType alpha: The integration parameter.
+         */
+
+        midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha);
+        floatMatrix eye;
+        vectorTools::eye(A.size(), eye);
+        DADADt = Dt*(1 - alpha)*eye;
+
         return NULL;
     }
 
@@ -417,28 +491,6 @@ namespace constitutiveTools{
                 }
             }
         }
-        
-    errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
-                               floatVector &A, floatMatrix &DADADt, const floatType alpha){
-        /*!
-         * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
-         * alpha=0 (implicit)
-         * alpha=1 (explicit)
-         * 
-         * :param const floatType &Dt: The change in time.
-         * :param const floatVector &Ap: The previous value of the vector
-         * :param const floatVector &DApDt: The previous time rate of change of the vector.
-         * :param const floatVector *DADt: The current time rate of change of the vector.
-         * :param floatVector &A: The current value of the vector.
-         * :param floatMatrix &DADADt: The derivative of the vector w.r.t. the rate of change of the vector.
-         * :param const floatType alpha: The integration parameter.
-         */
-
-        midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha);
-        floatMatrix eye;
-        vectorTools::eye(A.size(), eye);
-        DADADt = Dt*(1 - alpha)*eye;
-
         return NULL;
     }
 }
