@@ -514,6 +514,86 @@ int testComputeDFDt(std::ofstream &results){
     return 0;
 }
 
+int testEvolveF(std::ofstream &results){
+    /*!
+     * Test the evolution of the deformation gradient.
+     * 
+     * :param std::ofstream &results: The output file
+     */
+    
+    floatType Dt = 2.7;
+
+    floatVector Fp = {0.69646919, 0.28613933, 0.22685145,
+                      0.55131477, 0.71946897, 0.42310646,
+                      0.98076420, 0.68482974, 0.4809319};
+
+    floatVector Lp = {0.69006282, 0.0462321 , 0.88086378,
+                      0.8153887 , 0.54987134, 0.72085876, 
+                      0.66559485, 0.63708462, 0.54378588};
+
+    floatVector L = {0.57821272, 0.27720263, 0.45555826,
+                     0.82144027, 0.83961342, 0.95322334,
+                     0.4768852 , 0.93771539, 0.1056616};
+
+    //Test 1 (fully explicit)
+    floatVector F;
+    errorOut error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 1);
+
+    if (error){
+        error->print();
+        results << "testEvolveF & False\n";
+        return 1;
+    }
+
+    floatVector answer = {4.39551129, 2.53782698, 1.84614498,
+                          4.81201673, 3.75047725, 2.48674399,
+                          4.62070491, 3.44211354, 2.32252023};
+
+    if (!vectorTools::fuzzyEquals(answer, F)){
+        results << "testEvolveF (test 1) & False\n";
+        return 1;
+    }
+
+    //Test 2 (fully implicit)
+    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 0);
+
+    if (error){
+        error->print();
+        results << "testEvolveF & False\n";
+        return 1;
+    }
+
+    answer = {0.63522182, -0.1712192 , -0.00846781,
+             -0.81250979, -0.19375022, -0.20193394,
+             -0.36163914, -0.03662069, -0.05769288};
+
+    if (!vectorTools::fuzzyEquals(answer, F)){
+        results << "testEvolveF (test 2) & False\n";
+        return 1;
+    }
+
+    //Test 3 (midpoint rule)
+    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 0.5);
+
+    if (error){
+        error->print();
+        results << "testEvolveF & False\n";
+        return 1;
+    }
+
+    answer = {0.20004929, -0.4409338 , -0.18955924,
+             -3.59005736, -2.17210401, -1.55661536,
+             -1.88391214, -1.13150095, -0.80579654};
+
+    if (!vectorTools::fuzzyEquals(answer, F)){
+        results << "testEvolveF (test 3) & False\n";
+        return 1;
+    }
+    
+    results << "testEvolve & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -536,6 +616,7 @@ int main(){
     testWLF(results);
     testMidpointEvolution(results);
     testComputeDFDt(results);
+    testEvolveF(results);
 
     //Close the results file
     results.close();
