@@ -547,6 +547,74 @@ int testComputeDFDt(std::ofstream &results){
         return 1;
     }
 
+    //Test the jacobians
+    floatVector DFDtJ;
+    floatMatrix dDFDtdL, dDFDtdF;
+    error = constitutiveTools::computeDFDt(L, F, DFDtJ, dDFDtdL, dDFDtdF);
+
+    std::cout << "dFDtdL:\n"; vectorTools::print(dDFDtdL);
+    std::cout << "dFDtdF:\n"; vectorTools::print(dDFDtdF);
+
+    if (error){
+        error->print();
+        results << "testComputeDFDt & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(DFDt, DFDtJ)){
+        results << "testComputeDFDt (test 2) & False\n";
+        return 1;
+    }
+
+    //Use finite differences to estimate the jacobian
+    floatType eps = 1e-6;
+    for (unsigned int i=0; i<F.size(); i++){
+
+        //Compute finite difference gradient w.r.t. L
+        floatVector delta(L.size(), 0);
+        delta[i] = eps*fabs(L[i]) + eps;
+
+        error = constitutiveTools::computeDFDt(L + delta, F, DFDtJ);
+
+        if (error){
+            error->print();
+            results << "testComputeDFDt & False\n";
+            return 1;
+        }
+
+        floatVector gradCol = (DFDtJ - DFDt)/delta[i];
+
+        for (unsigned int j=0; j<gradCol.size(); j++){
+            if (!vectorTools::fuzzyEquals(dDFDtdL[j][i], gradCol[j])){
+                results << "testComputeDFDt (test 3) & False\n";
+                return 1;
+            }
+        }
+
+        //Compute finite difference gradient w.r.t. F
+        delta = floatVector(F.size(), 0);
+        delta[i] = eps*fabs(F[i]) + eps;
+
+        error = constitutiveTools::computeDFDt(L, F + delta, DFDtJ);
+
+        if (error){
+            error->print();
+            results << "testComputeDFDt & False\n";
+            return 1;
+        }
+
+        gradCol = (DFDtJ - DFDt)/delta[i];
+
+        for (unsigned int j=0; j<gradCol.size(); j++){
+            if (!vectorTools::fuzzyEquals(dDFDtdF[j][i], gradCol[j])){
+                results << "testComputeDFDt (test 4) & False\n";
+                return 1;
+            }
+        }
+
+
+    }
+
     results << "testComputeDFDt & True\n";
     return 0;
 }
