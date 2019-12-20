@@ -418,6 +418,27 @@ namespace constitutiveTools{
             }
         }
         
+    errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
+                               floatVector &A, floatMatrix &DADADt, const floatType alpha){
+        /*!
+         * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
+         * alpha=0 (implicit)
+         * alpha=1 (explicit)
+         * 
+         * :param const floatType &Dt: The change in time.
+         * :param const floatVector &Ap: The previous value of the vector
+         * :param const floatVector &DApDt: The previous time rate of change of the vector.
+         * :param const floatVector *DADt: The current time rate of change of the vector.
+         * :param floatVector &A: The current value of the vector.
+         * :param floatMatrix &DADADt: The derivative of the vector w.r.t. the rate of change of the vector.
+         * :param const floatType alpha: The integration parameter.
+         */
+
+        midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha);
+        floatMatrix eye;
+        vectorTools::eye(A.size(), eye);
+        DADADt = Dt*(1 - alpha)*eye;
+
         return NULL;
     }
 }

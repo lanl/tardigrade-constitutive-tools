@@ -470,6 +470,43 @@ int testMidpointEvolution(std::ofstream &results){
         results << "testMidpointEvolution (test 3) & False\n";
         return 1;
     }
+
+    //Add test for the jacobian
+    floatType alpha = .37;
+    floatType eps = 1e-6;
+    floatVector A0, Ai;
+    floatMatrix DADADt;
+
+    error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha);
+    error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A0, DADADt, alpha);
+
+    if (error){
+        error->print();
+        results << "testMidpointEvolution & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(A0, A)){
+        results << "testMidpointEvolution (test 4) & False\n";
+        return 1;
+    }
+
+    for (unsigned int i=0; i<DADt.size(); i++){
+        floatVector delta = floatVector(DADt.size(), 0);
+        delta[i] = eps*(DADt[i]) + eps;
+
+        error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt+delta, Ai, alpha);
+
+        floatVector gradCol = (Ai - A0)/delta[i];
+
+        for (unsigned int j=0; j<gradCol.size(); j++){
+            if (!vectorTools::fuzzyEquals(DADADt[j][i], gradCol[j])){
+                results << "testMidpointEvolution (test 5) & False\n";
+                return 1;
+            }
+        }
+        
+    }
     
     results << "testMidpointEvolution & True\n";
     return 0;
