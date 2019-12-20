@@ -783,6 +783,27 @@ int testMac(std::ofstream &results){
     return 0;
 }
 
+int testComputeUnitNormal(std::ofstream &results){
+    /*!
+     * Test the computation of the unit normal.
+     * 
+     * :param std::ofstream &results: The output file
+     */
+
+    floatVector A = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    floatVector Anorm;
+
+    constitutiveTools::computeUnitNormal(A, Anorm);
+
+    if (!vectorTools::fuzzyEquals(vectorTools::inner(Anorm, Anorm), 1.)){
+        results << "testComputeUnitNormal (test 1) & False\n";
+        return 1;
+    }
+
+    results << "testComputeUnitNormal & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -807,6 +828,7 @@ int main(){
     testComputeDFDt(results);
     testEvolveF(results);
     testMac(results);
+    testComputeUnitNormal(results);
 
     //Close the results file
     results.close();

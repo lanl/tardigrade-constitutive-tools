@@ -78,6 +78,8 @@ namespace constitutiveTools{
 
     floatType mac(const floatType &x, floatType &dmacdx);
 
+    errorOut computeUnitNormal(const floatVector &A, floatVector &Anorm);
+
 }
 
 #endif

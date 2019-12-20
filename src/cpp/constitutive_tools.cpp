@@ -585,4 +585,20 @@ namespace constitutiveTools{
         else {dmacdx = 1;}
         return mac(x);
     }
+
+    errorOut computeUnitNormal(const floatVector &A, floatVector &Anorm){
+        /*!
+         * Compute the unit normal of a second order tensor (or strictly speaking 
+         * any tensor).
+         * 
+         * :param const floatVector &A: The second order tensor
+         */
+
+        floatType norm = sqrt(vectorTools::inner(A, A));
+        
+        Anorm = A/norm;
+
+        return NULL;
+    }
+    
 }
