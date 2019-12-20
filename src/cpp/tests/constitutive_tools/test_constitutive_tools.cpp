@@ -725,7 +725,6 @@ int testEvolveF(std::ofstream &results){
         floatVector gradCol = (FJ - F)/delta[i];
 
         for (unsigned int j=0; j<gradCol.size(); j++){
-            std::cout << "j: " << j << "\n";
             if (!vectorTools::fuzzyEquals(gradCol[j], dFdL[j][i], 1e-5, 1e-5)){
                 results << "testEvolveF (test 5) & False\n";
                 return 1;
