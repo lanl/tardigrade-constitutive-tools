@@ -737,6 +737,29 @@ int testEvolveF(std::ofstream &results){
     return 0;
 }
 
+int testMac(std::ofstream &results){
+    /*!
+     * Test the computation of the Macullay brackets.
+     * 
+     * :param std::ofstream &results: The output file
+     */
+
+    floatType x = 1;
+    if (!vectorTools::fuzzyEquals(constitutiveTools::mac(x), x)){
+        results << "testMac (test 1) & False\n";
+        return 1;
+    }
+
+    x = -1;
+    if (!vectorTools::fuzzyEquals(constitutiveTools::mac(x), 0.)){
+        results << "testMac (test 2) & False\n";
+        return 1;
+    }
+
+    results << "testMac & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -760,6 +783,7 @@ int main(){
     testMidpointEvolution(results);
     testComputeDFDt(results);
     testEvolveF(results);
+    testMac(results);
 
     //Close the results file
     results.close();
