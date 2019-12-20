@@ -76,6 +76,8 @@ namespace constitutiveTools{
 
     floatType mac(const floatType &x);
 
+    floatType mac(const floatType &x, floatType &dmacdx);
+
 }
 
 #endif

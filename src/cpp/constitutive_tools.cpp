@@ -574,4 +574,15 @@ namespace constitutiveTools{
 
         return 0.5*(fabs(x) + x);
     }
+
+    floatType mac(const floatType &x, floatType &dmacdx){
+        /*!
+         * Compute the Macaulay brackets of the scalar x and 
+         * return the jacobian as well.
+         */
+
+        if (x<0){ dmacdx = 0; }
+        else {dmacdx = 1;}
+        return mac(x);
+    }
 }

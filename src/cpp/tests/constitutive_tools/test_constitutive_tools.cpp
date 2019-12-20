@@ -756,6 +756,29 @@ int testMac(std::ofstream &results){
         return 1;
     }
 
+    floatType xJ = 2;
+    floatType dmacdx;
+    if (!vectorTools::fuzzyEquals(constitutiveTools::mac(xJ), constitutiveTools::mac(xJ, dmacdx))){
+        results << "testMac (test 3) & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(dmacdx, 1.)){
+        results << "testMac (test 4) & False\n";
+        return 1;
+    }
+
+    xJ = -2;
+    if (!vectorTools::fuzzyEquals(constitutiveTools::mac(xJ), constitutiveTools::mac(xJ, dmacdx))){
+        results << "testMac (test 5) & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(dmacdx, 0.)){
+        results << "testMac (test 6) & False\n";
+        return 1;
+    }
+
     results << "testMac & True\n";
     return 0;
 }
