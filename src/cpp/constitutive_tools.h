@@ -81,7 +81,6 @@ namespace constitutiveTools{
     errorOut computeUnitNormal(const floatVector &A, floatVector &Anorm);
 
     errorOut computeUnitNormal(const floatVector &A, floatVector &Anorm, floatMatrix &dAnormdA);
-
 }
 
 #endif

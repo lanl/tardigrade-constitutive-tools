@@ -618,7 +618,7 @@ namespace constitutiveTools{
 
         floatMatrix eye = vectorTools::eye<floatType>(A.size());
 
-        dAnormdA = eye - vectorTools::dyadic(Anorm, Anorm);
+        dAnormdA = (eye - vectorTools::dyadic(Anorm, Anorm))/norm;
 
         return NULL;
     }
