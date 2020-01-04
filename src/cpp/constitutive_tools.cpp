@@ -650,9 +650,9 @@ namespace constitutiveTools{
             for (unsigned int J=0; J<dim; J++){
                 for (unsigned int i=0; i<dim; i++){
                     for (unsigned int j=0; j<dim; j++){
-                        pullBackVelocityGradient[dim*I + J] = inverseDeformationGradient[dim*I + i] *
-                                                              velocityGradient[dim*i + j] *
-                                                              deformationGradient[dim*j + J];
+                        pullBackVelocityGradient[dim*I + J] += inverseDeformationGradient[dim*I + i] *
+                                                               velocityGradient[dim*i + j] *
+                                                               deformationGradient[dim*j + J];
                     }
                 }
             }
