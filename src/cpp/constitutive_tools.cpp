@@ -662,8 +662,8 @@ namespace constitutiveTools{
     }
 
     errorOut pullBackVelocityGradient(const floatVector &velocityGradient, const floatVector &deformationGradient,
-                                      floatVector &pullBackVelocityGradient, floatVector &dPullBackLdL, 
-                                      floatVector &dPullBackLdF){
+                                      floatVector &pullBackVelocityGradient, floatMatrix &dPullBackLdL, 
+                                      floatMatrix &dPullBackLdF){
         /*!
          * Pull back the velocity gradient to the configuration indicated by deformationGradient.
          * i.e. $totalDeformationGradient_{iI} = deformationGradient_{i \bar{I}} remainingDeformationGradient_{\bar{I} I}$
@@ -674,9 +674,9 @@ namespace constitutiveTools{
          * :param const floatVector &deformationGradient: The deformation gradient between the desired configuration 
          *     and the current configuration.
          * :param floatVector &pullBackVelocityGradient: The pulled back velocity gradient.
-         * :param floatVector &dPullBackLdL: The gradient of the pulled back velocity gradient 
+         * :param floatMatrix &dPullBackLdL: The gradient of the pulled back velocity gradient 
          *     w.r.t. the velocity gradient.
-         * :param floatVector &dPullBackLdF: The gradient of the pulled back velocity gradient 
+         * :param floatMatrix &dPullBackLdF: The gradient of the pulled back velocity gradient 
          *     w.r.t. the deformation gradient.
          */
 
@@ -703,7 +703,7 @@ namespace constitutiveTools{
 
         //Construct the gradients
         dPullBackLdL = floatMatrix(pullBackVelocityGradient.size(), floatVector( velocityGradient.size(), 0));
-        dPullBackLdL = floatMatrix(pullBackVelocityGradient.size(), floatVector( deformationGradient.size(), 0));
+        dPullBackLdF = floatMatrix(pullBackVelocityGradient.size(), floatVector( deformationGradient.size(), 0));
 
         for (unsigned int I=0; I<dim; I++){
             for (unsigned int J=0; J<dim; J++){
@@ -718,7 +718,7 @@ namespace constitutiveTools{
                                 dPullBackLdF[dim*I + J][dim*k + K] += -inverseDeformationGradient[dim*I + k] *
                                                                        inverseDeformationGradient[dim*K + i] *
                                                                        velocityGradient[dim*i + j] *
-                                                                       deformationGradient[dim*j + J]
+                                                                       deformationGradient[dim*j + J];
                             }
                             dPullBackLdF[dim * I + J][dim*k + K] += inverseDeformationGradient[dim*I + i] * 
                                                                     velocityGradient[dim*i + k] * 

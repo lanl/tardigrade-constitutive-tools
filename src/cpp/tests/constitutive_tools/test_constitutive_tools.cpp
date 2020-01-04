@@ -885,6 +885,71 @@ int testPullBackVelocityGradient(std::ofstream &results){
         return 1;
     }
 
+    floatVector pullBackLJ;
+    floatMatrix dpbLdL, dpbLdF;
+    
+    //Test of the jacobian
+    error = constitutiveTools::pullBackVelocityGradient(velocityGradient, deformationGradient, pullBackLJ, 
+                                                        dpbLdL, dpbLdF);
+
+    if (error){
+        error->print();
+        results << "testPullBackVelocityGradient & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(pullBackL, pullBackLJ)){
+        results << "testPullBackVelocityGradient (test 2) & False\n";
+        return 1;
+    }
+
+    //Check dpbLdL
+    floatType eps = 1e-6;
+    for (unsigned int i=0; i<velocityGradient.size(); i++){
+        floatVector delta(velocityGradient.size(), 0);
+        delta[i] = eps*fabs(velocityGradient[i]) + eps;
+
+        error = constitutiveTools::pullBackVelocityGradient(velocityGradient + delta, deformationGradient, pullBackLJ);
+
+        if (error){
+            error->print();
+            results << "testPullBackVelocityGradient & False\n";
+            return 1;
+        }
+
+        floatVector gradCol = (pullBackLJ - pullBackL)/delta[i];
+
+        for (unsigned int j=0; j<gradCol.size(); j++){
+            if (!vectorTools::fuzzyEquals(gradCol[j], dpbLdL[j][i])){
+                results << "testPullBackVelocityGradient (test 3) & False\n";
+                return 1;
+            }
+        }
+    }
+
+    //Check dpbLdF
+    for (unsigned int i=0; i<deformationGradient.size(); i++){
+        floatVector delta(deformationGradient.size(), 0);
+        delta[i] = eps*fabs(deformationGradient[i]) + eps;
+
+        error = constitutiveTools::pullBackVelocityGradient(velocityGradient, deformationGradient + delta, pullBackLJ);
+
+        if (error){
+            error->print();
+            results << "testPullBackVelocityGradient & False\n";
+            return 1;
+        }
+
+        floatVector gradCol = (pullBackLJ - pullBackL)/delta[i];
+
+        for (unsigned int j=0; j<gradCol.size(); j++){
+            if (!vectorTools::fuzzyEquals(gradCol[j], dpbLdF[j][i], 1e-4)){
+                results << "testPullBackVelocityGradient (test 4) & False\n";
+                return 1;
+            }
+        }
+    }
+
     results << "testPullBackVelocityGradient & True\n";
     return 0;
 }
