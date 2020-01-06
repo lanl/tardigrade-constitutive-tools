@@ -793,11 +793,59 @@ int testComputeUnitNormal(std::ofstream &results){
     floatVector A = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     floatVector Anorm;
 
-    constitutiveTools::computeUnitNormal(A, Anorm);
+    errorOut error = constitutiveTools::computeUnitNormal(A, Anorm);
+
+    if (error){
+        error->print();
+        results << "testComputeUnitNormal & False\n";
+        return 1;
+    }
 
     if (!vectorTools::fuzzyEquals(vectorTools::inner(Anorm, Anorm), 1.)){
         results << "testComputeUnitNormal (test 1) & False\n";
         return 1;
+    }
+
+    //Check the jacobian
+    floatVector AnormJ;
+    floatMatrix dAnormdA;
+
+    error = constitutiveTools::computeUnitNormal(A, AnormJ, dAnormdA);
+
+    if (error){
+        error->print();
+        results << "testComputeUnitNormal & False\n";
+        return 1;
+    }
+
+    //Check the normalized value
+    if (!vectorTools::fuzzyEquals(AnormJ, Anorm)){
+        results << "testComputeUnitNormal (test 2) & False\n";
+        return 1;
+    }
+
+    //Check the gradient
+    floatType eps = 1e-6;
+    for (unsigned int i=0; i<A.size(); i++){
+        floatVector delta(A.size(), 0);
+        delta[i] = eps*fabs(A[i]) + eps;
+
+        error = constitutiveTools::computeUnitNormal(A + delta, AnormJ, dAnormdA);
+
+        if (error){
+            error->print();
+            results << "testComputeUnitNormal & False\n";
+            return 1;
+        }
+
+        floatVector gradCol = (AnormJ - Anorm)/delta[i];
+
+        for (unsigned int j=0; j<gradCol.size(); j++){
+            if (!vectorTools::fuzzyEquals(dAnormdA[j][i], gradCol[j])){
+                results << "testComputeUnitNormal (test 3) & False\n";
+                return 1;
+            }
+        }
     }
 
     results << "testComputeUnitNormal & True\n";
