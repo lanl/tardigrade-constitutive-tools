@@ -44,7 +44,7 @@ namespace constitutiveTools{
 
     errorOut computeGreenLagrangeStrain(const floatVector &deformationGradient, floatVector &E);
 
-     errorOut computeDGreenLagrangeStrainDF(const floatVector &F, floatMatrix &dEdF);
+    errorOut computeDGreenLagrangeStrainDF(const floatVector &F, floatMatrix &dEdF);
 
     errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J);
 
@@ -73,6 +73,13 @@ namespace constitutiveTools{
 
     errorOut evolveF(const floatType &Dt, const floatVector &Fp, const floatVector &Lp, const floatVector &L,
                      floatVector &F, floatMatrix &dFdL, const floatType alpha=0.5);
+
+    floatType mac(const floatType &x);
+
+    floatType mac(const floatType &x, floatType &dmacdx);
+
+    errorOut computeUnitNormal(const floatVector &A, floatVector &Anorm);
+
 }
 
 #endif

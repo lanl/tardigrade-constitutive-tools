@@ -562,4 +562,43 @@ namespace constitutiveTools{
         }
         return NULL;
     }
+
+    floatType mac(const floatType &x){
+        /*!
+         * Compute the Macaulay brackets of a scalar x
+         * 
+         * returns x if x>0, 0 otherwise
+         * 
+         * :param const floatType &x: The incoming scalar.
+         */
+
+        return 0.5*(fabs(x) + x);
+    }
+
+    floatType mac(const floatType &x, floatType &dmacdx){
+        /*!
+         * Compute the Macaulay brackets of the scalar x and 
+         * return the jacobian as well.
+         */
+
+        if (x<0){ dmacdx = 0; }
+        else {dmacdx = 1;}
+        return mac(x);
+    }
+
+    errorOut computeUnitNormal(const floatVector &A, floatVector &Anorm){
+        /*!
+         * Compute the unit normal of a second order tensor (or strictly speaking 
+         * any tensor).
+         * 
+         * :param const floatVector &A: The second order tensor
+         */
+
+        floatType norm = sqrt(vectorTools::inner(A, A));
+        
+        Anorm = A/norm;
+
+        return NULL;
+    }
+    
 }
