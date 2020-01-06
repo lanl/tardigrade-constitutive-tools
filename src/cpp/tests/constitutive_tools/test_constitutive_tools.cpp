@@ -416,6 +416,184 @@ int testComputeDGreenLagrangeStrainDF(std::ofstream &results){
     return 0;
 }
 
+int testMidpointEvolution(std::ofstream &results){
+    /*!
+     * Test the midpoint evolution algorithm.
+     * 
+     * :param std::ofstream &results: The output file
+     */
+
+    floatType Dt = 2.5;
+    floatVector Ap    = {9, 10, 11, 12};
+    floatVector DApDt = {1, 2, 3, 4};
+    floatVector DADt  = {5, 6, 7, 8};
+    floatVector A;
+
+    //Test implicit integration
+    errorOut error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A, 0);
+
+    if (error){
+        error->print();
+        results << "testMidpointEvolution & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(A, Ap + Dt*DADt)){
+        results << "testMidpointEvolution (test 1) & False\n";
+        return 1;
+    }
+
+    //Test explicit integration
+    error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A, 1);
+
+    if (error){
+        error->print();
+        results << "testMidpointEvolution & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(A, Ap + Dt*DApDt)){
+        results << "testMidpointEvolution (test 2) & False\n";
+        return 1;
+    }
+
+    //Test midpoint integration
+    error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A);
+
+    if (error){
+        error->print();
+        results << "testMidpointEvolution & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(A, Ap + Dt*0.5*(DApDt + DADt))){
+        results << "testMidpointEvolution (test 3) & False\n";
+        return 1;
+    }
+    
+    results << "testMidpointEvolution & True\n";
+    return 0;
+}
+
+int testComputeDFDt(std::ofstream &results){
+    /*!
+     * Test the computation of the total time derivative of the 
+     * deformation gradient.
+     * 
+     * :param std::ofstream &results: The output file
+     */
+
+    floatVector F = {0.69646919, 0.28613933, 0.22685145,
+                     0.55131477, 0.71946897, 0.42310646,
+                     0.98076420, 0.68482974, 0.4809319};
+
+    floatVector L = {0.57821272, 0.27720263, 0.45555826,
+                     0.82144027, 0.83961342, 0.95322334,
+                     0.4768852 , 0.93771539, 0.1056616};
+
+    floatVector answer = {1.00232848, 0.67686793, 0.46754712,
+                          1.96988645, 1.49191786, 1.00002629,
+                          0.95274131, 0.88347295, 0.55575157};
+
+    floatVector DFDt;
+
+    errorOut error = constitutiveTools::computeDFDt(L, F, DFDt);
+
+    if (error){
+        error->print();
+        results << "testComputeDFDt & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(DFDt, answer)){
+        results << "testComputeDFDt (test 1) & False\n";
+        return 1;
+    }
+
+    results << "testComputeDFDt & True\n";
+    return 0;
+}
+
+int testEvolveF(std::ofstream &results){
+    /*!
+     * Test the evolution of the deformation gradient.
+     * 
+     * :param std::ofstream &results: The output file
+     */
+    
+    floatType Dt = 2.7;
+
+    floatVector Fp = {0.69646919, 0.28613933, 0.22685145,
+                      0.55131477, 0.71946897, 0.42310646,
+                      0.98076420, 0.68482974, 0.4809319};
+
+    floatVector Lp = {0.69006282, 0.0462321 , 0.88086378,
+                      0.8153887 , 0.54987134, 0.72085876, 
+                      0.66559485, 0.63708462, 0.54378588};
+
+    floatVector L = {0.57821272, 0.27720263, 0.45555826,
+                     0.82144027, 0.83961342, 0.95322334,
+                     0.4768852 , 0.93771539, 0.1056616};
+
+    //Test 1 (fully explicit)
+    floatVector F;
+    errorOut error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 1);
+
+    if (error){
+        error->print();
+        results << "testEvolveF & False\n";
+        return 1;
+    }
+
+    floatVector answer = {4.39551129, 2.53782698, 1.84614498,
+                          4.81201673, 3.75047725, 2.48674399,
+                          4.62070491, 3.44211354, 2.32252023};
+
+    if (!vectorTools::fuzzyEquals(answer, F)){
+        results << "testEvolveF (test 1) & False\n";
+        return 1;
+    }
+
+    //Test 2 (fully implicit)
+    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 0);
+
+    if (error){
+        error->print();
+        results << "testEvolveF & False\n";
+        return 1;
+    }
+
+    answer = {0.63522182, -0.1712192 , -0.00846781,
+             -0.81250979, -0.19375022, -0.20193394,
+             -0.36163914, -0.03662069, -0.05769288};
+
+    if (!vectorTools::fuzzyEquals(answer, F)){
+        results << "testEvolveF (test 2) & False\n";
+        return 1;
+    }
+
+    //Test 3 (midpoint rule)
+    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 0.5);
+
+    if (error){
+        error->print();
+        results << "testEvolveF & False\n";
+        return 1;
+    }
+
+    answer = {0.20004929, -0.4409338 , -0.18955924,
+             -3.59005736, -2.17210401, -1.55661536,
+             -1.88391214, -1.13150095, -0.80579654};
+
+    if (!vectorTools::fuzzyEquals(answer, F)){
+        results << "testEvolveF (test 3) & False\n";
+        return 1;
+    }
+    
+    results << "testEvolve & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -436,6 +614,9 @@ int main(){
     testDecomposeGreenLagrangeStrain(results);
     testMapPK2toCauchy(results);
     testWLF(results);
+    testMidpointEvolution(results);
+    testComputeDFDt(results);
+    testEvolveF(results);
 
     //Close the results file
     results.close();
