@@ -81,6 +81,9 @@ namespace constitutiveTools{
     errorOut computeUnitNormal(const floatVector &A, floatVector &Anorm);
 
     errorOut computeUnitNormal(const floatVector &A, floatVector &Anorm, floatMatrix &dAnormdA);
+
+    errorOut pullBackVelocityGradient(const floatVector &velocityGradient, const floatVector &deformationGradient,
+                                      floatVector &pullBackVelocityGradient);
 }
 
 #endif

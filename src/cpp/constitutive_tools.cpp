@@ -622,5 +622,42 @@ namespace constitutiveTools{
 
         return NULL;
     }
-    
+
+    errorOut pullBackVelocityGradient(const floatVector &velocityGradient, const floatVector &deformationGradient,
+                                      floatVector &pullBackVelocityGradient){
+        /*!
+         * Pull back the velocity gradient to the configuration indicated by deformationGradient.
+         * i.e. $totalDeformationGradient_{iI} = deformationGradient_{i \bar{I}} remainingDeformationGradient_{\bar{I} I}$
+         * This is done via
+         * $L_{\bar{I} \bar{J}} = deformationGradient_{\bar{I} i}^{-1} velocityGradient_{ij} deformationGradient_{j \bar{J}}$
+         * 
+         * :param const floatVector &velocityGradient: The velocity gradient in the current configuration.
+         * :param const floatVector &deformationGradient: The deformation gradient between the desired configuration 
+         *     and the current configuration.
+         * :param floatVector &pullBackVelocityGradient: The pulled back velocity gradient.
+         */
+
+        //Assume 3D
+        unsigned int dim = 3;
+
+        //Invert the deformation gradient
+        floatVector inverseDeformationGradient = vectorTools::inverse(deformationGradient, dim, dim);
+
+        //Pull back the velocity gradient
+        pullBackVelocityGradient = floatVector(velocityGradient.size(), 0);
+
+        for (unsigned int I=0; I<dim; I++){
+            for (unsigned int J=0; J<dim; J++){
+                for (unsigned int i=0; i<dim; i++){
+                    for (unsigned int j=0; j<dim; j++){
+                        pullBackVelocityGradient[dim*I + J] += inverseDeformationGradient[dim*I + i] *
+                                                               velocityGradient[dim*i + j] *
+                                                               deformationGradient[dim*j + J];
+                    }
+                }
+            }
+        }
+
+        return NULL;
+    }
 }

@@ -852,6 +852,43 @@ int testComputeUnitNormal(std::ofstream &results){
     return 0;
 }
 
+int testPullBackVelocityGradient(std::ofstream &results){
+    /*!
+     * Test the pull back operation on the velocity gradient.
+     * 
+     * :param std::ofstream &results: The output file.
+     */
+
+    floatVector velocityGradient = {0.69006282, 0.0462321 , 0.88086378,
+                                    0.8153887 , 0.54987134, 0.72085876,
+                                    0.66559485, 0.63708462, 0.54378588};
+
+    floatVector deformationGradient = {0.69646919, 0.28613933, 0.22685145,
+                                       0.55131477, 0.71946897, 0.42310646,
+                                       0.98076420, 0.68482974, 0.4809319};
+
+    floatVector pullBackL;    
+    floatVector expectedPullBackL = {6.32482111,   3.11877752,   2.43195977,
+                                    20.19439192,  10.22175689,   7.88052809,
+                                   -38.85113898, -18.79212468, -14.76285795};
+
+    errorOut error = constitutiveTools::pullBackVelocityGradient(velocityGradient, deformationGradient, pullBackL);
+
+    if (error){
+        error->print();
+        results << "testPullBackVelocityGradient & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(pullBackL, expectedPullBackL)){
+        results << "testPullBackVelocityGradient (test 1) & False\n";
+        return 1;
+    }
+
+    results << "testPullBackVelocityGradient & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -877,6 +914,7 @@ int main(){
     testEvolveF(results);
     testMac(results);
     testComputeUnitNormal(results);
+    testPullBackVelocityGradient(results);
 
     //Close the results file
     results.close();
