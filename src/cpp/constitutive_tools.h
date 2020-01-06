@@ -84,6 +84,10 @@ namespace constitutiveTools{
 
     errorOut pullBackVelocityGradient(const floatVector &velocityGradient, const floatVector &deformationGradient,
                                       floatVector &pullBackVelocityGradient);
+
+    errorOut pullBackVelocityGradient(const floatVector &velocityGradient, const floatVector &deformationGradient,
+                                      floatVector &pullBackVelocityGradient, floatMatrix &dPullBackLdL, 
+                                      floatMatrix &dPullBackLdF);
 }
 
 #endif

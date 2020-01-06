@@ -660,4 +660,76 @@ namespace constitutiveTools{
 
         return NULL;
     }
+
+    errorOut pullBackVelocityGradient(const floatVector &velocityGradient, const floatVector &deformationGradient,
+                                      floatVector &pullBackVelocityGradient, floatMatrix &dPullBackLdL, 
+                                      floatMatrix &dPullBackLdF){
+        /*!
+         * Pull back the velocity gradient to the configuration indicated by deformationGradient.
+         * i.e. $totalDeformationGradient_{iI} = deformationGradient_{i \bar{I}} remainingDeformationGradient_{\bar{I} I}$
+         * This is done via
+         * $L_{\bar{I} \bar{J}} = deformationGradient_{\bar{I} i}^{-1} velocityGradient_{ij} deformationGradient_{j \bar{J}}$
+         * 
+         * :param const floatVector &velocityGradient: The velocity gradient in the current configuration.
+         * :param const floatVector &deformationGradient: The deformation gradient between the desired configuration 
+         *     and the current configuration.
+         * :param floatVector &pullBackVelocityGradient: The pulled back velocity gradient.
+         * :param floatMatrix &dPullBackLdL: The gradient of the pulled back velocity gradient 
+         *     w.r.t. the velocity gradient.
+         * :param floatMatrix &dPullBackLdF: The gradient of the pulled back velocity gradient 
+         *     w.r.t. the deformation gradient.
+         */
+
+        //Assume 3D
+        unsigned int dim = 3;
+
+        //Invert the deformation gradient
+        floatVector inverseDeformationGradient = vectorTools::inverse(deformationGradient, dim, dim);
+
+        //Pull back the velocity gradient
+        pullBackVelocityGradient = floatVector(velocityGradient.size(), 0);
+
+        for (unsigned int I=0; I<dim; I++){
+            for (unsigned int J=0; J<dim; J++){
+                for (unsigned int i=0; i<dim; i++){
+                    for (unsigned int j=0; j<dim; j++){
+                        pullBackVelocityGradient[dim*I + J] += inverseDeformationGradient[dim*I + i] *
+                                                               velocityGradient[dim*i + j] *
+                                                               deformationGradient[dim*j + J];
+                    }
+                }
+            }
+        }
+
+        //Construct the gradients
+        dPullBackLdL = floatMatrix(pullBackVelocityGradient.size(), floatVector( velocityGradient.size(), 0));
+        dPullBackLdF = floatMatrix(pullBackVelocityGradient.size(), floatVector( deformationGradient.size(), 0));
+
+        for (unsigned int I=0; I<dim; I++){
+            for (unsigned int J=0; J<dim; J++){
+                for (unsigned int k=0; k<dim; k++){
+                    for (unsigned int l=0; l<dim; l++){
+                        dPullBackLdL[dim*I + J][dim*k + l] = inverseDeformationGradient[dim*I + k] * deformationGradient[dim*l + J];
+                    }
+
+                    for (unsigned int K=0; K<dim; K++){
+                        for (unsigned int i=0; i<dim; i++){
+                            for (unsigned int j=0; j<dim; j++){
+                                dPullBackLdF[dim*I + J][dim*k + K] += -inverseDeformationGradient[dim*I + k] *
+                                                                       inverseDeformationGradient[dim*K + i] *
+                                                                       velocityGradient[dim*i + j] *
+                                                                       deformationGradient[dim*j + J];
+                            }
+                            dPullBackLdF[dim * I + J][dim*k + K] += inverseDeformationGradient[dim*I + i] * 
+                                                                    velocityGradient[dim*i + k] * 
+                                                                    deltaDirac(J, K);
+                        }
+                    }
+                }
+            }
+        }
+
+        return NULL;
+    }
+    
 }
