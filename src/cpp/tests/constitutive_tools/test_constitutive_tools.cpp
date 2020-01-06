@@ -470,6 +470,43 @@ int testMidpointEvolution(std::ofstream &results){
         results << "testMidpointEvolution (test 3) & False\n";
         return 1;
     }
+
+    //Add test for the jacobian
+    floatType alpha = .37;
+    floatType eps = 1e-6;
+    floatVector A0, Ai;
+    floatMatrix DADADt;
+
+    error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha);
+    error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A0, DADADt, alpha);
+
+    if (error){
+        error->print();
+        results << "testMidpointEvolution & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(A0, A)){
+        results << "testMidpointEvolution (test 4) & False\n";
+        return 1;
+    }
+
+    for (unsigned int i=0; i<DADt.size(); i++){
+        floatVector delta = floatVector(DADt.size(), 0);
+        delta[i] = eps*(DADt[i]) + eps;
+
+        error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt+delta, Ai, alpha);
+
+        floatVector gradCol = (Ai - A0)/delta[i];
+
+        for (unsigned int j=0; j<gradCol.size(); j++){
+            if (!vectorTools::fuzzyEquals(DADADt[j][i], gradCol[j])){
+                results << "testMidpointEvolution (test 5) & False\n";
+                return 1;
+            }
+        }
+        
+    }
     
     results << "testMidpointEvolution & True\n";
     return 0;
@@ -508,6 +545,71 @@ int testComputeDFDt(std::ofstream &results){
     if (!vectorTools::fuzzyEquals(DFDt, answer)){
         results << "testComputeDFDt (test 1) & False\n";
         return 1;
+    }
+
+    //Test the jacobians
+    floatVector DFDtJ;
+    floatMatrix dDFDtdL, dDFDtdF;
+    error = constitutiveTools::computeDFDt(L, F, DFDtJ, dDFDtdL, dDFDtdF);
+
+    if (error){
+        error->print();
+        results << "testComputeDFDt & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(DFDt, DFDtJ)){
+        results << "testComputeDFDt (test 2) & False\n";
+        return 1;
+    }
+
+    //Use finite differences to estimate the jacobian
+    floatType eps = 1e-6;
+    for (unsigned int i=0; i<F.size(); i++){
+
+        //Compute finite difference gradient w.r.t. L
+        floatVector delta(L.size(), 0);
+        delta[i] = eps*fabs(L[i]) + eps;
+
+        error = constitutiveTools::computeDFDt(L + delta, F, DFDtJ);
+
+        if (error){
+            error->print();
+            results << "testComputeDFDt & False\n";
+            return 1;
+        }
+
+        floatVector gradCol = (DFDtJ - DFDt)/delta[i];
+
+        for (unsigned int j=0; j<gradCol.size(); j++){
+            if (!vectorTools::fuzzyEquals(dDFDtdL[j][i], gradCol[j])){
+                results << "testComputeDFDt (test 3) & False\n";
+                return 1;
+            }
+        }
+
+        //Compute finite difference gradient w.r.t. F
+        delta = floatVector(F.size(), 0);
+        delta[i] = eps*fabs(F[i]) + eps;
+
+        error = constitutiveTools::computeDFDt(L, F + delta, DFDtJ);
+
+        if (error){
+            error->print();
+            results << "testComputeDFDt & False\n";
+            return 1;
+        }
+
+        gradCol = (DFDtJ - DFDt)/delta[i];
+
+        for (unsigned int j=0; j<gradCol.size(); j++){
+            if (!vectorTools::fuzzyEquals(dDFDtdF[j][i], gradCol[j])){
+                results << "testComputeDFDt (test 4) & False\n";
+                return 1;
+            }
+        }
+
+
     }
 
     results << "testComputeDFDt & True\n";
@@ -588,6 +690,47 @@ int testEvolveF(std::ofstream &results){
     if (!vectorTools::fuzzyEquals(answer, F)){
         results << "testEvolveF (test 3) & False\n";
         return 1;
+    }
+
+    //Tests 4 and 5 (jacobian)
+    floatVector FJ;
+    floatMatrix dFdL;
+    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, FJ, dFdL, 0.5);
+
+    if (error){
+        error->print(); 
+        results << "testEvolveF & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(F, FJ)){
+        results << "testEvolveF (test 4) False\n";
+        return 1;
+    }
+
+    floatType eps = 1e-6;
+    for (unsigned int i=0; i<L.size(); i++){
+
+        floatVector delta(L.size(), 0);
+        delta[i] = eps*fabs(L[i]) + eps;
+
+        error = constitutiveTools::evolveF(Dt, Fp, Lp, L + delta, FJ, dFdL, 0.5);
+
+        if (error){
+            error->print();
+            results << "testEvolveF & False\n";
+            return 1;
+        }
+
+        floatVector gradCol = (FJ - F)/delta[i];
+
+        for (unsigned int j=0; j<gradCol.size(); j++){
+            if (!vectorTools::fuzzyEquals(gradCol[j], dFdL[j][i], 1e-5, 1e-5)){
+                results << "testEvolveF (test 5) & False\n";
+                return 1;
+            }
+        }
+
     }
     
     results << "testEvolve & True\n";

@@ -316,16 +316,18 @@ namespace constitutiveTools{
          * :param floatVector &DFDt: The total time derivative of the deformation gradient
          */
 
+        //Assume 3D
+        unsigned int dim = 3;
+
         if (velocityGradient.size() != deformationGradient.size()){
             return new errorNode("computeDFDt", "The velocity gradient and deformation gradient must have the same size");
         }
 
-        if (velocityGradient.size() != 9){
-            return new errorNode("computeDFDt", "The velocity gradient must be 3D (9 values)");
+        if (velocityGradient.size() != dim*dim){
+            return new errorNode("computeDFDt", "The velocity gradient doesn't have enough entries");
         }
 
         DFDt = floatVector(velocityGradient.size(), 0);
-        unsigned int dim = 3;
 
         for (unsigned int i=0; i<dim; i++){
             for (unsigned int I=0; I<dim; I++){
@@ -334,6 +336,54 @@ namespace constitutiveTools{
                 }
             }
         }
+        return NULL;
+    }
+
+    errorOut computeDFDt(const floatVector &velocityGradient, const floatVector &deformationGradient, floatVector &DFDt,
+                         floatMatrix &dDFDtdL, floatMatrix &dDFDtdF){
+        /*!
+         * Compute the total time derivative of the deformation gradient
+         * and return the partial derivatives w.r.t. L and F.
+         * 
+         * \dot{F}_{iI} = L_{ij} F_{jI}
+         * \frac{\partial \dot{F}_{iI}}{\partial L_{kl}} = \delta_{ik} F{lI}
+         * \frac{\partial \dot{F}_{iI}}{\partial F_{kK}} = L_{ik} \delta{IK}
+         * 
+         * :param const floatVector &velocityGradient: The velocity gradient L_{ij}
+         * :param const floatVector &deformationGradient: The deformation gradient F_{iI}
+         * :param floatVector &DFDt: The total time derivative of the deformation gradient
+         */
+
+        //Assume 3D
+        unsigned int dim = 3;
+
+        errorOut error = computeDFDt(velocityGradient, deformationGradient, DFDt);
+
+        if (error){
+            errorOut result = new errorNode("computeDFDt (jacobian)", "error in computation of DFDt");
+            result->addNext(error);
+            return result;
+        }
+
+        //Form the identity tensor
+        floatVector eye(dim*dim, 0);
+        vectorTools::eye(eye);
+
+        //Form the partial w.r.t. L and F
+        dDFDtdL = floatMatrix(dim*dim, floatVector(dim*dim, 0));
+        dDFDtdF = dDFDtdL;
+
+        for (unsigned int i=0; i<dim; i++){
+            for (unsigned int I=0; I<dim; I++){
+                for (unsigned int k=0; k<dim; k++){
+                    for (unsigned int l=0; l<dim; l++){ //Note that we will use l = K for efficiency
+                        dDFDtdL[dim*i + I][dim*k + l] = eye[dim*i + k] * deformationGradient[dim*l + I];
+                        dDFDtdF[dim*i + I][dim*k + l] = velocityGradient[dim*i + k] * eye[dim*I + l];
+                    }
+                }
+            }
+        }
+
         return NULL;
     }
 
@@ -361,6 +411,30 @@ namespace constitutiveTools{
         }
 
         A = Ap + Dt*(alpha*DApDt + (1 - alpha)*DADt);
+        return NULL;
+    }
+
+    errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
+                               floatVector &A, floatMatrix &DADADt, const floatType alpha){
+        /*!
+         * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
+         * alpha=0 (implicit)
+         * alpha=1 (explicit)
+         * 
+         * :param const floatType &Dt: The change in time.
+         * :param const floatVector &Ap: The previous value of the vector
+         * :param const floatVector &DApDt: The previous time rate of change of the vector.
+         * :param const floatVector *DADt: The current time rate of change of the vector.
+         * :param floatVector &A: The current value of the vector.
+         * :param floatMatrix &DADADt: The derivative of the vector w.r.t. the rate of change of the vector.
+         * :param const floatType alpha: The integration parameter.
+         */
+
+        midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha);
+        floatMatrix eye;
+        vectorTools::eye(A.size(), eye);
+        DADADt = Dt*(1 - alpha)*eye;
+
         return NULL;
     }
 
@@ -417,7 +491,75 @@ namespace constitutiveTools{
                 }
             }
         }
+        return NULL;
+    }
+
+    errorOut evolveF(const floatType &Dt, const floatVector &Fp, const floatVector &Lp, const floatVector &L,
+                     floatVector &F, floatMatrix &dFdL, const floatType alpha){
+        /*!
+         * Evolve F using the midpoint integration method and return the jacobian w.r.t. L.
+         * 
+         * F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha\right) L_{ij}^{t+1}\right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t}\right]
+         * \frac{\partial F_{jI}^{t + 1}}{\partial L_{kl}^{t+1}} &= \left[\delta_{kj} - \Delta t \left(1 - \alpha\right) L_{kj}\right]^{-1} \Delta t \left(1 - \alpha\right) F_{lI]^{t + 1}
+         * 
+         * :param const floatType &Dt: The change in time.
+         * :param const floatVector &Fp: The previous value of the deformation gradient
+         * :param const floatVector &Lp: The previous velocity gradient.
+         * :param const floatVector &L: The current velocity gradient.
+         * :param floatVector &F: The computed current deformation gradient.
+         * :param const floatType alpha: The integration parameter.
+         */
+
+        //Assumes 3D
+        const unsigned int dim = 3;
+        if (Fp.size() != dim*dim){
+            return new errorNode("evolveF", "The deformation gradient doesn't have enough terms (require 9 for 3D)");
+        }
+
+        if (Lp.size() != Fp.size()){
+            return new errorNode("evolveF", "The previous velocity gradient and deformation gradient aren't the same size");
+        }
+
+        if (Fp.size() != L.size()){
+            return new errorNode("evolveF", "The previous deformation gradient and the current velocity gradient aren't the same size");
+        }
+
+        //Compute the time-rate of change of the previous deformation gradient from the velocity gradient.
+        floatVector DFpDt;
+        computeDFDt(Lp, Fp, DFpDt);        
+
+        //Compute the left-hand side
+        floatVector eye(dim*dim);
+        vectorTools::eye(eye);
+        floatVector LHS = eye - Dt*(1 - alpha)*L;
         
+        //Compute the inverse of the left-hand side
+        floatVector invLHS = vectorTools::inverse(LHS, dim, dim);
+
+        //Compute the right-hand size
+        floatVector RHS = Fp + Dt*alpha*DFpDt;
+        F = floatVector(dim*dim, 0);
+
+        //Compute the new value of F
+        for (unsigned int i=0; i<dim; i++){
+            for (unsigned int I=0; I<dim; I++){
+                for (unsigned int j=0; j<dim; j++){
+                    F[dim*i + I] += invLHS[dim*i + j]*RHS[dim*j + I];
+                }
+            }
+        }
+
+        //Compute the jacobian
+        dFdL = floatMatrix(F.size(), floatVector(L.size(), 0));
+        for (unsigned int j=0; j<dim; j++){
+            for (unsigned int I=0; I<dim; I++){
+                for (unsigned int k=0; k<dim; k++){
+                    for (unsigned int l=0; l<dim; l++){
+                        dFdL[dim*j + I][dim*k + l] = invLHS[dim*j + k] * Dt * (1 - alpha)*F[dim*l + I];
+                    }
+                }
+            }
+        }
         return NULL;
     }
 }
