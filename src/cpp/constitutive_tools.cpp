@@ -696,5 +696,29 @@ namespace constitutiveTools{
 
         return NULL;
     }
+
+    errorOut quadraticThermalExpansion(const floatType &temperature, const floatType &referenceTemperature, 
+                                       const floatVector &linearParameters, const floatVector &quadraticParameters, 
+                                       floatVector &thermalExpansion){
+        /*! 
+         * Define a quadratic equation for the thermal expansion. This could be the 
+         * thermal strain or the value of the stretch tensor.
+         * 
+         * :param const floatType &temperature: The temperature
+         * :param const floatType &referenceTemperature: The reference temperature
+         * :param const floatVector &linearParameters: The linear thermal expansion parameters.
+         * :param const floatVector &quadraticParameters: The quadratic thermal expansion parameters.
+         * :param floatVector &thermalExpansion: The resulting thermal expansion.
+         */
+
+        if (linearParameters.size() != quadraticParameters.size()){
+            return new errorNode("quadraticThermalExpansion", "The linear and quadratic parameters must have the same length");
+        }
+
+        floatType relativeTemperature  = temperature - referenceTemperature;
+        thermalExpansion = linearParameters*relativeTemperature + quadraticParameters * relativeTemperature * relativeTemperature;
+
+        return NULL;
+    }
     
 }

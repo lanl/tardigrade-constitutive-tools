@@ -954,6 +954,40 @@ int testPullBackVelocityGradient(std::ofstream &results){
     return 0;
 }
 
+int testQuadraticThermalExpansion(std::ofstream &results){
+    /*!
+     * Test the computation of the thermal expansion using a 
+     * quadratic form.
+     * 
+     * :param std::ofstream &results: The output file.
+     */
+
+    floatType temperature = 283.15;
+    floatType referenceTemperature = 273.15;
+
+    floatVector linearParameters = {1, 2, 3, 4};
+    floatVector quadraticParameters = {5, 6, 7, 8};
+
+    floatVector thermalExpansion;
+    errorOut error = constitutiveTools::quadraticThermalExpansion(temperature, referenceTemperature, 
+                                                                  linearParameters, quadraticParameters, 
+                                                                  thermalExpansion);
+
+    if (error){
+        error->print();
+        results << "testQuadraticThermalExpansion & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(thermalExpansion, {510., 620., 730., 840.})){
+        results << "testQuadraticThermalExpansion (test 1) & False\n";
+        return 1;
+    }
+
+    results << "testQuadraticThermalExpansion & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -980,6 +1014,7 @@ int main(){
     testMac(results);
     testComputeUnitNormal(results);
     testPullBackVelocityGradient(results);
+    testQuadraticThermalExpansion(results);
 
     //Close the results file
     results.close();

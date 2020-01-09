@@ -88,6 +88,10 @@ namespace constitutiveTools{
     errorOut pullBackVelocityGradient(const floatVector &velocityGradient, const floatVector &deformationGradient,
                                       floatVector &pullBackVelocityGradient, floatMatrix &dPullBackLdL, 
                                       floatMatrix &dPullBackLdF);
+
+    errorOut quadraticThermalExpansion(const floatType &temperature, const floatType &referenceTemperature, 
+                                       const floatVector &linearParameters, const floatVector &quadraticParameters,
+                                       floatVector &thermalExpansion);
 }
 
 #endif
