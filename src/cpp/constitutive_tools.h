@@ -92,6 +92,10 @@ namespace constitutiveTools{
     errorOut quadraticThermalExpansion(const floatType &temperature, const floatType &referenceTemperature, 
                                        const floatVector &linearParameters, const floatVector &quadraticParameters,
                                        floatVector &thermalExpansion);
+
+    errorOut quadraticThermalExpansion(const floatType &temperature, const floatType &referenceTemperature, 
+                                       const floatVector &linearParameters, const floatVector &quadraticParameters,
+                                       floatVector &thermalExpansion, floatVector &thermalExpansionJacobian);
 }
 
 #endif

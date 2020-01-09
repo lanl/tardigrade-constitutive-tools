@@ -969,8 +969,8 @@ int testQuadraticThermalExpansion(std::ofstream &results){
     floatVector quadraticParameters = {5, 6, 7, 8};
 
     floatVector thermalExpansion;
-    errorOut error = constitutiveTools::quadraticThermalExpansion(temperature, referenceTemperature, 
-                                                                  linearParameters, quadraticParameters, 
+    errorOut error = constitutiveTools::quadraticThermalExpansion(     temperature, referenceTemperature, 
+                                                                  linearParameters,  quadraticParameters, 
                                                                   thermalExpansion);
 
     if (error){
@@ -981,6 +981,40 @@ int testQuadraticThermalExpansion(std::ofstream &results){
 
     if (!vectorTools::fuzzyEquals(thermalExpansion, {510., 620., 730., 840.})){
         results << "testQuadraticThermalExpansion (test 1) & False\n";
+        return 1;
+    }
+
+    floatVector thermalExpansionJ, thermalExpansionJacobian;
+    floatType eps = 1e-6;
+    floatType delta = eps*temperature + eps;
+
+    error = constitutiveTools::quadraticThermalExpansion(      temperature,     referenceTemperature,
+                                                          linearParameters,      quadraticParameters,
+                                                         thermalExpansionJ, thermalExpansionJacobian);
+
+    if (error){
+        error->print();
+        results << "testQuadraticThermalExpansion & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(thermalExpansion, thermalExpansionJ)){
+        results << "testQuadraticThermalExpansion (test 2) & False\n";
+        return 1;
+    }
+
+    error = constitutiveTools::quadraticThermalExpansion(      temperature + delta,     referenceTemperature,
+                                                                  linearParameters,      quadraticParameters,
+                                                                 thermalExpansionJ);
+
+    if (error){
+        error->print();
+        results << "testQuadraticThermalExpansion & False\n";
+        return 1;
+    }
+    
+    if (!vectorTools::fuzzyEquals(thermalExpansionJacobian, (thermalExpansionJ - thermalExpansion)/delta, 1e-4)){
+        results << "testQuadraticThermalExpansion (test 3) & False\n";
         return 1;
     }
 
