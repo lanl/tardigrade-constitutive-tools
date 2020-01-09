@@ -733,6 +733,8 @@ namespace constitutiveTools{
          * :param const floatVector &linearParameters: The linear thermal expansion parameters.
          * :param const floatVector &quadraticParameters: The quadratic thermal expansion parameters.
          * :param floatVector &thermalExpansion: The resulting thermal expansion.
+         * :param floatVector &thermalExpansionJacobian: The gradient of the thermal expansion w.r.t. 
+         *     the temperature.
          */
 
         errorOut error = quadraticThermalExpansion(temperature, referenceTemperature, linearParameters, quadraticParameters, 
