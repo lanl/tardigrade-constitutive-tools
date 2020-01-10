@@ -1022,6 +1022,37 @@ int testQuadraticThermalExpansion(std::ofstream &results){
     return 0;
 }
 
+int testPushForwardGreenLagrangeStrain(std::ofstream &results){
+    /*!
+     * Test the push-forward operation on the Green-Lagrange strain.
+     * 
+     * :param std::ofstream &results: The output file.
+     */
+
+    floatVector deformationGradient = {0.30027935, -0.72811411,  0.26475099,
+                                       1.2285819 ,  0.57663593,  1.43113814,
+                                      -0.45871432,  0.2175795 ,  0.54013937};
+
+    floatVector greenLagrangeStrain;
+    constitutiveTools::computeGreenLagrangeStrain(deformationGradient, greenLagrangeStrain);
+
+    floatVector almansiStrain = {-0.33393717,  0.0953188 , -0.29053383,
+                                  0.0953188 ,  0.35345526,  0.11588247,
+                                 -0.29053383,  0.11588247, -0.56150741};
+
+    floatVector result;
+    constitutiveTools::pushForwardGreenLagrangeStrain(greenLagrangeStrain, deformationGradient, 
+                                                      result);
+
+    if (!vectorTools::fuzzyEquals(result, almansiStrain)){
+        results << "testPushForwardGreenLagrangeStrain (test 1) & False\n";
+        return 1;
+    }
+
+    results << "testPushForwardGreenLagrangeStrain & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -1049,6 +1080,7 @@ int main(){
     testComputeUnitNormal(results);
     testPullBackVelocityGradient(results);
     testQuadraticThermalExpansion(results);
+    testPushForwardGreenLagrangeStrain(results);
 
     //Close the results file
     results.close();
