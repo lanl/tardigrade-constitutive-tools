@@ -750,4 +750,28 @@ namespace constitutiveTools{
 
         return NULL;
     }
+
+    errorOut pushForwardGreenLagrangeStrain(const floatVector &greenLagrangeStrain, const floatVector &deformationGradient,
+                                            floatVector &almansiStrain){
+        /*!
+         * Push forward the Green-Lagrange strain to the current configuration.
+         * 
+         * :param const floatVector &greenLagrangeStrain: The Green-Lagrange strain.
+         * :param const floatVector &deformationGradient: The deformation gradient mapping between configurations.
+         * :param floatVector &almansiStrain: The strain in the current configuration indicated by the deformation gradient.
+         */
+
+        //Assume 3D
+        unsigned int dim = 3;
+
+        //Compute the inverse deformation gradient
+        floatVector inverseDeformationGradient = vectorTools::inverse(deformationGradient, dim, dim);
+
+        //Map the Green-Lagrange strain to the current configuration
+        almansiStrain = vectorTools::matrixMultiply(greenLagrangeStrain, inverseDeformationGradient,
+                                                    dim, dim, dim, dim, 0, 0);
+        almansiStrain = vectorTools::matrixMultiply(inverseDeformationGradient, almansiStrain,
+                                                    dim, dim, dim, dim, 1, 0);
+        return NULL;
+    }
 }

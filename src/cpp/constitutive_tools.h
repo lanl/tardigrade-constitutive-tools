@@ -96,6 +96,9 @@ namespace constitutiveTools{
     errorOut quadraticThermalExpansion(const floatType &temperature, const floatType &referenceTemperature, 
                                        const floatVector &linearParameters, const floatVector &quadraticParameters,
                                        floatVector &thermalExpansion, floatVector &thermalExpansionJacobian);
+
+    errorOut pushForwardGreenLagrangeStrain(const floatVector &greenLagrangeStrain, const floatVector &deformationGradient, 
+                                            floatVector &almansiStrain);
 }
 
 #endif
