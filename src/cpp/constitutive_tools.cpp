@@ -756,6 +756,11 @@ namespace constitutiveTools{
         /*!
          * Push forward the Green-Lagrange strain to the current configuration.
          * 
+         * $e_{ij} = F_{Ii}^{-1} E_{IJ} F_{Jj}^{-1}$
+         *
+         * where $e_{ij}$ is the Almansi strain (the strain in the current configuration, $F_{iI}^{-1}$ is the 
+         * inverse of the deformation gradient, and $E_{IJ}$ is the Green-Lagrange strain.
+         * 
          * :param const floatVector &greenLagrangeStrain: The Green-Lagrange strain.
          * :param const floatVector &deformationGradient: The deformation gradient mapping between configurations.
          * :param floatVector &almansiStrain: The strain in the current configuration indicated by the deformation gradient.
@@ -780,6 +785,13 @@ namespace constitutiveTools{
         /*!
          * Push forward the Green-Lagrange strain to the current configuration 
          * and return the jacobians.
+         * 
+         * $e_{ij} = F_{Ii}^{-1} E_{IJ} F_{Jj}^{-1}$
+         * $\frac{\partial e_{ij}}{\partial E_{KL}} = F_{Ki}^{-1} F_{Kj}^{-1}$
+         * $\frac{\partial e_{ij}}{\partial F_{kK}} = -F_{Ik}^{-1} F_{Ki}^{-1} E_{IJ} F_{J j}^{-1} - F_{Ii}^{-1} E_{IJ} F_{Jk}^{-1} F_{Kj}^{-1}$
+         *
+         * where $e_{ij}$ is the Almansi strain (the strain in the current configuration, $F_{iI}^{-1}$ is the 
+         * inverse of the deformation gradient, and $E_{IJ}$ is the Green-Lagrange strain.
          * 
          * :param const floatVector &greenLagrangeStrain: The Green-Lagrange strain.
          * :param const floatVector &deformationGradient: The deformation gradient mapping between configurations.
