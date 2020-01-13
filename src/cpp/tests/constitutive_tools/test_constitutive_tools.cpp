@@ -1034,19 +1034,97 @@ int testPushForwardGreenLagrangeStrain(std::ofstream &results){
                                       -0.45871432,  0.2175795 ,  0.54013937};
 
     floatVector greenLagrangeStrain;
-    constitutiveTools::computeGreenLagrangeStrain(deformationGradient, greenLagrangeStrain);
+    errorOut error = constitutiveTools::computeGreenLagrangeStrain(deformationGradient, greenLagrangeStrain);
+
+    if (error){
+        error->print();
+        results << "testPushForwardGreenLagrangeStrain & False\n";
+        return 1;
+    }
 
     floatVector almansiStrain = {-0.33393717,  0.0953188 , -0.29053383,
                                   0.0953188 ,  0.35345526,  0.11588247,
                                  -0.29053383,  0.11588247, -0.56150741};
 
     floatVector result;
-    constitutiveTools::pushForwardGreenLagrangeStrain(greenLagrangeStrain, deformationGradient, 
-                                                      result);
+    error = constitutiveTools::pushForwardGreenLagrangeStrain(greenLagrangeStrain, deformationGradient, 
+                                                              result);
+
+    if (error){
+        error->print();
+        results << "testPushForwardGreenLagrangeStrain & False\n";
+        return 1;
+    }
 
     if (!vectorTools::fuzzyEquals(result, almansiStrain)){
         results << "testPushForwardGreenLagrangeStrain (test 1) & False\n";
         return 1;
+    }
+
+    //Test the jacobian
+    floatVector resultJ;
+    floatMatrix dedE, dedF;
+    error = constitutiveTools::pushForwardGreenLagrangeStrain(greenLagrangeStrain, deformationGradient, 
+                                                              resultJ, dedE, dedF);
+
+    if (error){
+        error->print();
+        results << "testPushForwardGreenLagrangeStrain & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(result, resultJ)){
+        results << "testPushForwardGreenLagrangeStrain (test 2) & False\n";
+        return 1;
+    }
+
+    //Check dedE
+    floatType eps = 1e-6;
+    for (unsigned int i=0; i<greenLagrangeStrain.size(); i++){
+        floatVector delta(greenLagrangeStrain.size(), 0);
+        delta[i] = eps*fabs(greenLagrangeStrain[i]) + eps;
+
+        error = constitutiveTools::pushForwardGreenLagrangeStrain(greenLagrangeStrain + delta, deformationGradient, 
+                                                                  resultJ);
+    
+        if (error){
+            error->print();
+            results << "testPushForwardGreenLagrangeStrain & False\n";
+            return 1;
+        }
+
+        floatVector grad = (resultJ - result)/delta[i];
+
+        for (unsigned int j=0; j<grad.size(); j++){
+            if (!vectorTools::fuzzyEquals(grad[j], dedE[j][i])){
+                results << "testPushForwardGreenLagrangeStrain (test 3) & False\n";
+                return 1;
+            }
+        }
+    }
+
+    //Check dedF
+    for (unsigned int i=0; i<deformationGradient.size(); i++){
+        floatVector delta(deformationGradient.size(), 0);
+        delta[i] = eps*fabs(deformationGradient[i]) + eps;
+
+        error = constitutiveTools::pushForwardGreenLagrangeStrain(greenLagrangeStrain, deformationGradient + delta, 
+                                                                  resultJ);
+    
+        if (error){
+            error->print();
+            results << "testPushForwardGreenLagrangeStrain & False\n";
+            return 1;
+        }
+
+        floatVector grad = (resultJ - result)/delta[i];
+
+        for (unsigned int j=0; j<grad.size(); j++){
+            if (!vectorTools::fuzzyEquals(grad[j], dedF[j][i], 1e-5)){
+                results << "testPushForwardGreenLagrangeStrain (test 4) & False\n";
+                return 1;
+            }
+        }
     }
 
     results << "testPushForwardGreenLagrangeStrain & True\n";

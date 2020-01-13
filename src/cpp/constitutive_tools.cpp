@@ -756,6 +756,11 @@ namespace constitutiveTools{
         /*!
          * Push forward the Green-Lagrange strain to the current configuration.
          * 
+         * $e_{ij} = F_{Ii}^{-1} E_{IJ} F_{Jj}^{-1}$
+         *
+         * where $e_{ij}$ is the Almansi strain (the strain in the current configuration, $F_{iI}^{-1}$ is the 
+         * inverse of the deformation gradient, and $E_{IJ}$ is the Green-Lagrange strain.
+         * 
          * :param const floatVector &greenLagrangeStrain: The Green-Lagrange strain.
          * :param const floatVector &deformationGradient: The deformation gradient mapping between configurations.
          * :param floatVector &almansiStrain: The strain in the current configuration indicated by the deformation gradient.
@@ -772,6 +777,86 @@ namespace constitutiveTools{
                                                     dim, dim, dim, dim, 0, 0);
         almansiStrain = vectorTools::matrixMultiply(inverseDeformationGradient, almansiStrain,
                                                     dim, dim, dim, dim, 1, 0);
+        return NULL;
+    }
+
+    errorOut pushForwardGreenLagrangeStrain(const floatVector &greenLagrangeStrain, const floatVector &deformationGradient,
+                                            floatVector &almansiStrain, floatMatrix &dalmansiStraindE, floatMatrix &dalmansiStraindF){
+        /*!
+         * Push forward the Green-Lagrange strain to the current configuration 
+         * and return the jacobians.
+         * 
+         * $e_{ij} = F_{Ii}^{-1} E_{IJ} F_{Jj}^{-1}$
+         * $\frac{\partial e_{ij}}{\partial E_{KL}} = F_{Ki}^{-1} F_{Kj}^{-1}$
+         * $\frac{\partial e_{ij}}{\partial F_{kK}} = -F_{Ik}^{-1} F_{Ki}^{-1} E_{IJ} F_{J j}^{-1} - F_{Ii}^{-1} E_{IJ} F_{Jk}^{-1} F_{Kj}^{-1}$
+         *
+         * where $e_{ij}$ is the Almansi strain (the strain in the current configuration, $F_{iI}^{-1}$ is the 
+         * inverse of the deformation gradient, and $E_{IJ}$ is the Green-Lagrange strain.
+         * 
+         * :param const floatVector &greenLagrangeStrain: The Green-Lagrange strain.
+         * :param const floatVector &deformationGradient: The deformation gradient mapping between configurations.
+         * :param floatVector &almansiStrain: The strain in the current configuration indicated by the deformation gradient.
+         * :param floatMatrix &dalmansiStraindE: Compute the derivative of the almansi strain w.r.t. the Green-Lagrange strain.
+         * :param floatMatrix &dalmansiStraindF: Compute the derivative of the almansi strain w.r.t. the deformation gradient.
+         */
+
+        //Assume 3D
+        unsigned int dim = 3;
+
+        //Compute the inverse deformation gradient
+        floatVector inverseDeformationGradient = vectorTools::inverse(deformationGradient, dim, dim);
+
+        //Compute the jacobian of the inverse deformation gradient
+        floatMatrix dFinvdF(dim*dim, floatVector(dim*dim, 0));
+        for (unsigned int I=0; I<dim; I++){
+            for (unsigned int l=0; l<dim; l++){
+                for (unsigned int k=0; k<dim; k++){
+                    for (unsigned int K=0; K<dim; K++){
+                        dFinvdF[dim*I + l][dim*k + K] = -inverseDeformationGradient[dim*I + k] *
+                                                         inverseDeformationGradient[dim*K + l];
+                    }
+                }
+            }
+        }
+
+        //Map the Green-Lagrange strain to the current configuration
+        almansiStrain = vectorTools::matrixMultiply(greenLagrangeStrain, inverseDeformationGradient,
+                                                    dim, dim, dim, dim, 0, 0);
+        almansiStrain = vectorTools::matrixMultiply(inverseDeformationGradient, almansiStrain,
+                                                    dim, dim, dim, dim, 1, 0);
+
+        //Compute the jacobians
+        dalmansiStraindE = floatMatrix(dim*dim, floatVector(dim*dim, 0));
+        for (unsigned int i=0; i<dim; i++){
+            for (unsigned int j=0; j<dim; j++){
+                for (unsigned int K=0; K<dim; K++){
+                    for (unsigned int L=0; L<dim; L++){
+                        dalmansiStraindE[dim*i + j][dim*K + L] = inverseDeformationGradient[dim*K + i] * 
+                                                                 inverseDeformationGradient[dim*L + j];
+                    }
+                }
+            }
+        }
+
+        dalmansiStraindF = floatMatrix(dim*dim, floatVector(dim*dim, 0));
+        floatVector term1 = vectorTools::matrixMultiply(greenLagrangeStrain, inverseDeformationGradient,
+                                                        dim, dim, dim, dim, 0, 0);
+        floatVector term2 = vectorTools::matrixMultiply(inverseDeformationGradient, greenLagrangeStrain,
+                                                        dim, dim, dim, dim, 1, 0);
+
+        for (unsigned int i=0; i<dim; i++){
+            for (unsigned int j=0; j<dim; j++){
+                for (unsigned int k=0; k<dim; k++){
+                    for (unsigned int K=0; K<dim; K++){
+                        for (unsigned int I=0; I<dim; I++){
+                            dalmansiStraindF[dim*i + j][dim*k + K] += dFinvdF[dim*I + i][dim*k + K] * term1[dim*I + j]
+                                                                    + term2[dim*i + I] * dFinvdF[dim*I + j][dim*k + K];
+                        }
+                    }
+                }
+            }
+        }
+
         return NULL;
     }
 }
