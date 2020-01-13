@@ -388,6 +388,40 @@ namespace constitutiveTools{
     }
 
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
+                               floatVector &A, const floatVector &alpha){
+        /*!
+         * Perform midpoint rule based evolution of a vector.
+         * alpha=0 (implicit)
+         * alpha=1 (explicit)
+         * 
+         * :param const floatType &Dt: The change in time.
+         * :param const floatVector &Ap: The previous value of the vector
+         * :param const floatVector &DApDt: The previous time rate of change of the vector.
+         * :param const floatVector &DADt: The current time rate of change of the vector.
+         * :param floatVector &A: The current value of the vector.
+         * :param const floatVector &alpha: The integration parameter.
+         */
+
+        if ((Ap.size() != DApDt.size()) || (Ap.size() != DADt.size())){
+            return new errorNode("midpointEvolution", "The size of the previous value of the vector and the two rates are not equal");
+        }
+        if (Ap.size() != alpha.size()){
+            return new errorNode("midpointEvolution", "The size of the alpha vector is not the same size as the previous vector value");
+        }
+
+        A = floatVector(Ap.size(), 0);
+        unsigned int i = 0;
+        for (auto ai = alpha.begin(); ai != alpha.end(); ai++, i++){
+            if (((*ai) < 0) || ((*ai) > 1)){
+                return new errorNode("midpointEvolution", "Alpha must be between 0 and 1");
+            }
+            A[i] = Ap[i] + Dt * (*ai * DApDt[i] + (1 - *ai) * DADt[i]);
+        }
+        
+        return NULL;
+    }
+
+    errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
                                floatVector &A, const floatType alpha){
         /*!
          * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
@@ -402,16 +436,7 @@ namespace constitutiveTools{
          * :param const floatType alpha: The integration parameter.
          */
 
-        if ((Ap.size() != DApDt.size()) || (Ap.size() != DADt.size())){
-            return new errorNode("midpointEvolution", "The size of the previous value of the vector and the two rates are not equal");
-        }
-
-        if ((alpha > 1) || (alpha < 0)){
-            return new errorNode("midpointEvolution", "Alpha must be between 0 and 1");
-        }
-
-        A = Ap + Dt*(alpha*DApDt + (1 - alpha)*DADt);
-        return NULL;
+        return midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha*floatVector(Ap.size(), 1));
     }
 
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
