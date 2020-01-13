@@ -65,6 +65,9 @@ namespace constitutiveTools{
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
                                floatVector &A, const floatVector &alpha);
 
+    errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
+                               floatVector &A, floatMatrix &DADADt, const floatVector &alpha);
+
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt, 
                                floatVector &A, const floatType alpha=0.5);
 

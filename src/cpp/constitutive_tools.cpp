@@ -422,6 +422,40 @@ namespace constitutiveTools{
     }
 
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
+                               floatVector &A, floatMatrix &DADADt, const floatVector &alpha){
+        /*!
+         * Perform midpoint rule based evolution of a vector and return the jacobian.
+         * alpha=0 (implicit)
+         * alpha=1 (explicit)
+         * 
+         * :param const floatType &Dt: The change in time.
+         * :param const floatVector &Ap: The previous value of the vector
+         * :param const floatVector &DApDt: The previous time rate of change of the vector.
+         * :param const floatVector &DADt: The current time rate of change of the vector.
+         * :param floatVector &A: The current value of the vector.
+         * :param floatMatrix &DADADt: The gradient of A w.r.t. the current rate of change.
+         * :param const floatVector &alpha: The integration parameter.
+         */
+
+        errorOut error = midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha);
+
+        if (error){
+            errorOut result = new errorNode("midpointEvolution (jacobian)", "Error in computation of the integrated term");
+            result->addNext(error);
+            return result;
+        }
+
+        DADADt = floatMatrix(A.size(), floatVector(A.size(), 0));
+        unsigned int i=0;
+        for (auto ai = alpha.begin(); ai != alpha.end(); ai++, i++){
+            DADADt[i][i] = Dt * (1 - *ai);
+        }
+        
+        return NULL;
+    }
+
+
+    errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
                                floatVector &A, const floatType alpha){
         /*!
          * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
@@ -455,12 +489,7 @@ namespace constitutiveTools{
          * :param const floatType alpha: The integration parameter.
          */
 
-        midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha);
-        floatMatrix eye;
-        vectorTools::eye(A.size(), eye);
-        DADADt = Dt*(1 - alpha)*eye;
-
-        return NULL;
+        return midpointEvolution(Dt, Ap, DApDt, DADt, A, DADADt, alpha*floatVector(Ap.size(), 1));
     }
 
     errorOut evolveF(const floatType &Dt, const floatVector &Fp, const floatVector &Lp, const floatVector &L,
