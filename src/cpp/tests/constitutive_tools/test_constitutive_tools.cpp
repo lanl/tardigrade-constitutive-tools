@@ -427,6 +427,7 @@ int testMidpointEvolution(std::ofstream &results){
     floatVector Ap    = {9, 10, 11, 12};
     floatVector DApDt = {1, 2, 3, 4};
     floatVector DADt  = {5, 6, 7, 8};
+    floatVector alphaVec = {0.1, 0.2, 0.3, 0.4};
     floatVector A;
 
     //Test implicit integration
@@ -471,6 +472,19 @@ int testMidpointEvolution(std::ofstream &results){
         return 1;
     }
 
+    error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A, alphaVec);
+
+    if (error){
+        error->print();
+        results << "testMidpointEvolution & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(A, {20.5, 23. , 25.5, 28.})){
+        results << "testMidpointEvolution (test 4) & False\n";
+        return 1;
+    }
+
     //Add test for the jacobian
     floatType alpha = .37;
     floatType eps = 1e-6;
@@ -487,7 +501,7 @@ int testMidpointEvolution(std::ofstream &results){
     }
 
     if (!vectorTools::fuzzyEquals(A0, A)){
-        results << "testMidpointEvolution (test 4) & False\n";
+        results << "testMidpointEvolution (test 5) & False\n";
         return 1;
     }
 
@@ -501,7 +515,7 @@ int testMidpointEvolution(std::ofstream &results){
 
         for (unsigned int j=0; j<gradCol.size(); j++){
             if (!vectorTools::fuzzyEquals(DADADt[j][i], gradCol[j])){
-                results << "testMidpointEvolution (test 5) & False\n";
+                results << "testMidpointEvolution (test 6) & False\n";
                 return 1;
             }
         }
