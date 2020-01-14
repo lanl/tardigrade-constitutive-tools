@@ -491,8 +491,8 @@ int testMidpointEvolution(std::ofstream &results){
     floatVector A0, Ai;
     floatMatrix DADADt;
 
-    error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha);
-    error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A0, DADADt, alpha);
+    error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A, alphaVec);
+    error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt, A0, DADADt, alphaVec);
 
     if (error){
         error->print();
@@ -509,7 +509,7 @@ int testMidpointEvolution(std::ofstream &results){
         floatVector delta = floatVector(DADt.size(), 0);
         delta[i] = eps*(DADt[i]) + eps;
 
-        error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt+delta, Ai, alpha);
+        error = constitutiveTools::midpointEvolution(Dt, Ap, DApDt, DADt + delta, Ai, alphaVec);
 
         floatVector gradCol = (Ai - A0)/delta[i];
 
