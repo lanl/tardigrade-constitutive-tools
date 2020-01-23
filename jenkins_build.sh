@@ -20,3 +20,8 @@ make
 
 # Perform repo tests
 ./test_${repo}
+
+# Check for failed tests
+if grep -i false results.tex; then
+    exit 1
+fi
