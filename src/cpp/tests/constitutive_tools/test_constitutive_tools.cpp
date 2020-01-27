@@ -486,7 +486,6 @@ int testMidpointEvolution(std::ofstream &results){
     }
 
     //Add test for the jacobian
-    floatType alpha = .37;
     floatType eps = 1e-6;
     floatVector A0, Ai;
     floatMatrix DADADt;
