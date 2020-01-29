@@ -799,8 +799,46 @@ int testEvolveF(std::ofstream &results){
         results << "testEvolveF (test 8) & False\n";
         return 1;
     }
+
+    //Tests 9 and 10 (mode 2 jacobian)
+    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, FJ, dFdL, 0.5, 2);
+
+    if (error){
+        error->print(); 
+        results << "testEvolveF & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(F, FJ)){
+        results << "testEvolveF (test 9) False\n";
+        return 1;
+    }
+
+    for (unsigned int i=0; i<L.size(); i++){
+
+        floatVector delta(L.size(), 0);
+        delta[i] = eps*fabs(L[i]) + eps;
+
+        error = constitutiveTools::evolveF(Dt, Fp, Lp, L + delta, FJ, 0.5, 2);
+
+        if (error){
+            error->print();
+            results << "testEvolveF & False\n";
+            return 1;
+        }
+
+        floatVector gradCol = (FJ - F)/delta[i];
+
+        for (unsigned int j=0; j<gradCol.size(); j++){
+            if (!vectorTools::fuzzyEquals(gradCol[j], dFdL[j][i], 1e-5, 1e-5)){
+                results << "testEvolveF (test 10) & False\n";
+                return 1;
+            }
+        }
+
+    }
     
-    results << "testEvolve & True\n";
+    results << "testEvolveF & True\n";
     return 0;
 }
 
