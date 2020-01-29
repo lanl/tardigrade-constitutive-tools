@@ -493,18 +493,26 @@ namespace constitutiveTools{
     }
 
     errorOut evolveF(const floatType &Dt, const floatVector &Fp, const floatVector &Lp, const floatVector &L,
-                     floatVector &F, const floatType alpha){
+                     floatVector &F, const floatType alpha, const unsigned int mode){
         /*!
          * Evolve F using the midpoint integration method.
          * 
-         * F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha\right) L_{ij}^{t+1}\right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t}\right]
+         * mode 1:
+         * F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha \right) L_{ij}^{t+1} \right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t} \right]
          * 
+         * mode 2:
+         * F_{iI}^{t + 1} = \left[F_{iJ}^{t} + \Delta t \alpha \dot{F}_{iJ}^{t} \right] \left[\delta_{IJ} - \Delta T \left( 1- \alpha \right) L_{IJ}^{t+1} \right]^{-1}
+         *
          * :param const floatType &Dt: The change in time.
          * :param const floatVector &Fp: The previous value of the deformation gradient
-         * :param const floatVector &Lp: The previous velocity gradient.
-         * :param const floatVector &L: The current velocity gradient.
+         * :param const floatVector &Lp: The previous velocity gradient in the current configuration (mode 1) or 
+         *     reference configuration (mode 2).
+         * :param const floatVector &L: The current velocity gradient in the current configuration (mode 1) or 
+         *     reference configuration (mode 2).
          * :param floatVector &F: The computed current deformation gradient.
          * :param const floatType alpha: The integration parameter.
+         * :param const unsigned int mode: The mode of the ODE. Whether the velocity gradient is known in the 
+         *     current (mode 1) or reference (mode 2) configuration. 
          */
 
         //Assumes 3D
@@ -521,9 +529,18 @@ namespace constitutiveTools{
             return new errorNode("evolveF", "The previous deformation gradient and the current velocity gradient aren't the same size");
         }
 
+        if ((mode != 1) || (mode != 2)){
+            return new errorNode("evolveF", "The mode of evolution is not recognized");
+        }
+
         //Compute the time-rate of change of the previous deformation gradient from the velocity gradient.
         floatVector DFpDt;
-        computeDFDt(Lp, Fp, DFpDt);        
+        if (mode == 1){
+            DFpDt = vectorTools::matrixMultiply(Lp, Fp, dim, dim, dim, dim);
+        }
+        if (mode == 2){
+            DFpDt = vectorTools::matrixMultiply(Fp, Lp, dim, dim, dim, dim);
+        }
 
         //Compute the left-hand side
         floatVector eye(dim*dim);
@@ -533,23 +550,22 @@ namespace constitutiveTools{
         //Compute the inverse of the left-hand side
         floatVector invLHS = vectorTools::inverse(LHS, dim, dim);
 
-        //Compute the right-hand size
+        //Compute the right-hand side
         floatVector RHS = Fp + Dt*alpha*DFpDt;
         F = floatVector(dim*dim, 0);
 
         //Compute the new value of F
-        for (unsigned int i=0; i<dim; i++){
-            for (unsigned int I=0; I<dim; I++){
-                for (unsigned int j=0; j<dim; j++){
-                    F[dim*i + I] += invLHS[dim*i + j]*RHS[dim*j + I];
-                }
-            }
+        if (mode == 1){
+            F = vectorTools::matrixMultiply(invLHS, RHS, dim, dim, dim, dim);
+        }
+        if (mode == 2){
+            F = vectorTools::matrixMultiply(RHS, invLHS, dim, dim, dim, dim);
         }
         return NULL;
     }
 
     errorOut evolveF(const floatType &Dt, const floatVector &Fp, const floatVector &Lp, const floatVector &L,
-                     floatVector &F, floatMatrix &dFdL, const floatType alpha){
+                     floatVector &F, floatMatrix &dFdL, const floatType alpha, const unsigned int mode = 1){
         /*!
          * Evolve F using the midpoint integration method and return the jacobian w.r.t. L.
          * 
@@ -590,8 +606,10 @@ namespace constitutiveTools{
         //Compute the inverse of the left-hand side
         floatVector invLHS = vectorTools::inverse(LHS, dim, dim);
 
-        //Compute the right-hand size
+        //Compute the right-hand side
         floatVector RHS = Fp + Dt*alpha*DFpDt;
+
+        //Evolve the deformation gradient
         F = vectorTools::matrixMultiply(invLHS, RHS, dim, dim, dim, dim);
 
         //Compute the jacobian
