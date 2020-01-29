@@ -529,7 +529,7 @@ namespace constitutiveTools{
             return new errorNode("evolveF", "The previous deformation gradient and the current velocity gradient aren't the same size");
         }
 
-        if ((mode != 1) || (mode != 2)){
+        if ((mode != 1) && (mode != 2)){
             return new errorNode("evolveF", "The mode of evolution is not recognized");
         }
 
@@ -565,12 +565,17 @@ namespace constitutiveTools{
     }
 
     errorOut evolveF(const floatType &Dt, const floatVector &Fp, const floatVector &Lp, const floatVector &L,
-                     floatVector &F, floatMatrix &dFdL, const floatType alpha, const unsigned int mode = 1){
+                     floatVector &F, floatMatrix &dFdL, const floatType alpha, const unsigned int mode){
         /*!
          * Evolve F using the midpoint integration method and return the jacobian w.r.t. L.
          * 
-         * F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha\right) L_{ij}^{t+1}\right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t}\right]
+         * mode 1:
+         * F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha \right) L_{ij}^{t+1} \right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t} \right]
          * \frac{\partial F_{jI}^{t + 1}}{\partial L_{kl}^{t+1}} &= \left[\delta_{kj} - \Delta t \left(1 - \alpha\right) L_{kj}\right]^{-1} \Delta t \left(1 - \alpha\right) F_{lI]^{t + 1}
+         * 
+         * mode 2:
+         * F_{iI}^{t + 1} = \left[F_{iJ}^{t} + \Delta t \alpha \dot{F}_{iJ}^{t} \right] \left[\delta_{IJ} - \Delta T \left( 1- \alpha \right) L_{IJ}^{t+1} \right]^{-1}
+         * \frac{\partial F_{iJ}^{t + 1}{\partial L_{KL}} = \Delta t (1 - \alpha) F_{iK}^{t + 1} \left[\delta_{JL} - 
          * 
          * :param const floatType &Dt: The change in time.
          * :param const floatVector &Fp: The previous value of the deformation gradient

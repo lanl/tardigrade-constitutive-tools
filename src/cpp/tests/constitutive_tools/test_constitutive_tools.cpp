@@ -650,9 +650,9 @@ int testEvolveF(std::ofstream &results){
                      0.82144027, 0.83961342, 0.95322334,
                      0.4768852 , 0.93771539, 0.1056616};
 
-    //Test 1 (fully explicit)
+    //Test 1 (mode 1 fully explicit)
     floatVector F;
-    errorOut error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 1);
+    errorOut error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 1, 1);
 
     if (error){
         error->print();
@@ -669,8 +669,8 @@ int testEvolveF(std::ofstream &results){
         return 1;
     }
 
-    //Test 2 (fully implicit)
-    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 0);
+    //Test 2 (mode 1 fully implicit)
+    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 0, 1);
 
     if (error){
         error->print();
@@ -687,8 +687,8 @@ int testEvolveF(std::ofstream &results){
         return 1;
     }
 
-    //Test 3 (midpoint rule)
-    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 0.5);
+    //Test 3 (mode 1 midpoint rule)
+    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 0.5, 1);
 
     if (error){
         error->print();
@@ -705,10 +705,10 @@ int testEvolveF(std::ofstream &results){
         return 1;
     }
 
-    //Tests 4 and 5 (jacobian)
+    //Tests 4 and 5 (mode 1 jacobian)
     floatVector FJ;
     floatMatrix dFdL;
-    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, FJ, dFdL, 0.5);
+    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, FJ, dFdL, 0.5, 1);
 
     if (error){
         error->print(); 
@@ -727,7 +727,7 @@ int testEvolveF(std::ofstream &results){
         floatVector delta(L.size(), 0);
         delta[i] = eps*fabs(L[i]) + eps;
 
-        error = constitutiveTools::evolveF(Dt, Fp, Lp, L + delta, FJ, dFdL, 0.5);
+        error = constitutiveTools::evolveF(Dt, Fp, Lp, L + delta, FJ, 0.5, 1);
 
         if (error){
             error->print();
@@ -744,6 +744,60 @@ int testEvolveF(std::ofstream &results){
             }
         }
 
+    }
+
+    //Test 6 (mode 2 fully explicit)
+    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 1, 2);
+
+    if (error){
+        error->print();
+        results << "testEvolveF & False\n";
+        return 1;
+    }
+
+    answer = {3.03173544, 1.1881084 , 2.77327313,
+              3.92282144, 2.58424672, 3.75584617,
+              5.18006647, 2.65125419, 4.85252662};
+
+    if (!vectorTools::fuzzyEquals(answer, F)){
+        results << "testEvolveF (test 6) & False\n";
+        return 1;
+    }
+
+    //Test 7 (mode 2 fully implicit)
+    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 0, 2);
+
+    if (error){
+        error->print();
+        results << "testEvolveF & False\n";
+        return 1;
+    }
+
+    answer = {0.65045472, -0.42475879, -0.09274688,
+             -0.25411831, -0.08867872, -0.16467241,
+              0.45611733, -0.45427799, -0.17799727};
+
+    if (!vectorTools::fuzzyEquals(answer, F)){
+        results << "testEvolveF (test 7) & False\n";
+        return 1;
+    }
+
+    //Test 8 (mode 2 midpoint rule)
+    error = constitutiveTools::evolveF(Dt, Fp, Lp, L, F, 0.5, 2);
+
+    if (error){
+        error->print();
+        results << "testEvolveF & False\n";
+        return 1;
+    }
+
+    answer = {-0.02066217, -1.43862233, -0.42448874,
+              -0.96426544, -1.72139966, -0.83831629,
+              -0.59802055, -2.37943476, -0.88998505};
+
+    if (!vectorTools::fuzzyEquals(answer, F)){
+        results << "testEvolveF (test 8) & False\n";
+        return 1;
     }
     
     results << "testEvolve & True\n";
