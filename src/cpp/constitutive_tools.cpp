@@ -601,7 +601,12 @@ namespace constitutiveTools{
 
         //Compute the time-rate of change of the previous deformation gradient from the velocity gradient.
         floatVector DFpDt;
-        computeDFDt(Lp, Fp, DFpDt);        
+        if (mode == 1){
+            DFpDt = vectorTools::matrixMultiply(Lp, Fp, dim, dim, dim, dim);
+        }
+        if (mode == 2){
+            DFpDt = vectorTools::matrixMultiply(Fp, Lp, dim, dim, dim, dim);
+        }
 
         //Compute the left-hand side
         floatVector eye(dim*dim);
@@ -615,15 +620,33 @@ namespace constitutiveTools{
         floatVector RHS = Fp + Dt*alpha*DFpDt;
 
         //Evolve the deformation gradient
-        F = vectorTools::matrixMultiply(invLHS, RHS, dim, dim, dim, dim);
+        if (mode == 1){
+            F = vectorTools::matrixMultiply(invLHS, RHS, dim, dim, dim, dim);
+        }
+        if (mode == 2){
+            F = vectorTools::matrixMultiply(RHS, invLHS, dim, dim, dim, dim);
+        }
 
         //Compute the jacobian
         dFdL = floatMatrix(F.size(), floatVector(L.size(), 0));
-        for (unsigned int j=0; j<dim; j++){
-            for (unsigned int I=0; I<dim; I++){
-                for (unsigned int k=0; k<dim; k++){
-                    for (unsigned int l=0; l<dim; l++){
-                        dFdL[dim*j + I][dim*k + l] = invLHS[dim*j + k] * Dt * (1 - alpha)*F[dim*l + I];
+        if (mode == 1){
+            for (unsigned int j=0; j<dim; j++){
+                for (unsigned int I=0; I<dim; I++){
+                    for (unsigned int k=0; k<dim; k++){
+                        for (unsigned int l=0; l<dim; l++){
+                            dFdL[dim*j + I][dim*k + l] = invLHS[dim*j + k] * Dt * (1 - alpha)*F[dim*l + I];
+                        }
+                    }
+                }
+            }
+        }
+        if (mode == 2){
+            for (unsigned int j=0; j<dim; j++){
+                for (unsigned int I=0; I<dim; I++){
+                    for (unsigned int K=0; K<dim; K++){
+                        for (unsigned int L=0; L<dim; L++){
+                            dFdL[dim*j + I][dim*K + L] = invLHS[dim*L + I] * Dt * (1 - alpha)*F[dim*j + K];
+                        }
                     }
                 }
             }
