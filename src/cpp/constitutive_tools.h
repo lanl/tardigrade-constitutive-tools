@@ -75,10 +75,10 @@ namespace constitutiveTools{
                                floatVector &A, floatMatrix &DADADt, const floatType alpha=0.5);
 
     errorOut evolveF(const floatType &Dt, const floatVector &Fp, const floatVector &Lp, const floatVector &L, 
-                     floatVector &F, const floatType alpha=0.5);
+                     floatVector &F, const floatType alpha=0.5, const unsigned int mode = 1);
 
     errorOut evolveF(const floatType &Dt, const floatVector &Fp, const floatVector &Lp, const floatVector &L,
-                     floatVector &F, floatMatrix &dFdL, const floatType alpha=0.5);
+                     floatVector &F, floatMatrix &dFdL, const floatType alpha=0.5, const unsigned int mode = 1);
 
     floatType mac(const floatType &x);
 
