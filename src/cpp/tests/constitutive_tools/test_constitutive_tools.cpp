@@ -154,7 +154,44 @@ int testComputeGreenLagrangeStrain(std::ofstream &results){
         return 1;
     }
 
-    results << "testComputeGreenLagrangeSTrain & True\n";
+    floatVector EJ;
+    floatMatrix dEdF;
+    ret = constitutiveTools::computeGreenLagrangeStrain(F, EJ, dEdF);
+
+    if (ret){
+        results << "testComputeGreenLagrangeStrain & False\n";
+        return 1;
+    }
+
+    if (!vectorTools::fuzzyEquals(E, EJ)){
+        results << "testComputeGreenLagrangeStrain (test 3) & False\n";
+        return 1;
+    }
+
+    floatType eps = 1e-6;
+    for (unsigned int i=0; i<F.size(); i++){
+        floatVector delta(F.size(), 0);
+
+        delta[i] = eps * fabs(F[i]) + eps;
+
+        ret = constitutiveTools::computeGreenLagrangeStrain(F + delta, EJ);
+
+        if (ret){
+            results << "testComputeGreenLagrangeStrain & False\n";
+            return 1;
+        }
+
+        floatVector gradCol = (EJ - E)/delta[i];
+
+        for (unsigned int j=0; j<gradCol.size(); j++){
+            if (!vectorTools::fuzzyEquals(gradCol[j], dEdF[j][i])){
+                results << "testComputeDGreenLagrangeStrainDF (test 4) & False\n";
+                return 1;
+            }
+        }
+    }
+
+    results << "testComputeGreenLagrangeStrain & True\n";
     return 0;
 }
 
