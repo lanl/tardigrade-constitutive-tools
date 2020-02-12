@@ -112,6 +112,37 @@ namespace constitutiveTools{
         return NULL;
     }
 
+    errorOut computeGreenLagrangeStrain(const floatVector &F, floatVector &E, floatMatrix &dEdF){
+        /*!
+         * Compute the Green-Lagrange strain from the deformation gradient and it's jacobian.
+         * 
+         * :param floatVector &F: A reference to the deformation gradient.
+         * :param floatVector &E: The resulting Green-Lagrange strain.
+         * :param floatMatrix &dEdF: The jacobian of the Green-Lagrange strain w.r.t. the 
+         *     deformation gradient.
+         * 
+         * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
+         * The Green-Lagrange strain is organized as E11, E12, E13, E21, E22, E23, E31, E32, E33
+         */
+
+        errorOut error = computeGreenLagrangeStrain(F, E);
+
+        if (error){
+            errorOut result = new errorNode("computeGreenLagrangeStrain (jacobian)", "Error in computation of Green-Lagrange strain");
+            result->addNext(error);
+            return result;
+        }
+
+        error = computeDGreenLagrangeStrainDF(F, dEdF);
+
+        if (error){
+            errorOut result = new errorNode("computeGreenLagrangeStrain (jacobian)", "Error in computation of Green-Lagrange strain jacobian");
+            result->addNext(error);
+            return result;
+        }
+        return NULL;
+    }
+
     errorOut computeDGreenLagrangeStrainDF(const floatVector &F,
                                         floatMatrix &dEdF){
         /*!
