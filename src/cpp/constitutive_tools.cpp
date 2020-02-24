@@ -990,4 +990,24 @@ namespace constitutiveTools{
 
         return NULL;
     }
+
+    errorOut pullBackAlmansiStrain( const floatVector &almansiStrain, const floatVector &deformationGradient,
+                                    floatVector &greenLagrangeStrain ){
+        /*!
+         * Pull back the almansi strain to the configuration indiacted by the deformation gradient.
+         * 
+         * :param const floatVector &almansiStrain: The strain in the deformation gradient's current configuration.
+         * :param const floatVector &deformationGradient: The deformation gradient between configurations.
+         * :param floatVector &greenLagrangeStrain: The Green-Lagrange strain which corresponds to the reference 
+         *     configuration of the deformation gradient.
+         */
+
+        //Assume 3d
+        unsigned int dim = 3;
+
+        greenLagrangeStrain = vectorTools::matrixMultiply( deformationGradient, almansiStrain, dim, dim, dim, dim, 1, 0 );
+        greenLagrangeStrain = vectorTools::matrixMultiply( greenLagrangeStrain, deformationGradient, dim, dim, dim, dim, 0, 0 );
+
+        return NULL;
+    }
 }
