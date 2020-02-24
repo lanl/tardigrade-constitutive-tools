@@ -1273,6 +1273,43 @@ int testPushForwardGreenLagrangeStrain(std::ofstream &results){
     return 0;
 }
 
+int testPullBackAlmansiStrain( std::ofstream &results ){
+    /*!
+     * Test the pull-back operation on the Green-Lagrange strain.
+     * 
+     * :param std::ofstream &results: The output file.
+     */
+
+    floatVector deformationGradient = { 0.1740535 ,  1.2519364 , -0.9531442 ,
+                                       -0.7512021 , -0.60229072,  0.32640812,
+                                       -0.59754476, -0.06209685, -1.50856757 };
+
+    floatVector almansiStrain = { 0.25045537, 0.48303426, 0.98555979,
+                                  0.51948512, 0.61289453, 0.12062867,
+                                  0.8263408 , 0.60306013, 0.54506801 };
+
+    floatVector answer = { 0.55339061, -0.59325289,  0.92984685,
+                          -0.83130342, -0.25274097, -1.5877536 ,
+                           1.67911302, -0.83554021,  3.47033811 };
+
+    floatVector result;
+    errorOut error = constitutiveTools::pullBackAlmansiStrain( almansiStrain, deformationGradient, result );
+
+    if ( error ){
+        error->print();
+        results << "testPullBackAlmansiStrain & False\n";
+        return 1;
+    }
+
+    if ( !vectorTools::fuzzyEquals( answer, result ) ){
+        results << "testPullBackAlmansiStrain (test 1) & False\n";
+        return 1;
+    }
+
+    results << "testPullBackAlansiStrain & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -1283,24 +1320,25 @@ int main(){
 
     //Open the results file
     std::ofstream results;
-    results.open("results.tex");
+    results.open( "results.tex" );
 
     //Run the tests
-    testDeltaDirac(results);
-    testRotateMatrix(results);
-    testComputeGreenLagrangeStrain(results);
-    testComputeDGreenLagrangeStrainDF(results);
-    testDecomposeGreenLagrangeStrain(results);
-    testMapPK2toCauchy(results);
-    testWLF(results);
-    testMidpointEvolution(results);
-    testComputeDFDt(results);
-    testEvolveF(results);
-    testMac(results);
-    testComputeUnitNormal(results);
-    testPullBackVelocityGradient(results);
-    testQuadraticThermalExpansion(results);
-    testPushForwardGreenLagrangeStrain(results);
+    testDeltaDirac( results );
+    testRotateMatrix( results );
+    testComputeGreenLagrangeStrain( results );
+    testComputeDGreenLagrangeStrainDF( results );
+    testDecomposeGreenLagrangeStrain( results );
+    testMapPK2toCauchy( results );
+    testWLF( results );
+    testMidpointEvolution( results );
+    testComputeDFDt( results );
+    testEvolveF( results );
+    testMac( results );
+    testComputeUnitNormal( results );
+    testPullBackVelocityGradient( results );
+    testQuadraticThermalExpansion( results );
+    testPushForwardGreenLagrangeStrain( results );
+    testPullBackAlmansiStrain( results );
 
     //Close the results file
     results.close();

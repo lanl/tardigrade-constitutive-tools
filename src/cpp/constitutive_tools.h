@@ -110,6 +110,9 @@ namespace constitutiveTools{
 
     errorOut pushForwardGreenLagrangeStrain(const floatVector &greenLagrangeStrain, const floatVector &deformationGradient, 
                                             floatVector &almansiStrain, floatMatrix &dalmansiStraindE, floatMatrix &dalmansiStraindF);
+
+    errorOut pullBackAlmansiStrain( const floatVector &almansiStrain, const floatVector &deformationGradient,
+                                    floatVector &greenLagrangeStrain );
 }
 
 #endif
