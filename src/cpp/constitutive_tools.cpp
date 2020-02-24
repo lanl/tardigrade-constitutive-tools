@@ -994,7 +994,7 @@ namespace constitutiveTools{
     errorOut pullBackAlmansiStrain( const floatVector &almansiStrain, const floatVector &deformationGradient,
                                     floatVector &greenLagrangeStrain ){
         /*!
-         * Pull back the almansi strain to the configuration indiacted by the deformation gradient.
+         * Pull back the almansi strain to the configuration indicated by the deformation gradient.
          * 
          * :param const floatVector &almansiStrain: The strain in the deformation gradient's current configuration.
          * :param const floatVector &deformationGradient: The deformation gradient between configurations.
@@ -1007,6 +1007,54 @@ namespace constitutiveTools{
 
         greenLagrangeStrain = vectorTools::matrixMultiply( deformationGradient, almansiStrain, dim, dim, dim, dim, 1, 0 );
         greenLagrangeStrain = vectorTools::matrixMultiply( greenLagrangeStrain, deformationGradient, dim, dim, dim, dim, 0, 0 );
+
+        return NULL;
+    }
+
+    errorOut pullBackAlmansiStrain( const floatVector &almansiStrain, const floatVector &deformationGradient,
+                                    floatVector &greenLagrangeStrain, floatMatrix &dEde, floatMatrix &dEdF ){
+        /*!
+         * Pull back the almansi strain to the configuration indicated by the deformation gradient.
+         * 
+         * Also return the Jacobians.
+         * 
+         * :param const floatVector &almansiStrain: The strain in the deformation gradient's current configuration.
+         * :param const floatVector &deformationGradient: The deformation gradient between configurations.
+         * :param floatVector &greenLagrangeStrain: The Green-Lagrange strain which corresponds to the reference 
+         *     configuration of the deformation gradient.
+         */
+
+        //Assume 3d
+        unsigned int dim = 3;
+
+        errorOut error = pullBackAlmansiStrain( almansiStrain, deformationGradient, greenLagrangeStrain );
+
+        if ( error ){
+            errorOut result = new errorNode( "pullBackAlmansiStrain (jacobian)",
+                                             "Error in computation of Green-Lagrange strain" );
+            result->addNext( error );
+            return result;
+        }
+
+        floatVector eye( dim * dim );
+        vectorTools::eye( eye );
+
+        dEde = floatMatrix( dim * dim, floatVector( dim * dim, 0 ) );
+        dEdF = floatMatrix( dim * dim, floatVector( dim * dim, 0 ) );
+
+        for ( unsigned int I = 0; I < dim; I++ ){
+            for ( unsigned int J = 0; J < dim; J++ ){
+                for ( unsigned int K = 0; K < dim; K++ ){
+                    for ( unsigned int L = 0; L < dim; L++ ){
+                        dEde[ dim * I + J ][ dim * K + L ] = deformationGradient[ dim * K + I ] * deformationGradient[ dim * L + J ];
+                        for ( unsigned int j = 0; j < dim; j++ ){
+                            dEdF[ dim * I + J ][ dim * K + L ] += eye[ dim * I + L ] * almansiStrain[ dim * K + j ] * deformationGradient[ dim * j + J ]
+                                                                + deformationGradient[ dim * j + I ] * almansiStrain[ dim * j + K ] * eye[ dim * J + L ];
+                        }
+                    }
+                }
+            }
+        }
 
         return NULL;
     }
