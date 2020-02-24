@@ -1322,7 +1322,8 @@ int testPullBackAlmansiStrain( std::ofstream &results ){
         results << "testPullBackAlmansiStrain (test 2) & False\n";
         return 1;
     }
-    
+
+    //Testing dEde    
     floatType eps = 1e-6;
     for ( unsigned int i = 0; i < almansiStrain.size(); i++ ){
         floatVector delta( almansiStrain.size(), 0 );
@@ -1346,6 +1347,7 @@ int testPullBackAlmansiStrain( std::ofstream &results ){
         }
     }
 
+    //Testing dEdF
     for ( unsigned int i = 0; i < deformationGradient.size(); i++ ){
         floatVector delta( deformationGradient.size(), 0 );
         delta[i] = eps * fabs( deformationGradient[i] ) + eps;
