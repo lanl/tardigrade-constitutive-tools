@@ -1306,6 +1306,70 @@ int testPullBackAlmansiStrain( std::ofstream &results ){
         return 1;
     }
 
+    //Test the jacobians
+    floatVector resultJ;
+    floatMatrix dEde, dEdF;
+
+    error = constitutiveTools::pullBackAlmansiStrain( almansiStrain, deformationGradient, resultJ, dEde, dEdF );
+
+    if ( error ){
+        error->print();
+        results << "testPullBackAlmansiStrain & False\n";
+        return 1;
+    }
+
+    if ( !vectorTools::fuzzyEquals( answer, resultJ ) ){
+        results << "testPullBackAlmansiStrain (test 2) & False\n";
+        return 1;
+    }
+
+    //Testing dEde    
+    floatType eps = 1e-6;
+    for ( unsigned int i = 0; i < almansiStrain.size(); i++ ){
+        floatVector delta( almansiStrain.size(), 0 );
+        delta[i] = eps * fabs( almansiStrain[i] ) + eps;
+
+        error = constitutiveTools::pullBackAlmansiStrain( almansiStrain + delta, deformationGradient, resultJ );
+
+        if ( error ){
+            error->print();
+            results << "testPullBackAlmansiStrain & False\n";
+            return 1;
+        }
+
+        floatVector gradCol = ( resultJ - result ) / delta[i];
+
+        for ( unsigned int j = 0; j < gradCol.size(); j++ ){
+            if ( !vectorTools::fuzzyEquals( gradCol[j], dEde[j][i] ) ){
+                results << "testPullBackAlmansiStrain (test 3) & False\n";
+                return 1;
+            }
+        }
+    }
+
+    //Testing dEdF
+    for ( unsigned int i = 0; i < deformationGradient.size(); i++ ){
+        floatVector delta( deformationGradient.size(), 0 );
+        delta[i] = eps * fabs( deformationGradient[i] ) + eps;
+
+        error = constitutiveTools::pullBackAlmansiStrain( almansiStrain, deformationGradient + delta, resultJ );
+
+        if ( error ){
+            error->print();
+            results << "testPullBackAlmansiStrain & False\n";
+            return 1;
+        }
+
+        floatVector gradCol = ( resultJ - result ) / delta[i];
+
+        for ( unsigned int j = 0; j < gradCol.size(); j++ ){
+            if ( !vectorTools::fuzzyEquals( gradCol[j], dEdF[j][i] ) ){
+                results << "testPullBackAlmansiStrain (test 4) & False\n";
+                return 1;
+            }
+        }
+    }
+
     results << "testPullBackAlansiStrain & True\n";
     return 0;
 }
