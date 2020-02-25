@@ -718,8 +718,13 @@ namespace constitutiveTools{
          */
 
         floatType norm = sqrt(vectorTools::inner(A, A));
-        
-        Anorm = A/norm;
+
+        if ( vectorTools::fuzzyEquals( norm, 0. ) ){
+            Anorm = floatVector( A.size(), 0 );        
+        }
+        else {
+            Anorm = A/norm;
+        }
 
         return NULL;
     }
@@ -736,7 +741,12 @@ namespace constitutiveTools{
 
         floatType norm = sqrt(vectorTools::inner(A, A));
         
-        Anorm = A/norm;
+        if ( vectorTools::fuzzyEquals( norm, 0. ) ){
+            Anorm = floatVector( A.size(), 0 );        
+        }
+        else {
+            Anorm = A/norm;
+        }
 
         floatMatrix eye = vectorTools::eye<floatType>(A.size());
 
