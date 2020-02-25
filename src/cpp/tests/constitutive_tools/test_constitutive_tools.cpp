@@ -990,6 +990,39 @@ int testComputeUnitNormal(std::ofstream &results){
         }
     }
 
+    A = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    error = constitutiveTools::computeUnitNormal( A, Anorm );
+
+    if ( error ){
+        error->print();
+        results << "testComputeUnitNormal & False\n";
+        return 1;
+    }
+
+    if ( !vectorTools::fuzzyEquals( Anorm, A ) ){
+        results << "testComputeUnitNormal (test 4) & False\n";
+        return 1;
+    }
+
+    error = constitutiveTools::computeUnitNormal( A, Anorm, dAnormdA );
+
+    if ( error ){
+        error->print();
+        results << "testComputeUnitNormal & False\n";
+        return 1;
+    }
+
+    if ( !vectorTools::fuzzyEquals( Anorm, A ) ){
+        results << "testComputeUnitNormal (test 5) & False\n";
+        return 1;
+    }
+
+    if ( !std::isnan( vectorTools::l2norm( dAnormdA ) ) ){
+        results << "testComputeUnitNormal (test 6) & False\n";
+        return 1;
+    }
+
     results << "testComputeUnitNormal & True\n";
     return 0;
 }
