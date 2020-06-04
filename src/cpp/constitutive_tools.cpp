@@ -90,6 +90,7 @@ namespace constitutiveTools{
          * \param &E: The resulting Green-Lagrange strain.
          *
          * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
+         *
          * The Green-Lagrange strain is organized as E11, E12, E13, E21, E22, E23, E31, E32, E33
          */
 
@@ -122,6 +123,7 @@ namespace constitutiveTools{
          *     deformation gradient.
          *
          * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
+         *
          * The Green-Lagrange strain is organized as E11, E12, E13, E21, E22, E23, E31, E32, E33
          */
 
