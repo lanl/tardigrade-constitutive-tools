@@ -1,22 +1,22 @@
-/*
-===============================================================================
-|                            constitutive_tools.cpp                           |
-===============================================================================
-| A collection of tools useful for constitutive models. These tools are       |
-| intended to be generalized expressions which perform operations commonly    |
-| encountered in the development of constitutive models. This will enable     |
-| users to develop new models quickly and (in principle) with less errors     |
-| resulting in delays.                                                        |
-|                                                                             |
-| Developers should use vector_tools to perform vector multiplications and    |
-| matrix solves since this library can be independently checked. Also using   |
-| templates and typedef for the data is strongly encouraged so that single    |
-| and double precision values (in addition to other types) can be used        |
-| simply without significant reworking of the code. Passing by reference is   |
-| also encouraged if appropriate to allow users of FORTRAN to interface with  |
-| the code without extensive modifications.                                   |
-===============================================================================
-*/
+/**
+  *****************************************************************************
+  * \file constitutive_tools.cpp
+  *****************************************************************************
+  * A collection of tools useful for constitutive models. These tools are
+  * intended to be generalized expressions which perform operations commonly
+  * encountered in the development of constitutive models. This will enable
+  * users to develop new models quickly and (in principle) with less errors
+  * resulting in delays.
+  *
+  * Developers should use vector_tools to perform vector multiplications and
+  * matrix solves since this library can be independently checked. Also using
+  * templates and typedef for the data is strongly encouraged so that single
+  * and double precision values (in addition to other types) can be used
+  * simply without significant reworking of the code. Passing by reference is
+  * also encouraged if appropriate to allow users of FORTRAN to interface with
+  * the code without extensive modifications.
+  *****************************************************************************
+  */
 
 #include<constitutive_tools.h>
 
@@ -25,14 +25,14 @@ namespace constitutiveTools{
     floatType deltaDirac(const unsigned int i, const unsigned int j){
         /*!
          * The delta dirac function
-         * 
+         *
          * if i==j return 1
          * if i!=j return 0
-         * 
-         * :params const unsigned int i: The first index
-         * :params const unsigned int j: The second index
+         *
+         * \params const unsigned int i: The first index
+         * \params const unsigned int j: The second index
          */
-    
+
         if (i==j){
             return 1.;
         }
@@ -43,12 +43,12 @@ namespace constitutiveTools{
         /*!
          * Rotate a matrix A using the orthogonal matrix Q with the form
          * A'_ij = Q_{Ii} A_{IJ} Q_{Jj}
-         * 
+         *
          * TODO: Generalize to non square matrices
-         * 
-         * :param const floatVector &A: The matrix to be rotated
-         * :param const floatVector &Q: The rotation matrix
-         * :param floatVector &rotatedA: The rotated matrix
+         *
+         * \param const floatVector &A: The matrix to be rotated
+         * \param const floatVector &Q: The rotation matrix
+         * \param floatVector &rotatedA: The rotated matrix
          */
 
         //Check the size of A
@@ -77,29 +77,29 @@ namespace constitutiveTools{
 
         return NULL;
     }
-    
+
     errorOut computeGreenLagrangeStrain(const floatVector &F,
                                         floatVector &E){
         /*!
          * Compute the Green-Lagrange strain from the deformation gradient. The operation is:
          * E = 0.5 (F_{iI} F_{iJ} - delta_{IJ})
-         * 
-         * Where F is the deformation gradient and delta is the kronecker delta. 
-         * 
-         * :params floatVector &F: A reference to the deformation gradient.
-         * :params floatVector &E: The resulting Green-Lagrange strain.
-         * 
+         *
+         * Where F is the deformation gradient and delta is the kronecker delta.
+         *
+         * \params floatVector &F: A reference to the deformation gradient.
+         * \params floatVector &E: The resulting Green-Lagrange strain.
+         *
          * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
          * The Green-Lagrange strain is organized as E11, E12, E13, E21, E22, E23, E31, E32, E33
          */
-   
+
         if (F.size() != 9){
             return new errorNode("computeGreenLagrangeStrain", "The deformation gradient must be 3D.");
         }
-    
+
         const unsigned int dim=3;
         E.resize(dim*dim);
-        
+
         for (unsigned int I=0; I<dim; I++){
             for (unsigned int J=0; J<dim; J++){
                 E[dim*I + J] = -deltaDirac(I, J);
@@ -115,12 +115,12 @@ namespace constitutiveTools{
     errorOut computeGreenLagrangeStrain(const floatVector &F, floatVector &E, floatMatrix &dEdF){
         /*!
          * Compute the Green-Lagrange strain from the deformation gradient and it's jacobian.
-         * 
-         * :param floatVector &F: A reference to the deformation gradient.
-         * :param floatVector &E: The resulting Green-Lagrange strain.
-         * :param floatMatrix &dEdF: The jacobian of the Green-Lagrange strain w.r.t. the 
+         *
+         * \param floatVector &F: A reference to the deformation gradient.
+         * \param floatVector &E: The resulting Green-Lagrange strain.
+         * \param floatMatrix &dEdF: The jacobian of the Green-Lagrange strain w.r.t. the
          *     deformation gradient.
-         * 
+         *
          * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
          * The Green-Lagrange strain is organized as E11, E12, E13, E21, E22, E23, E31, E32, E33
          */
@@ -148,12 +148,12 @@ namespace constitutiveTools{
         /*!
          * Compute the derivative of the Green-Lagrange strain w.r.t. the deformation gradient.
          * dE_IJdFkK = 0.5 ( delta_{IK} F_{kJ} + F_{kI} delta_{JK})
-         * 
-         * Where F is the deformation gradient and delta is the kronecker delta. 
-         * 
-         * :params floatVector &F: A reference to the deformation gradient.
-         * :params floatVector &dEdF: The resulting gradient.
-         * 
+         *
+         * Where F is the deformation gradient and delta is the kronecker delta.
+         *
+         * \params floatVector &F: A reference to the deformation gradient.
+         * \params floatVector &dEdF: The resulting gradient.
+         *
          * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
          */
 
@@ -180,11 +180,11 @@ namespace constitutiveTools{
          * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts.
          * where J    = det(F) = sqrt(det(2*E + I))
          *       Ebar_IJ = 0.5*((1/(J**(2/3))) F_iI F_iJ - I_IJ) = (1/(J**(2/3)))*E_IJ + 0.5(1/(J**(2/3)) - 1)*I_{IJ}
-         * 
-         * :param const floatVector &E: The Green-Lagrange strain tensor
-         * :param floatVector &Ebar: The isochoric Green-Lagrange strain tensor.
+         *
+         * \param const floatVector &E: The Green-Lagrange strain tensor
+         * \param floatVector &Ebar: The isochoric Green-Lagrange strain tensor.
          *     format = E11, E12, E13, E21, E22, E23, E31, E32, E33
-         * :param floatType &J: The Jacobian of deformation (det(F))
+         * \param floatType &J: The Jacobian of deformation (det(F))
          */
 
         if (E.size() != 9){
@@ -210,14 +210,14 @@ namespace constitutiveTools{
          * Decompute the Green-Lagrange strain tensor into isochoric and volumetric parts.
          * where J    = det(F) = sqrt(det(2*E + I))
          *       Ebar_IJ = 0.5*((1/(J**(2/3))) F_iI F_iJ - I_IJ) = (1/(J**(2/3)))*E_IJ + 0.5(1/(J**(2/3)) - 1)*I_{IJ}
-         * 
-         * :param const floatVector &E: The Green-Lagrange strain tensor
-         * :param floatVector &Ebar: The isochoric Green-Lagrange strain tensor.
+         *
+         * \param const floatVector &E: The Green-Lagrange strain tensor
+         * \param floatVector &Ebar: The isochoric Green-Lagrange strain tensor.
          *     format = E11, E12, E13, E21, E22, E23, E31, E32, E33
-         * :param floatType &J: The Jacobian of deformation (det(F))
-         * :param floatMatrix &dEbardE: The derivative of the isochoric Green-Lagrange strain 
+         * \param floatType &J: The Jacobian of deformation (det(F))
+         * \param floatMatrix &dEbardE: The derivative of the isochoric Green-Lagrange strain
          *     tensor w.r.t. the total strain tensor.
-         * :param floatMatrix &dJdE: The derivative of the jacobian of deformation w.r.t. the 
+         * \param floatMatrix &dJdE: The derivative of the jacobian of deformation w.r.t. the
          *     Green-Lagrange strain tensor.
          */
 
@@ -248,10 +248,10 @@ namespace constitutiveTools{
          * Map the PK2 stress to the current configuration resulting in the Cauchy stress.
          * cauchy_ij = (1/det(F)) F_{iI} PK2_{IJ} F_{jJ}
          * where F is the deformation gradient
-         * 
-         * :param const floatVector &PK2Stress: The Second Piola-Kirchoff stress
-         * :param const floatVector &deformationGradient: The total deformation gradient.
-         * :param floatVector &cauchyStress: The Cauchy stress.
+         *
+         * \param const floatVector &PK2Stress: The Second Piola-Kirchoff stress
+         * \param const floatVector &deformationGradient: The total deformation gradient.
+         * \param floatVector &cauchyStress: The Cauchy stress.
          */
 
         if (PK2Stress.size() != 9){
@@ -283,14 +283,14 @@ namespace constitutiveTools{
     errorOut WLF(const floatType &temperature, const floatVector &WLFParameters, floatType &factor){
         /*!
          * An implementation of the Williams-Landel-Ferry equation.
-         * 
+         *
          * factor = 10**((-C1*(T - Tr))/(C2 + T - Tr))
-         * 
+         *
          * where T is the temperature, Tr is the reference temperature, and C1 and C2 are parameters
-         * 
-         * :param const floatType &temperature: The temperature
-         * :param const floatVector &WLFParameters: The parameters for the function [Tr, C1, C2]
-         * :param floatType &factor: The shift factor
+         *
+         * \param const floatType &temperature: The temperature
+         * \param const floatVector &WLFParameters: The parameters for the function [Tr, C1, C2]
+         * \param floatType &factor: The shift factor
          */
 
         if (WLFParameters.size() != 3){
@@ -314,10 +314,10 @@ namespace constitutiveTools{
         /*!
          * An implementation of the Williams-Landel-Ferry equation that also returns the gradient w.r.t. T
          *
-         * :param const floatType &temperature: The temperature
-         * :param const floatVector &WLFParameters: The parameters for the function [Tr, C1, C2]
-         * :param floatType &factor: The shift factor
-         * :param floatType &dfactordT: The derivative of the shift factor w.r.t. the temperature.
+         * \param const floatType &temperature: The temperature
+         * \param const floatVector &WLFParameters: The parameters for the function [Tr, C1, C2]
+         * \param floatType &factor: The shift factor
+         * \param floatType &dfactordT: The derivative of the shift factor w.r.t. the temperature.
          */
 
         errorOut error = WLF(temperature, WLFParameters, factor);
@@ -339,12 +339,12 @@ namespace constitutiveTools{
     errorOut computeDFDt(const floatVector &velocityGradient, const floatVector &deformationGradient, floatVector &DFDt){
         /*!
          * Compute the total time derivative of the deformation gradient.
-         * 
+         *
          * \dot{F}_{iI} = L_{ij} F_{jI}
-         * 
-         * :param const floatVector &velocityGradient: The velocity gradient L_{ij}
-         * :param const floatVector &deformationGradient: The deformation gradient F_{iI}
-         * :param floatVector &DFDt: The total time derivative of the deformation gradient
+         *
+         * \param const floatVector &velocityGradient: The velocity gradient L_{ij}
+         * \param const floatVector &deformationGradient: The deformation gradient F_{iI}
+         * \param floatVector &DFDt: The total time derivative of the deformation gradient
          */
 
         //Assume 3D
@@ -375,14 +375,14 @@ namespace constitutiveTools{
         /*!
          * Compute the total time derivative of the deformation gradient
          * and return the partial derivatives w.r.t. L and F.
-         * 
+         *
          * \dot{F}_{iI} = L_{ij} F_{jI}
          * \frac{\partial \dot{F}_{iI}}{\partial L_{kl}} = \delta_{ik} F{lI}
          * \frac{\partial \dot{F}_{iI}}{\partial F_{kK}} = L_{ik} \delta{IK}
-         * 
-         * :param const floatVector &velocityGradient: The velocity gradient L_{ij}
-         * :param const floatVector &deformationGradient: The deformation gradient F_{iI}
-         * :param floatVector &DFDt: The total time derivative of the deformation gradient
+         *
+         * \param const floatVector &velocityGradient: The velocity gradient L_{ij}
+         * \param const floatVector &deformationGradient: The deformation gradient F_{iI}
+         * \param floatVector &DFDt: The total time derivative of the deformation gradient
          */
 
         //Assume 3D
@@ -424,13 +424,13 @@ namespace constitutiveTools{
          * Perform midpoint rule based evolution of a vector.
          * alpha=0 (implicit)
          * alpha=1 (explicit)
-         * 
-         * :param const floatType &Dt: The change in time.
-         * :param const floatVector &Ap: The previous value of the vector
-         * :param const floatVector &DApDt: The previous time rate of change of the vector.
-         * :param const floatVector &DADt: The current time rate of change of the vector.
-         * :param floatVector &A: The current value of the vector.
-         * :param const floatVector &alpha: The integration parameter.
+         *
+         * \param const floatType &Dt: The change in time.
+         * \param const floatVector &Ap: The previous value of the vector
+         * \param const floatVector &DApDt: The previous time rate of change of the vector.
+         * \param const floatVector &DADt: The current time rate of change of the vector.
+         * \param floatVector &A: The current value of the vector.
+         * \param const floatVector &alpha: The integration parameter.
          */
 
         if ((Ap.size() != DApDt.size()) || (Ap.size() != DADt.size())){
@@ -448,7 +448,7 @@ namespace constitutiveTools{
             }
             A[i] = Ap[i] + Dt * (*ai * DApDt[i] + (1 - *ai) * DADt[i]);
         }
-        
+
         return NULL;
     }
 
@@ -458,14 +458,14 @@ namespace constitutiveTools{
          * Perform midpoint rule based evolution of a vector and return the jacobian.
          * alpha=0 (implicit)
          * alpha=1 (explicit)
-         * 
-         * :param const floatType &Dt: The change in time.
-         * :param const floatVector &Ap: The previous value of the vector
-         * :param const floatVector &DApDt: The previous time rate of change of the vector.
-         * :param const floatVector &DADt: The current time rate of change of the vector.
-         * :param floatVector &A: The current value of the vector.
-         * :param floatMatrix &DADADt: The gradient of A w.r.t. the current rate of change.
-         * :param const floatVector &alpha: The integration parameter.
+         *
+         * \param const floatType &Dt: The change in time.
+         * \param const floatVector &Ap: The previous value of the vector
+         * \param const floatVector &DApDt: The previous time rate of change of the vector.
+         * \param const floatVector &DADt: The current time rate of change of the vector.
+         * \param floatVector &A: The current value of the vector.
+         * \param floatMatrix &DADADt: The gradient of A w.r.t. the current rate of change.
+         * \param const floatVector &alpha: The integration parameter.
          */
 
         errorOut error = midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha);
@@ -481,7 +481,7 @@ namespace constitutiveTools{
         for (auto ai = alpha.begin(); ai != alpha.end(); ai++, i++){
             DADADt[i][i] = Dt * (1 - *ai);
         }
-        
+
         return NULL;
     }
 
@@ -492,13 +492,13 @@ namespace constitutiveTools{
          * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
          * alpha=0 (implicit)
          * alpha=1 (explicit)
-         * 
-         * :param const floatType &Dt: The change in time.
-         * :param const floatVector &Ap: The previous value of the vector
-         * :param const floatVector &DApDt: The previous time rate of change of the vector.
-         * :param const floatVector &DADt: The current time rate of change of the vector.
-         * :param floatVector &A: The current value of the vector.
-         * :param const floatType alpha: The integration parameter.
+         *
+         * \param const floatType &Dt: The change in time.
+         * \param const floatVector &Ap: The previous value of the vector
+         * \param const floatVector &DApDt: The previous time rate of change of the vector.
+         * \param const floatVector &DADt: The current time rate of change of the vector.
+         * \param floatVector &A: The current value of the vector.
+         * \param const floatType alpha: The integration parameter.
          */
 
         return midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha*floatVector(Ap.size(), 1));
@@ -510,14 +510,14 @@ namespace constitutiveTools{
          * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
          * alpha=0 (implicit)
          * alpha=1 (explicit)
-         * 
-         * :param const floatType &Dt: The change in time.
-         * :param const floatVector &Ap: The previous value of the vector
-         * :param const floatVector &DApDt: The previous time rate of change of the vector.
-         * :param const floatVector *DADt: The current time rate of change of the vector.
-         * :param floatVector &A: The current value of the vector.
-         * :param floatMatrix &DADADt: The derivative of the vector w.r.t. the rate of change of the vector.
-         * :param const floatType alpha: The integration parameter.
+         *
+         * \param const floatType &Dt: The change in time.
+         * \param const floatVector &Ap: The previous value of the vector
+         * \param const floatVector &DApDt: The previous time rate of change of the vector.
+         * \param const floatVector *DADt: The current time rate of change of the vector.
+         * \param floatVector &A: The current value of the vector.
+         * \param floatMatrix &DADADt: The derivative of the vector w.r.t. the rate of change of the vector.
+         * \param const floatType alpha: The integration parameter.
          */
 
         return midpointEvolution(Dt, Ap, DApDt, DADt, A, DADADt, alpha*floatVector(Ap.size(), 1));
@@ -527,23 +527,23 @@ namespace constitutiveTools{
                      floatVector &F, const floatType alpha, const unsigned int mode){
         /*!
          * Evolve F using the midpoint integration method.
-         * 
+         *
          * mode 1:
          * F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha \right) L_{ij}^{t+1} \right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t} \right]
-         * 
+         *
          * mode 2:
          * F_{iI}^{t + 1} = \left[F_{iJ}^{t} + \Delta t \alpha \dot{F}_{iJ}^{t} \right] \left[\delta_{IJ} - \Delta T \left( 1- \alpha \right) L_{IJ}^{t+1} \right]^{-1}
          *
-         * :param const floatType &Dt: The change in time.
-         * :param const floatVector &Fp: The previous value of the deformation gradient
-         * :param const floatVector &Lp: The previous velocity gradient in the current configuration (mode 1) or 
+         * \param const floatType &Dt: The change in time.
+         * \param const floatVector &Fp: The previous value of the deformation gradient
+         * \param const floatVector &Lp: The previous velocity gradient in the current configuration (mode 1) or
          *     reference configuration (mode 2).
-         * :param const floatVector &L: The current velocity gradient in the current configuration (mode 1) or 
+         * \param const floatVector &L: The current velocity gradient in the current configuration (mode 1) or
          *     reference configuration (mode 2).
-         * :param floatVector &F: The computed current deformation gradient.
-         * :param const floatType alpha: The integration parameter.
-         * :param const unsigned int mode: The mode of the ODE. Whether the velocity gradient is known in the 
-         *     current (mode 1) or reference (mode 2) configuration. 
+         * \param floatVector &F: The computed current deformation gradient.
+         * \param const floatType alpha: The integration parameter.
+         * \param const unsigned int mode: The mode of the ODE. Whether the velocity gradient is known in the
+         *     current (mode 1) or reference (mode 2) configuration.
          */
 
         //Assumes 3D
@@ -577,7 +577,7 @@ namespace constitutiveTools{
         floatVector eye(dim*dim);
         vectorTools::eye(eye);
         floatVector LHS = eye - Dt*(1 - alpha)*L;
-        
+
         //Compute the inverse of the left-hand side
         floatVector invLHS = vectorTools::inverse(LHS, dim, dim);
 
@@ -599,21 +599,21 @@ namespace constitutiveTools{
                      floatVector &F, floatMatrix &dFdL, const floatType alpha, const unsigned int mode){
         /*!
          * Evolve F using the midpoint integration method and return the jacobian w.r.t. L.
-         * 
+         *
          * mode 1:
          * F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha \right) L_{ij}^{t+1} \right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t} \right]
          * \frac{\partial F_{jI}^{t + 1}}{\partial L_{kl}^{t+1}} &= \left[\delta_{kj} - \Delta t \left(1 - \alpha\right) L_{kj}\right]^{-1} \Delta t \left(1 - \alpha\right) F_{lI]^{t + 1}
-         * 
+         *
          * mode 2:
          * F_{iI}^{t + 1} = \left[F_{iJ}^{t} + \Delta t \alpha \dot{F}_{iJ}^{t} \right] \left[\delta_{IJ} - \Delta T \left( 1- \alpha \right) L_{IJ}^{t+1} \right]^{-1}
-         * \frac{\partial F_{iJ}^{t + 1}{\partial L_{KL}} = \Delta t (1 - \alpha) F_{iK}^{t + 1} \left[\delta_{JL} - 
-         * 
-         * :param const floatType &Dt: The change in time.
-         * :param const floatVector &Fp: The previous value of the deformation gradient
-         * :param const floatVector &Lp: The previous velocity gradient.
-         * :param const floatVector &L: The current velocity gradient.
-         * :param floatVector &F: The computed current deformation gradient.
-         * :param const floatType alpha: The integration parameter.
+         * \frac{\partial F_{iJ}^{t + 1}{\partial L_{KL}} = \Delta t (1 - \alpha) F_{iK}^{t + 1} \left[\delta_{JL} -
+         *
+         * \param const floatType &Dt: The change in time.
+         * \param const floatVector &Fp: The previous value of the deformation gradient
+         * \param const floatVector &Lp: The previous velocity gradient.
+         * \param const floatVector &L: The current velocity gradient.
+         * \param floatVector &F: The computed current deformation gradient.
+         * \param const floatType alpha: The integration parameter.
          */
 
         //Assumes 3D
@@ -643,7 +643,7 @@ namespace constitutiveTools{
         floatVector eye(dim*dim);
         vectorTools::eye(eye);
         floatVector LHS = eye - Dt*(1 - alpha)*L;
-        
+
         //Compute the inverse of the left-hand side
         floatVector invLHS = vectorTools::inverse(LHS, dim, dim);
 
@@ -688,10 +688,10 @@ namespace constitutiveTools{
     floatType mac(const floatType &x){
         /*!
          * Compute the Macaulay brackets of a scalar x
-         * 
+         *
          * returns x if x>0, 0 otherwise
-         * 
-         * :param const floatType &x: The incoming scalar.
+         *
+         * \param const floatType &x: The incoming scalar.
          */
 
         return 0.5*(fabs(x) + x);
@@ -699,7 +699,7 @@ namespace constitutiveTools{
 
     floatType mac(const floatType &x, floatType &dmacdx){
         /*!
-         * Compute the Macaulay brackets of the scalar x and 
+         * Compute the Macaulay brackets of the scalar x and
          * return the jacobian as well.
          */
 
@@ -710,17 +710,17 @@ namespace constitutiveTools{
 
     errorOut computeUnitNormal(const floatVector &A, floatVector &Anorm){
         /*!
-         * Compute the unit normal of a second order tensor (or strictly speaking 
+         * Compute the unit normal of a second order tensor (or strictly speaking
          * any tensor).
-         * 
-         * :param const floatVector &A: The second order tensor
-         * :param const floatVector &Anorm: The unit normal in the direction of A
+         *
+         * \param const floatVector &A: The second order tensor
+         * \param const floatVector &Anorm: The unit normal in the direction of A
          */
 
         floatType norm = sqrt(vectorTools::inner(A, A));
 
         if ( vectorTools::fuzzyEquals( norm, 0. ) ){
-            Anorm = floatVector( A.size(), 0 );        
+            Anorm = floatVector( A.size(), 0 );
         }
         else {
             Anorm = A/norm;
@@ -731,18 +731,18 @@ namespace constitutiveTools{
 
     errorOut computeUnitNormal(const floatVector &A, floatVector &Anorm, floatMatrix &dAnormdA){
         /*!
-         * Compute the unit normal of a second order tensor (or strictly speaking any 
+         * Compute the unit normal of a second order tensor (or strictly speaking any
          * tensor) and the gradient of that unit normal w.r.t. the tensor.
-         * 
-         * :param const floatVector &A: The second order tensor
-         * :param const floatVector &Anorm: The unit normal in the direction of A
-         * :param const floatMatrix &dAnormdA: The gradient of the unit normal w.r.t. A
+         *
+         * \param const floatVector &A: The second order tensor
+         * \param const floatVector &Anorm: The unit normal in the direction of A
+         * \param const floatMatrix &dAnormdA: The gradient of the unit normal w.r.t. A
          */
 
         floatType norm = sqrt(vectorTools::inner(A, A));
-        
+
         if ( vectorTools::fuzzyEquals( norm, 0. ) ){
-            Anorm = floatVector( A.size(), 0 );        
+            Anorm = floatVector( A.size(), 0 );
         }
         else {
             Anorm = A/norm;
@@ -762,11 +762,11 @@ namespace constitutiveTools{
          * i.e. $totalDeformationGradient_{iI} = deformationGradient_{i \bar{I}} remainingDeformationGradient_{\bar{I} I}$
          * This is done via
          * $L_{\bar{I} \bar{J}} = deformationGradient_{\bar{I} i}^{-1} velocityGradient_{ij} deformationGradient_{j \bar{J}}$
-         * 
-         * :param const floatVector &velocityGradient: The velocity gradient in the current configuration.
-         * :param const floatVector &deformationGradient: The deformation gradient between the desired configuration 
+         *
+         * \param const floatVector &velocityGradient: The velocity gradient in the current configuration.
+         * \param const floatVector &deformationGradient: The deformation gradient between the desired configuration
          *     and the current configuration.
-         * :param floatVector &pullBackVelocityGradient: The pulled back velocity gradient.
+         * \param floatVector &pullBackVelocityGradient: The pulled back velocity gradient.
          */
 
         //Assume 3D
@@ -783,21 +783,21 @@ namespace constitutiveTools{
     }
 
     errorOut pullBackVelocityGradient(const floatVector &velocityGradient, const floatVector &deformationGradient,
-                                      floatVector &pullBackVelocityGradient, floatMatrix &dPullBackLdL, 
+                                      floatVector &pullBackVelocityGradient, floatMatrix &dPullBackLdL,
                                       floatMatrix &dPullBackLdF){
         /*!
          * Pull back the velocity gradient to the configuration indicated by deformationGradient.
          * i.e. $totalDeformationGradient_{iI} = deformationGradient_{i \bar{I}} remainingDeformationGradient_{\bar{I} I}$
          * This is done via
          * $L_{\bar{I} \bar{J}} = deformationGradient_{\bar{I} i}^{-1} velocityGradient_{ij} deformationGradient_{j \bar{J}}$
-         * 
-         * :param const floatVector &velocityGradient: The velocity gradient in the current configuration.
-         * :param const floatVector &deformationGradient: The deformation gradient between the desired configuration 
+         *
+         * \param const floatVector &velocityGradient: The velocity gradient in the current configuration.
+         * \param const floatVector &deformationGradient: The deformation gradient between the desired configuration
          *     and the current configuration.
-         * :param floatVector &pullBackVelocityGradient: The pulled back velocity gradient.
-         * :param floatMatrix &dPullBackLdL: The gradient of the pulled back velocity gradient 
+         * \param floatVector &pullBackVelocityGradient: The pulled back velocity gradient.
+         * \param floatMatrix &dPullBackLdL: The gradient of the pulled back velocity gradient
          *     w.r.t. the velocity gradient.
-         * :param floatMatrix &dPullBackLdF: The gradient of the pulled back velocity gradient 
+         * \param floatMatrix &dPullBackLdF: The gradient of the pulled back velocity gradient
          *     w.r.t. the deformation gradient.
          */
 
@@ -838,18 +838,18 @@ namespace constitutiveTools{
         return NULL;
     }
 
-    errorOut quadraticThermalExpansion(const floatType &temperature, const floatType &referenceTemperature, 
-                                       const floatVector &linearParameters, const floatVector &quadraticParameters, 
+    errorOut quadraticThermalExpansion(const floatType &temperature, const floatType &referenceTemperature,
+                                       const floatVector &linearParameters, const floatVector &quadraticParameters,
                                        floatVector &thermalExpansion){
-        /*! 
-         * Define a quadratic equation for the thermal expansion. This could be the 
+        /*!
+         * Define a quadratic equation for the thermal expansion. This could be the
          * thermal strain or the value of the stretch tensor.
-         * 
-         * :param const floatType &temperature: The temperature
-         * :param const floatType &referenceTemperature: The reference temperature
-         * :param const floatVector &linearParameters: The linear thermal expansion parameters.
-         * :param const floatVector &quadraticParameters: The quadratic thermal expansion parameters.
-         * :param floatVector &thermalExpansion: The resulting thermal expansion.
+         *
+         * \param const floatType &temperature: The temperature
+         * \param const floatType &referenceTemperature: The reference temperature
+         * \param const floatVector &linearParameters: The linear thermal expansion parameters.
+         * \param const floatVector &quadraticParameters: The quadratic thermal expansion parameters.
+         * \param floatVector &thermalExpansion: The resulting thermal expansion.
          */
 
         if (linearParameters.size() != quadraticParameters.size()){
@@ -862,23 +862,23 @@ namespace constitutiveTools{
         return NULL;
     }
 
-    errorOut quadraticThermalExpansion(const floatType &temperature, const floatType &referenceTemperature, 
-                                       const floatVector &linearParameters, const floatVector &quadraticParameters, 
+    errorOut quadraticThermalExpansion(const floatType &temperature, const floatType &referenceTemperature,
+                                       const floatVector &linearParameters, const floatVector &quadraticParameters,
                                        floatVector &thermalExpansion, floatVector &thermalExpansionJacobian){
-        /*! 
-         * Define a quadratic equation for the thermal expansion. This could be the 
+        /*!
+         * Define a quadratic equation for the thermal expansion. This could be the
          * thermal strain or the value of the stretch tensor.
-         * 
-         * :param const floatType &temperature: The temperature
-         * :param const floatType &referenceTemperature: The reference temperature
-         * :param const floatVector &linearParameters: The linear thermal expansion parameters.
-         * :param const floatVector &quadraticParameters: The quadratic thermal expansion parameters.
-         * :param floatVector &thermalExpansion: The resulting thermal expansion.
-         * :param floatVector &thermalExpansionJacobian: The gradient of the thermal expansion w.r.t. 
+         *
+         * \param const floatType &temperature: The temperature
+         * \param const floatType &referenceTemperature: The reference temperature
+         * \param const floatVector &linearParameters: The linear thermal expansion parameters.
+         * \param const floatVector &quadraticParameters: The quadratic thermal expansion parameters.
+         * \param floatVector &thermalExpansion: The resulting thermal expansion.
+         * \param floatVector &thermalExpansionJacobian: The gradient of the thermal expansion w.r.t.
          *     the temperature.
          */
 
-        errorOut error = quadraticThermalExpansion(temperature, referenceTemperature, linearParameters, quadraticParameters, 
+        errorOut error = quadraticThermalExpansion(temperature, referenceTemperature, linearParameters, quadraticParameters,
                                                    thermalExpansion);
 
         if (error){
@@ -896,15 +896,15 @@ namespace constitutiveTools{
                                             floatVector &almansiStrain){
         /*!
          * Push forward the Green-Lagrange strain to the current configuration.
-         * 
+         *
          * $e_{ij} = F_{Ii}^{-1} E_{IJ} F_{Jj}^{-1}$
          *
-         * where $e_{ij}$ is the Almansi strain (the strain in the current configuration, $F_{iI}^{-1}$ is the 
+         * where $e_{ij}$ is the Almansi strain (the strain in the current configuration, $F_{iI}^{-1}$ is the
          * inverse of the deformation gradient, and $E_{IJ}$ is the Green-Lagrange strain.
-         * 
-         * :param const floatVector &greenLagrangeStrain: The Green-Lagrange strain.
-         * :param const floatVector &deformationGradient: The deformation gradient mapping between configurations.
-         * :param floatVector &almansiStrain: The strain in the current configuration indicated by the deformation gradient.
+         *
+         * \param const floatVector &greenLagrangeStrain: The Green-Lagrange strain.
+         * \param const floatVector &deformationGradient: The deformation gradient mapping between configurations.
+         * \param floatVector &almansiStrain: The strain in the current configuration indicated by the deformation gradient.
          */
 
         //Assume 3D
@@ -924,21 +924,21 @@ namespace constitutiveTools{
     errorOut pushForwardGreenLagrangeStrain(const floatVector &greenLagrangeStrain, const floatVector &deformationGradient,
                                             floatVector &almansiStrain, floatMatrix &dalmansiStraindE, floatMatrix &dalmansiStraindF){
         /*!
-         * Push forward the Green-Lagrange strain to the current configuration 
+         * Push forward the Green-Lagrange strain to the current configuration
          * and return the jacobians.
-         * 
+         *
          * $e_{ij} = F_{Ii}^{-1} E_{IJ} F_{Jj}^{-1}$
          * $\frac{\partial e_{ij}}{\partial E_{KL}} = F_{Ki}^{-1} F_{Kj}^{-1}$
          * $\frac{\partial e_{ij}}{\partial F_{kK}} = -F_{Ik}^{-1} F_{Ki}^{-1} E_{IJ} F_{J j}^{-1} - F_{Ii}^{-1} E_{IJ} F_{Jk}^{-1} F_{Kj}^{-1}$
          *
-         * where $e_{ij}$ is the Almansi strain (the strain in the current configuration, $F_{iI}^{-1}$ is the 
+         * where $e_{ij}$ is the Almansi strain (the strain in the current configuration, $F_{iI}^{-1}$ is the
          * inverse of the deformation gradient, and $E_{IJ}$ is the Green-Lagrange strain.
-         * 
-         * :param const floatVector &greenLagrangeStrain: The Green-Lagrange strain.
-         * :param const floatVector &deformationGradient: The deformation gradient mapping between configurations.
-         * :param floatVector &almansiStrain: The strain in the current configuration indicated by the deformation gradient.
-         * :param floatMatrix &dalmansiStraindE: Compute the derivative of the almansi strain w.r.t. the Green-Lagrange strain.
-         * :param floatMatrix &dalmansiStraindF: Compute the derivative of the almansi strain w.r.t. the deformation gradient.
+         *
+         * \param const floatVector &greenLagrangeStrain: The Green-Lagrange strain.
+         * \param const floatVector &deformationGradient: The deformation gradient mapping between configurations.
+         * \param floatVector &almansiStrain: The strain in the current configuration indicated by the deformation gradient.
+         * \param floatMatrix &dalmansiStraindE: Compute the derivative of the almansi strain w.r.t. the Green-Lagrange strain.
+         * \param floatMatrix &dalmansiStraindF: Compute the derivative of the almansi strain w.r.t. the deformation gradient.
          */
 
         //Assume 3D
@@ -972,7 +972,7 @@ namespace constitutiveTools{
             for (unsigned int j=0; j<dim; j++){
                 for (unsigned int K=0; K<dim; K++){
                     for (unsigned int L=0; L<dim; L++){
-                        dalmansiStraindE[dim*i + j][dim*K + L] = inverseDeformationGradient[dim*K + i] * 
+                        dalmansiStraindE[dim*i + j][dim*K + L] = inverseDeformationGradient[dim*K + i] *
                                                                  inverseDeformationGradient[dim*L + j];
                     }
                 }
@@ -1005,10 +1005,10 @@ namespace constitutiveTools{
                                     floatVector &greenLagrangeStrain ){
         /*!
          * Pull back the almansi strain to the configuration indicated by the deformation gradient.
-         * 
-         * :param const floatVector &almansiStrain: The strain in the deformation gradient's current configuration.
-         * :param const floatVector &deformationGradient: The deformation gradient between configurations.
-         * :param floatVector &greenLagrangeStrain: The Green-Lagrange strain which corresponds to the reference 
+         *
+         * \param const floatVector &almansiStrain: The strain in the deformation gradient's current configuration.
+         * \param const floatVector &deformationGradient: The deformation gradient between configurations.
+         * \param floatVector &greenLagrangeStrain: The Green-Lagrange strain which corresponds to the reference
          *     configuration of the deformation gradient.
          */
 
@@ -1025,12 +1025,12 @@ namespace constitutiveTools{
                                     floatVector &greenLagrangeStrain, floatMatrix &dEde, floatMatrix &dEdF ){
         /*!
          * Pull back the almansi strain to the configuration indicated by the deformation gradient.
-         * 
+         *
          * Also return the Jacobians.
-         * 
-         * :param const floatVector &almansiStrain: The strain in the deformation gradient's current configuration.
-         * :param const floatVector &deformationGradient: The deformation gradient between configurations.
-         * :param floatVector &greenLagrangeStrain: The Green-Lagrange strain which corresponds to the reference 
+         *
+         * \param const floatVector &almansiStrain: The strain in the deformation gradient's current configuration.
+         * \param const floatVector &deformationGradient: The deformation gradient between configurations.
+         * \param floatVector &greenLagrangeStrain: The Green-Lagrange strain which corresponds to the reference
          *     configuration of the deformation gradient.
          */
 
