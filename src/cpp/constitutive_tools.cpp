@@ -42,7 +42,7 @@ namespace constitutiveTools{
     errorOut rotateMatrix(const floatVector &A, const floatVector &Q, floatVector &rotatedA){
         /*!
          * Rotate a matrix A using the orthogonal matrix Q with the form
-         * A'_ij = Q_{Ii} A_{IJ} Q_{Jj}
+         * \f$A'_{ij} = Q_{Ii} A_{IJ} Q_{Jj}\f$
          *
          * TODO: Generalize to non square matrices
          *
