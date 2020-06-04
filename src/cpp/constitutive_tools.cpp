@@ -82,6 +82,7 @@ namespace constitutiveTools{
                                         floatVector &E){
         /*!
          * Compute the Green-Lagrange strain from the deformation gradient. The operation is:
+         *
          * \f$E = 0.5 (F_{iI} F_{iJ} - \delta_{IJ})\f$
          *
          * Where F is the deformation gradient and \f$\delta\f$ is the kronecker delta.
@@ -149,6 +150,7 @@ namespace constitutiveTools{
                                         floatMatrix &dEdF){
         /*!
          * Compute the derivative of the Green-Lagrange strain w.r.t. the deformation gradient.
+         *
          * \f$\frac{dE_{IJ}}{dF_{kK}} = 0.5 ( \delta_{IK} F_{kJ} + F_{kI} \delta_{JK})\f$
          *
          * Where F is the deformation gradient and \f$\delta\f$ is the kronecker delta.
@@ -179,11 +181,11 @@ namespace constitutiveTools{
 
     errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J){
         /*!
-         * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts where 
+         * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts where
          *
-         * \f$J         = det(F) = sqrt(det(2*E + I))\f$
-         * 
-         * \f$Ebar_{IJ} = 0.5*((1/(J**(2/3))) F_{iI} F_{iJ} - I_{IJ}) = (1/(J**(2/3)))*E_{IJ} + 0.5(1/(J**(2/3))-1)*I_{IJ}\f$
+         * \f$J = det(F) = sqrt(det(2*E + I))\f$
+         *
+         * \f$Ebar_{IJ} = 0.5*((1/(J**(2/3))) F_{iI} F_{iJ} - I_{IJ}) = (1/(J**(2/3)))*E_{IJ} + 0.5(1/(J**(2/3)) - 1)*I_{IJ}\f$
          *
          * \param &E: The Green-Lagrange strain tensor
          * \param &Ebar: The isochoric Green-Lagrange strain tensor.
@@ -211,11 +213,11 @@ namespace constitutiveTools{
     errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J,
                                           floatMatrix &dEbardE, floatVector &dJdE){
         /*!
-         * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts where 
+         * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts where
          *
-         * \f$J         = det(F) = sqrt(det(2*E + I))\f$
-         * 
-         * \f$Ebar_{IJ} = 0.5*((1/(J**(2/3))) F_{iI} F_{iJ} - I_{IJ}) = (1/(J**(2/3)))*E_{IJ} + 0.5(1/(J**(2/3))-1)*I_{IJ}\f$
+         * \f$J = det(F) = sqrt(det(2*E + I))\f$
+         *
+         * \f$Ebar_{IJ} = 0.5*((1/(J**(2/3))) F_{iI} F_{iJ} - I_{IJ}) = (1/(J**(2/3)))*E_{IJ} + 0.5(1/(J**(2/3)) - 1)*I_{IJ}\f$
          *
          * \param &E: The Green-Lagrange strain tensor
          * \param &Ebar: The isochoric Green-Lagrange strain tensor.
@@ -252,7 +254,9 @@ namespace constitutiveTools{
     errorOut mapPK2toCauchy(const floatVector &PK2Stress, const floatVector &deformationGradient, floatVector &cauchyStress){
         /*!
          * Map the PK2 stress to the current configuration resulting in the Cauchy stress.
+         *
          * \f$cauchy_{ij} = (1/det(F)) F_{iI} PK2_{IJ} F_{jJ}\f$
+         *
          * where F is the deformation gradient
          *
          * \param &PK2Stress: The Second Piola-Kirchoff stress
@@ -428,7 +432,9 @@ namespace constitutiveTools{
                                floatVector &A, const floatVector &alpha){
         /*!
          * Perform midpoint rule based evolution of a vector.
+         *
          * alpha=0 (implicit)
+         *
          * alpha=1 (explicit)
          *
          * \param &Dt: The change in time.
@@ -462,7 +468,9 @@ namespace constitutiveTools{
                                floatVector &A, floatMatrix &DADADt, const floatVector &alpha){
         /*!
          * Perform midpoint rule based evolution of a vector and return the jacobian.
+         *
          * alpha=0 (implicit)
+         *
          * alpha=1 (explicit)
          *
          * \param &Dt: The change in time.
@@ -496,7 +504,9 @@ namespace constitutiveTools{
                                floatVector &A, const floatType alpha){
         /*!
          * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
+         *
          * alpha=0 (implicit)
+         *
          * alpha=1 (explicit)
          *
          * \param &Dt: The change in time.
@@ -514,7 +524,9 @@ namespace constitutiveTools{
                                floatVector &A, floatMatrix &DADADt, const floatType alpha){
         /*!
          * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
+         *
          * alpha=0 (implicit)
+         *
          * alpha=1 (explicit)
          *
          * \param &Dt: The change in time.
@@ -764,10 +776,13 @@ namespace constitutiveTools{
     errorOut pullBackVelocityGradient(const floatVector &velocityGradient, const floatVector &deformationGradient,
                                       floatVector &pullBackVelocityGradient){
         /*!
-         * Pull back the velocity gradient to the configuration indicated by deformationGradient.
-         * i.e. $totalDeformationGradient_{iI} = deformationGradient_{i \bar{I}} remainingDeformationGradient_{\bar{I} I}$
+         * Pull back the velocity gradient to the configuration indicated by deformationGradient, i.e. 
+         *
+         * \f$totalDeformationGradient_{iI} = deformationGradient_{i \bar{I}} remainingDeformationGradient_{\bar{I}I}\f$
+         *
          * This is done via
-         * $L_{\bar{I} \bar{J}} = deformationGradient_{\bar{I} i}^{-1} velocityGradient_{ij} deformationGradient_{j \bar{J}}$
+         *
+         * \f$L_{\bar{I} \bar{J}} = deformationGradient_{\bar{I} i}^{-1} velocityGradient_{ij} deformationGradient_{j\bar{J}}\f$
          *
          * \param &velocityGradient: The velocity gradient in the current configuration.
          * \param &deformationGradient: The deformation gradient between the desired configuration
@@ -792,10 +807,13 @@ namespace constitutiveTools{
                                       floatVector &pullBackVelocityGradient, floatMatrix &dPullBackLdL,
                                       floatMatrix &dPullBackLdF){
         /*!
-         * Pull back the velocity gradient to the configuration indicated by deformationGradient.
-         * i.e. $totalDeformationGradient_{iI} = deformationGradient_{i \bar{I}} remainingDeformationGradient_{\bar{I} I}$
+         * Pull back the velocity gradient to the configuration indicated by deformationGradient, i.e. 
+         *
+         * \f$totalDeformationGradient_{iI} = deformationGradient_{i \bar{I}} remainingDeformationGradient_{\bar{I}I}\f$
+         *
          * This is done via
-         * $L_{\bar{I} \bar{J}} = deformationGradient_{\bar{I} i}^{-1} velocityGradient_{ij} deformationGradient_{j \bar{J}}$
+         *
+         * \f$L_{\bar{I} \bar{J}} = deformationGradient_{\bar{I} i}^{-1} velocityGradient_{ij} deformationGradient_{j\bar{J}}\f$
          *
          * \param &velocityGradient: The velocity gradient in the current configuration.
          * \param &deformationGradient: The deformation gradient between the desired configuration
@@ -903,10 +921,10 @@ namespace constitutiveTools{
         /*!
          * Push forward the Green-Lagrange strain to the current configuration.
          *
-         * $e_{ij} = F_{Ii}^{-1} E_{IJ} F_{Jj}^{-1}$
+         * \f$e_{ij} = F_{Ii}^{-1} E_{IJ} F_{Jj}^{-1}\f$
          *
-         * where $e_{ij}$ is the Almansi strain (the strain in the current configuration, $F_{iI}^{-1}$ is the
-         * inverse of the deformation gradient, and $E_{IJ}$ is the Green-Lagrange strain.
+         * where \f$e_{ij}\f$ is the Almansi strain (the strain in the current configuration, \f$F_{iI}^{-1}\f$ is the
+         * inverse of the deformation gradient, and \f$E_{IJ}\f$ is the Green-Lagrange strain.
          *
          * \param &greenLagrangeStrain: The Green-Lagrange strain.
          * \param &deformationGradient: The deformation gradient mapping between configurations.
