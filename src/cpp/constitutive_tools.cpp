@@ -82,9 +82,9 @@ namespace constitutiveTools{
                                         floatVector &E){
         /*!
          * Compute the Green-Lagrange strain from the deformation gradient. The operation is:
-         * E = 0.5 (F_{iI} F_{iJ} - delta_{IJ})
+         * \f$E = 0.5 (F_{iI} F_{iJ} - \delta_{IJ})\f$
          *
-         * Where F is the deformation gradient and delta is the kronecker delta.
+         * Where F is the deformation gradient and \f$\delta\f$ is the kronecker delta.
          *
          * \param &F: A reference to the deformation gradient.
          * \param &E: The resulting Green-Lagrange strain.
@@ -149,9 +149,9 @@ namespace constitutiveTools{
                                         floatMatrix &dEdF){
         /*!
          * Compute the derivative of the Green-Lagrange strain w.r.t. the deformation gradient.
-         * dE_IJdFkK = 0.5 ( delta_{IK} F_{kJ} + F_{kI} delta_{JK})
+         * \f$\frac{dE_{IJ}}{dF_{kK}} = 0.5 ( \delta_{IK} F_{kJ} + F_{kI} \delta_{JK})\f$
          *
-         * Where F is the deformation gradient and delta is the kronecker delta.
+         * Where F is the deformation gradient and \f$\delta\f$ is the kronecker delta.
          *
          * \param &F: A reference to the deformation gradient.
          * \param &dEdF: The resulting gradient.
@@ -179,9 +179,11 @@ namespace constitutiveTools{
 
     errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J){
         /*!
-         * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts.
-         * where J    = det(F) = sqrt(det(2*E + I))
-         *       Ebar_IJ = 0.5*((1/(J**(2/3))) F_iI F_iJ - I_IJ) = (1/(J**(2/3)))*E_IJ + 0.5(1/(J**(2/3)) - 1)*I_{IJ}
+         * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts where 
+         *
+         * \f$J         = det(F) = sqrt(det(2*E + I))\f$
+         * 
+         * \f$Ebar_{IJ} = 0.5*((1/(J**(2/3))) F_{iI} F_{iJ} - I_{IJ}) = (1/(J**(2/3)))*E_{IJ} + 0.5(1/(J**(2/3))-1)*I_{IJ}\f$
          *
          * \param &E: The Green-Lagrange strain tensor
          * \param &Ebar: The isochoric Green-Lagrange strain tensor.
@@ -209,9 +211,11 @@ namespace constitutiveTools{
     errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J,
                                           floatMatrix &dEbardE, floatVector &dJdE){
         /*!
-         * Decompute the Green-Lagrange strain tensor into isochoric and volumetric parts.
-         * where J    = det(F) = sqrt(det(2*E + I))
-         *       Ebar_IJ = 0.5*((1/(J**(2/3))) F_iI F_iJ - I_IJ) = (1/(J**(2/3)))*E_IJ + 0.5(1/(J**(2/3)) - 1)*I_{IJ}
+         * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts where 
+         *
+         * \f$J         = det(F) = sqrt(det(2*E + I))\f$
+         * 
+         * \f$Ebar_{IJ} = 0.5*((1/(J**(2/3))) F_{iI} F_{iJ} - I_{IJ}) = (1/(J**(2/3)))*E_{IJ} + 0.5(1/(J**(2/3))-1)*I_{IJ}\f$
          *
          * \param &E: The Green-Lagrange strain tensor
          * \param &Ebar: The isochoric Green-Lagrange strain tensor.
@@ -248,7 +252,7 @@ namespace constitutiveTools{
     errorOut mapPK2toCauchy(const floatVector &PK2Stress, const floatVector &deformationGradient, floatVector &cauchyStress){
         /*!
          * Map the PK2 stress to the current configuration resulting in the Cauchy stress.
-         * cauchy_ij = (1/det(F)) F_{iI} PK2_{IJ} F_{jJ}
+         * \f$cauchy_{ij} = (1/det(F)) F_{iI} PK2_{IJ} F_{jJ}\f$
          * where F is the deformation gradient
          *
          * \param &PK2Stress: The Second Piola-Kirchoff stress
@@ -342,7 +346,7 @@ namespace constitutiveTools{
         /*!
          * Compute the total time derivative of the deformation gradient.
          *
-         * \dot{F}_{iI} = L_{ij} F_{jI}
+         * \f$\dot{F}_{iI} = L_{ij} F_{jI}\f$
          *
          * \param &velocityGradient: The velocity gradient L_{ij}
          * \param &deformationGradient: The deformation gradient F_{iI}
@@ -378,7 +382,7 @@ namespace constitutiveTools{
          * Compute the total time derivative of the deformation gradient
          * and return the partial derivatives w.r.t. L and F.
          *
-         * \dot{F}_{iI} = L_{ij} F_{jI}
+         * \f$\dot{F}_{iI} = L_{ij} F_{jI}\f$
          * \frac{\partial \dot{F}_{iI}}{\partial L_{kl}} = \delta_{ik} F{lI}
          * \frac{\partial \dot{F}_{iI}}{\partial F_{kK}} = L_{ik} \delta{IK}
          *
