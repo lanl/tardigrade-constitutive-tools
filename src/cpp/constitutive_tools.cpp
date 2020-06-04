@@ -290,7 +290,7 @@ namespace constitutiveTools{
         /*!
          * An implementation of the Williams-Landel-Ferry equation.
          *
-         * factor = 10**((-C1*(T - Tr))/(C2 + T - Tr))
+         * \f$factor = 10**((-C1*(T - Tr))/(C2 + T - Tr))\f$
          *
          * where T is the temperature, Tr is the reference temperature, and C1 and C2 are parameters
          *
@@ -383,11 +383,11 @@ namespace constitutiveTools{
          * and return the partial derivatives w.r.t. L and F.
          *
          * \f$\dot{F}_{iI} = L_{ij} F_{jI}\f$
-         * \frac{\partial \dot{F}_{iI}}{\partial L_{kl}} = \delta_{ik} F{lI}
-         * \frac{\partial \dot{F}_{iI}}{\partial F_{kK}} = L_{ik} \delta{IK}
+         * \f$\frac{\partial \dot{F}_{iI}}{\partial L_{kl}} = \delta_{ik} F{lI}\f$
+         * \f$\frac{\partial \dot{F}_{iI}}{\partial F_{kK}} = L_{ik} \delta{IK}\f$
          *
-         * \param &velocityGradient: The velocity gradient L_{ij}
-         * \param &deformationGradient: The deformation gradient F_{iI}
+         * \param &velocityGradient: The velocity gradient \f$L_{ij}\f$
+         * \param &deformationGradient: The deformation gradient \f$F_{iI}\f$
          * \param &DFDt: The total time derivative of the deformation gradient
          */
 
@@ -535,10 +535,10 @@ namespace constitutiveTools{
          * Evolve F using the midpoint integration method.
          *
          * mode 1:
-         * F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha \right) L_{ij}^{t+1} \right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t} \right]
+         * \f$F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha \right) L_{ij}^{t+1} \right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t} \right]\f$
          *
          * mode 2:
-         * F_{iI}^{t + 1} = \left[F_{iJ}^{t} + \Delta t \alpha \dot{F}_{iJ}^{t} \right] \left[\delta_{IJ} - \Delta T \left( 1- \alpha \right) L_{IJ}^{t+1} \right]^{-1}
+         * \f$F_{iI}^{t + 1} = \left[F_{iJ}^{t} + \Delta t \alpha \dot{F}_{iJ}^{t} \right] \left[\delta_{IJ} - \Delta T \left( 1- \alpha \right) L_{IJ}^{t+1} \right]^{-1}\f$
          *
          * \param &Dt: The change in time.
          * \param &Fp: The previous value of the deformation gradient
@@ -607,12 +607,12 @@ namespace constitutiveTools{
          * Evolve F using the midpoint integration method and return the jacobian w.r.t. L.
          *
          * mode 1:
-         * F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha \right) L_{ij}^{t+1} \right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t} \right]
-         * \frac{\partial F_{jI}^{t + 1}}{\partial L_{kl}^{t+1}} &= \left[\delta_{kj} - \Delta t \left(1 - \alpha\right) L_{kj}\right]^{-1} \Delta t \left(1 - \alpha\right) F_{lI]^{t + 1}
+         * \f$F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha \right) L_{ij}^{t+1} \right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t} \right]\f$
+         * \f$\frac{\partial F_{jI}^{t + 1}}{\partial L_{kl}^{t+1}} &= \left[\delta_{kj} - \Delta t \left(1 - \alpha\right) L_{kj}\right]^{-1} \Delta t \left(1 - \alpha\right) F_{lI]^{t + 1}\f$
          *
          * mode 2:
-         * F_{iI}^{t + 1} = \left[F_{iJ}^{t} + \Delta t \alpha \dot{F}_{iJ}^{t} \right] \left[\delta_{IJ} - \Delta T \left( 1- \alpha \right) L_{IJ}^{t+1} \right]^{-1}
-         * \frac{\partial F_{iJ}^{t + 1}{\partial L_{KL}} = \Delta t (1 - \alpha) F_{iK}^{t + 1} \left[\delta_{JL} -
+         * \f$F_{iI}^{t + 1} = \left[F_{iJ}^{t} + \Delta t \alpha \dot{F}_{iJ}^{t} \right] \left[\delta_{IJ} - \Delta T \left( 1- \alpha \right) L_{IJ}^{t+1} \right]^{-1}\f$
+         * \f$\frac{\partial F_{iJ}^{t + 1}{\partial L_{KL}} = \Delta t (1 - \alpha) F_{iK}^{t + 1} \left[\delta_{JL} -\f$
          *
          * \param &Dt: The change in time.
          * \param &Fp: The previous value of the deformation gradient
@@ -933,12 +933,14 @@ namespace constitutiveTools{
          * Push forward the Green-Lagrange strain to the current configuration
          * and return the jacobians.
          *
-         * $e_{ij} = F_{Ii}^{-1} E_{IJ} F_{Jj}^{-1}$
-         * $\frac{\partial e_{ij}}{\partial E_{KL}} = F_{Ki}^{-1} F_{Kj}^{-1}$
-         * $\frac{\partial e_{ij}}{\partial F_{kK}} = -F_{Ik}^{-1} F_{Ki}^{-1} E_{IJ} F_{J j}^{-1} - F_{Ii}^{-1} E_{IJ} F_{Jk}^{-1} F_{Kj}^{-1}$
+         * \f$e_{ij} = F_{Ii}^{-1} E_{IJ} F_{Jj}^{-1}\f$
          *
-         * where $e_{ij}$ is the Almansi strain (the strain in the current configuration, $F_{iI}^{-1}$ is the
-         * inverse of the deformation gradient, and $E_{IJ}$ is the Green-Lagrange strain.
+         * \f$\frac{\partial e_{ij}}{\partial E_{KL}} = F_{Ki}^{-1} F_{Kj}^{-1}\f$
+         *
+         * \f$\frac{\partial e_{ij}}{\partial F_{kK}} = -F_{Ik}^{-1} F_{Ki}^{-1} E_{IJ} F_{J j}^{-1} - F_{Ii}^{-1} E_{IJ} F_{Jk}^{-1} F_{Kj}^{-1}\f$
+         *
+         * where \f$e_{ij}\f$ is the Almansi strain (the strain in the current configuration, \f$F_{iI}^{-1}\f$ is the
+         * inverse of the deformation gradient, and \f$E_{IJ}\f$ is the Green-Lagrange strain.
          *
          * \param &greenLagrangeStrain: The Green-Lagrange strain.
          * \param &deformationGradient: The deformation gradient mapping between configurations.
