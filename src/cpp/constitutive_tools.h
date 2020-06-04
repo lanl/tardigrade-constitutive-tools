@@ -32,11 +32,11 @@
 
 namespace constitutiveTools{
 
-    typedef errorTools::Node errorNode; //!Redefinition for the error node
-    typedef errorNode* errorOut; //!Redefinition for a pointer to the error node
-    typedef double floatType; //!Define the float values type.
-    typedef std::vector< floatType > floatVector; //! Define a vector of floats
-    typedef std::vector< std::vector< floatType > > floatMatrix; //!Define a matrix of floats
+    typedef errorTools::Node errorNode; //!< Redefinition for the error node
+    typedef errorNode* errorOut; //!< Redefinition for a pointer to the error node
+    typedef double floatType; //!< Define the float values type.
+    typedef std::vector< floatType > floatVector; //!< Define a vector of floats
+    typedef std::vector< std::vector< floatType > > floatMatrix; //!< Define a matrix of floats
 
     floatType deltaDirac(const unsigned int i, const unsigned int j);
 
