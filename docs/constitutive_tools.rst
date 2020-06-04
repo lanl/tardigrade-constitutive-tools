@@ -10,9 +10,6 @@ constitutive_tools.cpp
 **********************
 
 .. doxygenfile:: constitutive_tools.cpp
-.. doxygenclass:: constitutiveTools::Node
-   :members:
-   :undoc-members:
 
 ********************
 constitutive_tools.h
