@@ -352,8 +352,8 @@ namespace constitutiveTools{
          *
          * \f$\dot{F}_{iI} = L_{ij} F_{jI}\f$
          *
-         * \param &velocityGradient: The velocity gradient L_{ij}
-         * \param &deformationGradient: The deformation gradient F_{iI}
+         * \param &velocityGradient: The velocity gradient \f$L_{ij}\f$
+         * \param &deformationGradient: The deformation gradient \f$F_{iI}\f$
          * \param &DFDt: The total time derivative of the deformation gradient
          */
 
