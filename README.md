@@ -19,29 +19,20 @@ this command will change on different platforms.
 
 ## Dependencies: 
 
-* CMake
+* Eigen   == 3.3
+* CMake   >= 3.14
 * Doxygen
 * Sphinx
 * Breathe
 * sphinx\_rtd\_theme
 
-### Make
-
-These tools have several dependencies that must be available in the same parent
-directory as this repo. 
-
-* eigen: https://gitlab.com/libeigen/eigen
-* error\_tools: https://xcp-stash.lanl.gov/projects/MM/repos/error_tools
-* vector\_tools: https://xcp-stash.lanl.gov/projects/MM/repos/vector_tools
-
 ### CMake
 
-The project is transitioning from Make to Cmake. For cmake builds, Eigen must be
-"installed" following the ``eigen/INSTALL`` instructions. The Eigen dependence
-is easiest to resolve if eigen is installed in the default install directory.
-However, if you don't have admin privileges, you can also insall Eigen to your
-home directory in ``~/include`` (or possibly in ``~/.local/include``, but this
-is untested by this project).
+For cmake builds, Eigen must be "installed" following the ``eigen/INSTALL``
+instructions. The Eigen dependence is easiest to resolve if eigen is installed
+in the default install directory.  However, if you don't have admin privileges,
+you can also insall Eigen to your home directory in ``~/include`` (or possibly
+in ``~/.local/include``, but this is untested by this project).
 
 #### Non-admin Eigen install for constitutive_tools
 [Reference](https://unix.stackexchange.com/questions/36871/where-should-a-local-executable-be-placed)
