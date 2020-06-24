@@ -13,8 +13,19 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 # Find related, but external, projects
-#find_package (VECTOR_TOOLS REQUIRED)
-#find_package (ERROR_TOOLS REQUIRED)
+# TODO: Decide how to handle master/dev build differences. bash env variables for GIT TAG?
+include(FetchContent)
+FetchContent_Declare(
+    error_tools
+    GIT_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/error_tools.git
+    GIT_TAG        origin/dev
+)
+FetchContent_Declare(
+    vector_tools
+    GIT_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/vector_tools.git
+    GIT_TAG        origin/dev
+)
+FetchContent_MakeAvailable(error_tools vector_tools)
 
 # Add project source directories
 add_subdirectory ("src/cpp")
