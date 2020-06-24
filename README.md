@@ -19,12 +19,17 @@ this command will change on different platforms.
 
 ## Dependencies: 
 
+### External
 * Eigen   == 3.3
 * CMake   >= 3.14
 * Doxygen
 * Sphinx
 * Breathe
 * sphinx\_rtd\_theme
+
+### Internal
+* error\_tools: https://xcp-stash.lanl.gov/projects/MM/repos/error_tools
+* vector\_tools: https://xcp-stash.lanl.gov/projects/MM/repos/vector_tools
 
 ### CMake
 
