@@ -67,7 +67,9 @@ $ make install
 
 ---
 
-## Building the documentation
+## Build and Test
+
+This repository is now built completely with cmake.
 
 > **API Health Note**: The sphinx API docs are a work-in-progress. The doxygen
 > API is much more useful
@@ -80,11 +82,41 @@ testing.
 ### sstelmo
 
 1) Activate the correct python environment
+```
+$ module load python/2019.10-python-3.7 
+$ sv3d
+```
+
+2) Build everything
+```
+$ pwd
+/path/to/constitutive_tools/
+
+# Just perform the build
+./new_build.sh
+
+# Build and perform tests
+./jenkins_build.sh
+```
+
+3) View test results
+```
+cat build/src/cpp/tests/test_constitutive_tools/results.tex
+```
+
+4) Display docs
 
 ```
-$ source /apps/anaconda/5.0.1-python-3.6/bin/activate
-$ source activate /projects/python/release-cpp
+# Sphinx
+firefox build/docs/sphinx/index.html &
+
+# Doxygen
+firefox build/docs/doxygen/html/index.html &
 ```
+
+### Building the documentation
+
+To build just the documentation pick up the steps here:
 
 2) Create the build directory and move there
 
