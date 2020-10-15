@@ -86,13 +86,15 @@ testing.
 
 ### sstelmo
 
-1) Activate the correct python environment
+1) Activate a [W-13 Python Environment](https://xcp-confluence.lanl.gov/display/PYT/The+W-13+Python+3+environment)
+
 ```
-$ module load python/2019.10-python-3.7 
-$ sv3d
+$ module load python/2019.10-python-3.7
+$ sv3r
 ```
 
 2) Build everything
+
 ```
 $ pwd
 /path/to/constitutive_tools/
@@ -105,6 +107,7 @@ $ pwd
 ```
 
 3) View test results
+
 ```
 cat build/src/cpp/tests/constitutive_tools/results.tex
 ```
@@ -157,7 +160,7 @@ constitutive_tools/build/docs/sphinx/index.html
 ```
 $ pwd
 /path/to/constitutive_tools/build/
-firefox docs/sphinx/index.html &
+$ firefox docs/sphinx/index.html &
 ```
 
 7) While the Sphinx API is still a WIP, try the doxygen API
@@ -165,5 +168,5 @@ firefox docs/sphinx/index.html &
 ```
 $ pwd
 /path/to/constitutive_tools/build/
-firefox docs/doxygen/html/index.html &
+$ firefox docs/doxygen/html/index.html &
 ```
