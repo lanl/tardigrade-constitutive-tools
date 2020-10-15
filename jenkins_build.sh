@@ -17,7 +17,7 @@ case $OSTYPE in
 esac
 
 # Activate conda environment
-rel='develop'
+rel='release'
 if [ -f "${apps}/anaconda/2019.10-python-3.7/etc/profile.d/conda.sh" ]; then
     . "${apps}/anaconda/2019.10-python-3.7/etc/profile.d/conda.sh"
     conda activate
@@ -29,11 +29,20 @@ else
 fi
 
 # Make bash script more like high-level languages.
-# https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
-# Have to do this after sourcing ifortvars.sh becuase the shell script has unbound variables
 set -Eeuxo pipefail
 
-# Clone and update dependencies
+# report conda environment
+conda info
+
+# Debugging
+whoami
+groups
+ls -l ~/include || true
+ls -l ~/include/eigen3 || true
+ls -l ~/include/eigen3/Eigen || true
+ls -l ~/include/eigen3/Eigen/Dense || true
+
+# Source common shell script variables
 source set_vars.sh
 
 # Clean and build repo tests
