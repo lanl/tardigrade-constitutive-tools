@@ -1484,7 +1484,7 @@ int testComputeSymmetricPart( std::ofstream &results ){
 
     floatVector A = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     
-    floatVector answer = { 1., 3., 5., 3., 5., 7., 5., 7., 9. }
+    floatVector answer = { 1., 3., 5., 3., 5., 7., 5., 7., 9. };
     
     floatVector result;
     
@@ -1535,13 +1535,13 @@ int testComputeSymmetricPart( std::ofstream &results ){
         for ( unsigned int j = 0; j < gradCol.size( ); j++ ){
             if ( !vectorTools::fuzzyEquals( gradCol[ j ], dSymmAdA[ j ][ i ] ) ){
                 results << "testComputeSymmetricPart (test 3) & False\n";
-    	    return 1;
-    	}
+    	        return 1;
+            }
         }
-    
-        results << "testComputeSymmetricPart & True\n";
-        return 0;
     }
+
+    results << "testComputeSymmetricPart & True\n";
+    return 0;
 }
 
 int main(){

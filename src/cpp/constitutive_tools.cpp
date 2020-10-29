@@ -1187,7 +1187,9 @@ namespace constitutiveTools{
         if ( dim * dim != A.size( ) ){
             return new errorNode( "computeSymmetricPart", "A is not a square matrix" );
         }
-    
+ 
+        symmA = floatVector( A.size( ), 0 );
+
         for ( unsigned int i = 0; i < dim; i++ ){
             for ( unsigned int j = 0; j < dim; j++ ){
                 symmA[ dim * i + j ] = 0.5 * ( A[ dim * i + j ] + A[ dim * j + i ] );
@@ -1245,7 +1247,7 @@ namespace constitutiveTools{
             for ( unsigned int j = 0; j < dim; j++ ){
                 for ( unsigned int k = 0; k < dim; k++ ){
                     for ( unsigned int l = 0; l < dim; l++ ){
-                        dSymmAdA[ dim * i + j ][ dim * k + l ] = 0.5 * ( eye[ dim * i + k ] * eye[ dim * j + l ] + eye[ dim * j + k ] * eye dim * i + l ] );
+                        dSymmAdA[ dim * i + j ][ dim * k + l ] = 0.5 * ( eye[ dim * i + k ] * eye[ dim * j + l ] + eye[ dim * j + k ] * eye[ dim * i + l ] );
                     }
                 }
             }
