@@ -93,7 +93,7 @@ namespace constitutiveTools{
          */
 
         //Assume 3D
-        unsigned int dim = 3
+        unsigned int dim = 3;
 
         if ( deformationGradient.size( ) != dim * dim ){
             return new errorNode( "computeRightCauchyGreen",
@@ -105,7 +105,7 @@ namespace constitutiveTools{
         return NULL;
     }
 
-    errorOut computeRightCauchyGreen( const floatVector &deformationGradient, floatVector &C, floatMAtrix &dCdF ){
+    errorOut computeRightCauchyGreen( const floatVector &deformationGradient, floatVector &C, floatMatrix &dCdF ){
         /*!
          * Compute the Right Cauchy-Green deformation tensor
 	 * 
@@ -145,7 +145,7 @@ namespace constitutiveTools{
                         dCdF[ dim * I + J ][ dim * k + K ] = eye[ dim * I + K ] * deformationGradient[ dim * k + J ]
                                                            + deformationGradient[ dim * k + I ] * eye[ dim * J + K ];
                     }
-                {
+                }
             }
         }
 

@@ -1419,11 +1419,18 @@ int testComputeRightCauchyGreen( std::ofstream &results ){
 
     floatVector result;
 
+    errorOut error = constitutiveTools::computeRightCauchyGreen( deformationGradient, result );
+
     if ( error ){
         error->print();
+        results << "testComputeRightCauchyGreen & False\n";
+        return 1;
+    }
+
+    if( !vectorTools::fuzzyEquals( result, answer ) ){
         results << "testComputeRightCauchyGreen (test 1) & False\n";
         return 1;
-    {
+    }
 
     //Test Jacobian
 
