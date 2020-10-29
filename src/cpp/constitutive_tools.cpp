@@ -471,7 +471,7 @@ namespace constitutiveTools{
          * \param &DFDt: The total time derivative of the deformation gradient
          * \param &dDFDtdL: The derivative of the total time derivative of the deformation gradient
          *     with respect to the velocity gradient.
-         * \param &dDFDtDF: The derivative of the total time derivative of the deformation gradient
+         * \param &dDFDtdF: The derivative of the total time derivative of the deformation gradient
          *     with respect to the deformation gradient.
          */
 
