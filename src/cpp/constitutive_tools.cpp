@@ -1169,4 +1169,88 @@ namespace constitutiveTools{
 
         return NULL;
     }
+
+    errorOut computeSymmetricPart( const floatVector &A, floatVector &symmA, unsigned int &dim ){
+        /*!
+         * Compute the symmetric part of a second order tensor and return it.
+         *
+         * \f$symm( A )_ij = \frac{1}{2}\left(A_{ij} + A_{ji}\right)\f$
+         *
+         * \param &A: A constant reference to the second order tensor to process
+         * \param &symmA: The symmetric part of A
+         * \param &dim: The dimension of A
+         */
+        
+        //Get the dimension of A
+        dim = ( unsigned int )( std::sqrt( ( double )A.size( ) ) + 0.5 );
+    
+        if ( dim * dim != A.size( ) ){
+            return new errorNode( "computeSymmetricPart", "A is not a square matrix" );
+        }
+    
+        for ( unsigned int i = 0; i < dim; i++ ){
+            for ( unsigned int j = 0; j < dim; j++ ){
+                symmA[ dim * i + j ] = 0.5 * ( A[ dim * i + j ] + A[ dim * j + i ] );
+            }
+        }
+    
+        return NULL;
+    }
+
+    errorOut computeSymmetricPart( const floatVector &A, floatVector &symmA ){
+        /*!
+         * Compute the symmetric part of a second order tensor and return it.
+         *
+         * \f$symm( A )_ij = \frac{1}{2}\left(A_{ij} + A_{ji}\right)\f$
+         *
+         * \param &A: A constant reference to the second order tensor to process
+         * \param &symmA: The symmetric part of A
+         * \param &dim: The dimension of A
+         */
+    
+        unsigned int dim;
+        return computeSymmetricPart( A, symmA, dim );
+    }
+
+    errorOut computeSymmetricPart( const floatVector &A, floatVector &symmA, floatMatrix &dSymmAdA ){
+        /*!
+         * Compute the symmetric part of a second order tensor and return it.
+         *
+         * \f$( A )^{symm}_{ij} = \frac{1}{2}\left(A_{ij} + A_{ji}\right)\f$
+         *
+         * Also computes the jacobian
+         * \f$\frac{\partial A^{symm}_{ij}}{\partial A_{kl}} = \frac{1}{2}\left( \delta_{ik} \delta_{jl} + \delta_{jk}\delta_{il} \right)
+         *
+         * \param &A: A constant reference to the second order tensor to process
+         * \param &symmA: The symmetric part of A
+         * \param &dSymmAdA: The Jacobian of the symmetric part of A w.r.t. A
+         */
+        
+        unsigned int dim;
+        errorOut error = computeSymmetricPart( A, symmA, dim );
+        
+        if ( error ){
+            errorOut result = new errorNode( "computeSymmetricPart (jacobian)",
+                                             "Error in computation of the symmetric part of A" );
+            result->addNext( error );
+            return result;
+        }
+        
+        floatVector eye( A.size( ) );
+        vectorTools::eye( eye );
+        
+        dSymmAdA = floatMatrix( symmA.size( ), floatVector( A.size( ), 0 ) );
+        
+        for ( unsigned int i = 0; i < dim; i++ ){
+            for ( unsigned int j = 0; j < dim; j++ ){
+                for ( unsigned int k = 0; k < dim; k++ ){
+                    for ( unsigned int l = 0; l < dim; l++ ){
+                        dSymmAdA[ dim * i + j ][ dim * k + l ] = 0.5 * ( eye[ dim * i + k ] * eye[ dim * j + l ] + eye[ dim * j + k ] * eye dim * i + l ] );
+                    }
+                }
+            }
+        }
+        
+        return NULL;
+    }
 }
