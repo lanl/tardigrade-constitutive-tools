@@ -78,6 +78,81 @@ namespace constitutiveTools{
         return NULL;
     }
 
+    errorOut computeRightCauchyGreen( const floatVector &deformationGradient, floatVector &C ){
+        /*!
+         * Compute the Right Cauchy-Green deformation tensor
+         *
+         * \f$C_{IJ} = F_{iI} F_{iJ}\f$
+         *
+         * \param &F: A reference to the deformation gradient
+         * \param &C: The resulting Right Cauchy-Green deformation tensor
+         *
+         * The deformation gradient is organized as F11, F12, F13, F21, F22, F23, F31, F32, F33
+         *
+         * The Right Cauchy-Green deformation tensor is organized as C11, C12, C13, C21, C22, C23, C31, C32, C33
+         */
+
+        //Assume 3D
+        unsigned int dim = 3
+
+        if ( deformationGradient.size( ) != dim * dim ){
+            return new errorNode( "computeRightCauchyGreen",
+			          "The deformation gradient must be 3D" );
+        }
+
+        C = vectorTools::matrixMultiply( deformationGradient, deformationGradient, dim, dim, dim, dim, 1, 0 );
+
+        return NULL;
+    }
+
+    errorOut computeRightCauchyGreen( const floatVector &deformationGradient, floatVector &C, floatMAtrix &dCdF ){
+        /*!
+         * Compute the Right Cauchy-Green deformation tensor
+	 * 
+	 * \f$C_{IJ} = F_{iI} F_{iJ}\f$
+	 * \param &F: A reference to the deformation gradient
+	 * \param &C: The resulting Right Cauchy-Green deformation tensor
+         * \param $dCdF: The Jacobian of the Right Cauchy-Green deformation tensor
+         *     with regards to the deformation gradient.
+         *
+         * The deformation gradient is organized as F11, F12, F13, F21, F22, F23, F31, F32, F33
+         *
+         * The Right Cauchy-Green deformation tensor is organized as C11, C12, C13, C21, C22, C23, C31, C32, C33
+         */
+
+        //Assume 3D
+        unsigned int dim = 3;
+
+        errorOut error = computeRightCauchyGreen( deformationGradient, C );
+
+        if ( error ){
+            errorOut result = new errorNode( "computeRightCauchyGreen (jacobian)",
+                                             "Error in computation of Right Cauchy green deformation tensor" );
+            result->addNext( error );
+            return result;
+        }
+        
+        //Assemble the Jacobian
+        floatVector eye( dim * dim );
+        vectorTools::eye( eye );
+        
+        dCdF = floatMatrix( C.size( ), floatVector( deformationGradient.size( ), 0 ) );
+        
+        for ( unsigned int I = 0; I < dim; I++ ){
+            for ( unsigned int J = 0; J < dim; J++ ){
+                for ( unsigned int k = 0; k < dim; k++ ){
+                    for ( unsigned int K =0 ; K < dim; K++ ){
+                        dCdF[ dim * I + J ][ dim * k + K ] = eye[ dim * I + K ] * deformationGradient[ dim * k + J ]
+                                                           + deformationGradient[ dim * k + I ] * eye[ dim * J + K ];
+                    }
+                {
+            }
+        }
+
+        return NULL;
+
+    }
+
     errorOut computeGreenLagrangeStrain(const floatVector &F,
                                         floatVector &E){
         /*!

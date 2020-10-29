@@ -42,6 +42,10 @@ namespace constitutiveTools{
 
     errorOut rotateMatrix(const floatVector &A, const floatVector &Q, floatVector &rotatedA);
 
+    errorOut computeRightCauchyGreen( const floatVector &deformationGradient, floatVector &C );
+
+    errorOut computeRightCauchyGreen( const floatVector &deformationGradient, floatVector &C, floatMatrix &dCdF );
+
     errorOut computeGreenLagrangeStrain(const floatVector &deformationGradient, floatVector &E);
 
     errorOut computeGreenLagrangeStrain(const floatVector &deformationGradient, floatVector &E, floatMatrix &dEdF);
