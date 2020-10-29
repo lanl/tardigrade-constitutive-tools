@@ -84,7 +84,7 @@ namespace constitutiveTools{
          *
          * \f$C_{IJ} = F_{iI} F_{iJ}\f$
          *
-         * \param &F: A reference to the deformation gradient
+         * \param &deformationGradient: A reference to the deformation gradient
          * \param &C: The resulting Right Cauchy-Green deformation tensor
          *
          * The deformation gradient is organized as F11, F12, F13, F21, F22, F23, F31, F32, F33
@@ -113,7 +113,7 @@ namespace constitutiveTools{
          * 
          * \param &deformationGradient: A reference to the deformation gradient
          * \param &C: The resulting Right Cauchy-Green deformation tensor
-         * \param $dCdF: The Jacobian of the Right Cauchy-Green deformation tensor
+         * \param &dCdF: The Jacobian of the Right Cauchy-Green deformation tensor
          *     with regards to the deformation gradient.
          *
          * The deformation gradient is organized as F11, F12, F13, F21, F22, F23, F31, F32, F33
@@ -230,7 +230,7 @@ namespace constitutiveTools{
          *
          * Where F is the deformation gradient and \f$\delta\f$ is the kronecker delta.
          *
-         * \param &F: A reference to the deformation gradient.
+         * \param &deformationGradient: A reference to the deformation gradient.
          * \param &dEdF: The resulting gradient.
          *
          * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
@@ -469,6 +469,10 @@ namespace constitutiveTools{
          * \param &velocityGradient: The velocity gradient \f$L_{ij}\f$
          * \param &deformationGradient: The deformation gradient \f$F_{iI}\f$
          * \param &DFDt: The total time derivative of the deformation gradient
+         * \param &dDFDtdL: The derivative of the total time derivative of the deformation gradient
+         *     with respect to the velocity gradient.
+         * \param &dDFDtDF: The derivative of the total time derivative of the deformation gradient
+         *     with respect to the deformation gradient.
          */
 
         //Assume 3D
@@ -676,8 +680,8 @@ namespace constitutiveTools{
         floatVector invLHS = vectorTools::inverse( LHS, dim, dim );
 
         //Compute the right-hand side
-        floatVector RHS = Fp + Dt * alpha * DFpDt;
-        F = floatVector( dim * dim, 0 );
+        floatVector RHS = previousDeformationGradient + Dt * alpha * DFpDt;
+        deformationGradient = floatVector( dim * dim, 0 );
 
         //Compute the new value of F
         if ( mode == 1 ){
@@ -703,11 +707,13 @@ namespace constitutiveTools{
          * \f$\frac{\partial F_{iJ}^{t + 1}}{\partial L_{KL}} = \Delta t (1 - \alpha) F_{iK}^{t + 1} \left[\delta_{JL} - \right ]\f$
          *
          * \param &Dt: The change in time.
-         * \param &Fp: The previous value of the deformation gradient
+         * \param &previousDeformationGradient: The previous value of the deformation gradient
          * \param &Lp: The previous velocity gradient.
          * \param &L: The current velocity gradient.
-         * \param &F: The computed current deformation gradient.
-         * \param alpha: The integration parameter.
+         * \param &deformationGradient: The computed current deformation gradient.
+         * \param &dFdL: The derivative of the deformation gradient w.r.t. the velocity gradient
+         * \param alpha: The integration parameter ( 0 for implicit, 1 for explicit )
+         * \param mode: The form of the ODE. See above for details.
          */
 
         //Assumes 3D
@@ -1134,6 +1140,8 @@ namespace constitutiveTools{
          * \param &deformationGradient: The deformation gradient between configurations.
          * \param &greenLagrangeStrain: The Green-Lagrange strain which corresponds to the reference
          *     configuration of the deformation gradient.
+         * \param &dEde: The derivative of the Green-Lagrange strain w.r.t. the Almansi strain.
+         * \param &dEdF: The derivative of the Green-Lagrange strain w.r.t. the deformation gradient
          */
 
         //Assume 3d
