@@ -1407,6 +1407,67 @@ int testPullBackAlmansiStrain( std::ofstream &results ){
     return 0;
 }
 
+int testComputeRightCauchyGreen( std::ofstream &results ){
+    /*!
+     * Test the computation of the Right Cauchy-Green deformation tensor
+     * \param &results: The output file
+     */
+
+    floatVector deformationGradient = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    
+    floatVector answer = { 66, 78, 90, 78, 93, 108, 90, 108, 126 };
+
+    floatVector result;
+
+    if ( error ){
+        error->print();
+        results << "testComputeRightCauchyGreen (test 1) & False\n";
+        return 1;
+    {
+
+    //Test Jacobian
+
+    floatVector resultJ;
+    floatMatrix dCdF;
+
+    error = constitutiveTools::computeRightCauchyGreen( deformationGradient, resultJ, dCdF );
+    
+    if ( error ){
+        error->print( );
+        results << "testComputeRightCauchyGreen & False\n";
+    }
+
+    if ( !vectorTools::fuzzyEquals( resultJ, answer ) ){
+        results << "testComputeRightCauchyGreen (test 2) & False\n";
+        return 1;
+    }
+
+    floatType eps = 1e-6;
+    for ( unsigned int i = 0; i < deformationGradient.size( ); i++ ){
+        floatVector delta( deformationGradient.size( ), 0 );
+        delta[ i ] = eps * fabs( deformationGradient[ i ] ) + eps;
+
+        error = constitutiveTools::computeRightCauchyGreen( deformationGradient + delta, resultJ );
+
+        if ( error ){
+            error->print( );
+            results << "testComputeRightCauchyGreen & False\n";
+        }
+
+        floatVector gradCol = ( resultJ - result ) / delta[ i ];
+
+        for ( unsigned int j = 0; j < gradCol.size( ); j++ ){
+            if ( !vectorTools::fuzzyEquals( gradCol[ j ], dCdF[ j ][ i ] ) ){
+                results << "testComputeRightCauchyGreen (test 3) & False\n";
+                return 1;
+            }
+        }
+    }
+
+    results << "testComputeRightCauchyGreen & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -1436,6 +1497,7 @@ int main(){
     testQuadraticThermalExpansion( results );
     testPushForwardGreenLagrangeStrain( results );
     testPullBackAlmansiStrain( results );
+    testComputeRightCauchyGreen( results );
 
     //Close the results file
     results.close();
