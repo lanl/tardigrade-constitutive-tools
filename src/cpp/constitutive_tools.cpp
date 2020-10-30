@@ -24,7 +24,7 @@ namespace constitutiveTools{
 
     floatType deltaDirac(const unsigned int i, const unsigned int j){
         /*!
-         * The delta dirac function
+         * The delta dirac function \f$\delta\f$
          *
          * if i==j return 1
          * if i!=j return 0
@@ -41,14 +41,14 @@ namespace constitutiveTools{
 
     errorOut rotateMatrix(const floatVector &A, const floatVector &Q, floatVector &rotatedA){
         /*!
-         * Rotate a matrix A using the orthogonal matrix Q with the form
+         * Rotate a matrix \f$A\f$ using the orthogonal matrix \f$Q\f$ with the form
          * \f$A'_{ij} = Q_{Ii} A_{IJ} Q_{Jj}\f$
          *
          * TODO: Generalize to non square matrices
          *
-         * \param &A: The matrix to be rotated
-         * \param &Q: The rotation matrix
-         * \param &rotatedA: The rotated matrix
+         * \param &A: The matrix to be rotated ( \f$A\f$ )
+         * \param &Q: The rotation matrix ( \f$Q\f$Q )
+         * \param &rotatedA: The rotated matrix ( \f$A'\f$ )
          */
 
         //Check the size of A
