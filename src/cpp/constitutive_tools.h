@@ -50,7 +50,7 @@ namespace constitutiveTools{
 
     errorOut computeGreenLagrangeStrain(const floatVector &deformationGradient, floatVector &E, floatMatrix &dEdF);
 
-    errorOut computeDGreenLagrangeStrainDF(const floatVector &F, floatMatrix &dEdF);
+    errorOut computeDGreenLagrangeStrainDF(const floatVector &deformationGradient, floatMatrix &dEdF);
 
     errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J);
 
@@ -80,11 +80,11 @@ namespace constitutiveTools{
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
                                floatVector &A, floatMatrix &DADADt, const floatType alpha=0.5);
 
-    errorOut evolveF(const floatType &Dt, const floatVector &Fp, const floatVector &Lp, const floatVector &L,
-                     floatVector &F, const floatType alpha=0.5, const unsigned int mode = 1);
+    errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
+                     floatVector &deformationGradient, const floatType alpha=0.5, const unsigned int mode = 1);
 
-    errorOut evolveF(const floatType &Dt, const floatVector &Fp, const floatVector &Lp, const floatVector &L,
-                     floatVector &F, floatMatrix &dFdL, const floatType alpha=0.5, const unsigned int mode = 1);
+    errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
+                     floatVector &deformationGradient, floatMatrix &dFdL, const floatType alpha=0.5, const unsigned int mode = 1);
 
     floatType mac(const floatType &x);
 
