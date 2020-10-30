@@ -42,6 +42,7 @@ namespace constitutiveTools{
     errorOut rotateMatrix(const floatVector &A, const floatVector &Q, floatVector &rotatedA){
         /*!
          * Rotate a matrix \f$A\f$ using the orthogonal matrix \f$Q\f$ with the form
+         * 
          * \f$A'_{ij} = Q_{Ii} A_{IJ} Q_{Jj}\f$
          *
          * TODO: Generalize to non square matrices
@@ -1187,7 +1188,9 @@ namespace constitutiveTools{
          *
          * \param &A: A constant reference to the second order tensor to process ( \f$A\f$ )
          * \param &symmA: The symmetric part of A ( \f$A^{symm}\f$ )
-         * \param &dim: The dimension of A
+         * \param &dim: The dimension of A. Note that this is an output used for help
+         *     with computing the Jacobian. If you don't need dim as an output use the
+         *     version of this function without it.
          */
         
         //Get the dimension of A
