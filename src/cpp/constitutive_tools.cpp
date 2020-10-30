@@ -329,15 +329,15 @@ namespace constitutiveTools{
 
     errorOut mapPK2toCauchy(const floatVector &PK2Stress, const floatVector &deformationGradient, floatVector &cauchyStress){
         /*!
-         * Map the PK2 stress to the current configuration resulting in the Cauchy stress.
+         * Map the PK2 stress ( \f$P^{II}\f$ ) to the current configuration resulting in the Cauchy stress ( \f$\sigma\f$ ).
          *
-         * \f$cauchy_{ij} = (1/det(F)) F_{iI} PK2_{IJ} F_{jJ}\f$
+         * \f$\sigma_{ij} = (1/det(F)) F_{iI} P^{II}_{IJ} F_{jJ}\f$
          *
-         * where F is the deformation gradient
+         * where \f$F\f$ is the deformation gradient
          *
-         * \param &PK2Stress: The Second Piola-Kirchoff stress
-         * \param &deformationGradient: The total deformation gradient.
-         * \param &cauchyStress: The Cauchy stress.
+         * \param &PK2Stress: The Second Piola-Kirchoff stress ( \f$P^{II}\f$ )
+         * \param &deformationGradient: The total deformation gradient ( \f$F\f$ ).
+         * \param &cauchyStress: The Cauchy stress (\f$\sigma\f$ ).
          */
 
         if (PK2Stress.size() != 9){
