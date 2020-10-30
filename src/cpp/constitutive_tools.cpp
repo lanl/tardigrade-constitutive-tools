@@ -257,16 +257,16 @@ namespace constitutiveTools{
 
     errorOut decomposeGreenLagrangeStrain( const floatVector &E, floatVector &Ebar, floatType &J ){
         /*!
-         * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts where
+         * Decompose the Green-Lagrange strain tensor ( \f$E\f$ ) into isochoric ( \f$\bar{E}\f$ ) and volumetric ( \f$J\f$ ) parts where
          *
          * \f$J = det(F) = sqrt(det(2*E + I))\f$
          *
-         * \f$Ebar_{IJ} = 0.5*((1/(J**(2/3))) F_{iI} F_{iJ} - I_{IJ}) = (1/(J**(2/3)))*E_{IJ} + 0.5(1/(J**(2/3)) - 1)*I_{IJ}\f$
+         * \f$\bar{E}_{IJ} = 0.5*((1/(J**(2/3))) F_{iI} F_{iJ} - I_{IJ}) = (1/(J**(2/3)))*E_{IJ} + 0.5(1/(J**(2/3)) - 1)*I_{IJ}\f$
          *
-         * \param &E: The Green-Lagrange strain tensor
-         * \param &Ebar: The isochoric Green-Lagrange strain tensor.
+         * \param &E: The Green-Lagrange strain tensor ( \f$E\f$ )
+         * \param &Ebar: The isochoric Green-Lagrange strain tensor ( \f$\bar{E}\f$ ).
          *     format = E11, E12, E13, E21, E22, E23, E31, E32, E33
-         * \param &J: The Jacobian of deformation (det(F))
+         * \param &J: The Jacobian of deformation ( \f$J\f$ )
          */
 
         if (E.size() != 9){
@@ -289,20 +289,20 @@ namespace constitutiveTools{
     errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J,
                                           floatMatrix &dEbardE, floatVector &dJdE){
         /*!
-         * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts where
+         * Decompose the Green-Lagrange strain tensor ( \f$E\f$ ) into isochoric ( \f$\bar{E}\f$ ) and volumetric ( \f$J\f$ ) parts where
          *
          * \f$J = det(F) = sqrt(det(2*E + I))\f$
          *
-         * \f$Ebar_{IJ} = 0.5*((1/(J**(2/3))) F_{iI} F_{iJ} - I_{IJ}) = (1/(J**(2/3)))*E_{IJ} + 0.5(1/(J**(2/3)) - 1)*I_{IJ}\f$
+         * \f$\bar{E}_{IJ} = 0.5*((1/(J**(2/3))) F_{iI} F_{iJ} - I_{IJ}) = (1/(J**(2/3)))*E_{IJ} + 0.5(1/(J**(2/3)) - 1)*I_{IJ}\f$
          *
-         * \param &E: The Green-Lagrange strain tensor
-         * \param &Ebar: The isochoric Green-Lagrange strain tensor.
+         * \param &E: The Green-Lagrange strain tensor ( \f$E\f$ )
+         * \param &Ebar: The isochoric Green-Lagrange strain tensor ( \f$\bar{E}\f$ ).
          *     format = E11, E12, E13, E21, E22, E23, E31, E32, E33
-         * \param &J: The Jacobian of deformation (det(F))
+         * \param &J: The Jacobian of deformation ( \f$J\f$ )
          * \param &dEbardE: The derivative of the isochoric Green-Lagrange strain
-         *     tensor w.r.t. the total strain tensor.
+         *     tensor w.r.t. the total strain tensor ( \f$\frac{\partial \bar{E}}{\partial E}\f$ ).
          * \param &dJdE: The derivative of the jacobian of deformation w.r.t. the
-         *     Green-Lagrange strain tensor.
+         *     Green-Lagrange strain tensor ( \f$\frac{\partial J}{\partial E}\f$ ).
          */
 
         errorOut error = decomposeGreenLagrangeStrain(E, Ebar, J);
