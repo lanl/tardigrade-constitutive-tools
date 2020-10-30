@@ -157,14 +157,14 @@ namespace constitutiveTools{
     errorOut computeGreenLagrangeStrain( const floatVector &deformationGradient,
                                          floatVector &E ){
         /*!
-         * Compute the Green-Lagrange strain ( E ) from the deformation gradient ( F ). The operation is:
+         * Compute the Green-Lagrange strain ( \f$E\f$ ) from the deformation gradient ( \f$F\f$ ). The operation is:
          *
          * \f$E = 0.5 (F_{iI} F_{iJ} - \delta_{IJ})\f$
          *
-         * Where F is the deformation gradient and \f$\delta\f$ is the kronecker delta.
+         * Where \f$F\f$ is the deformation gradient and \f$\delta\f$ is the kronecker delta.
          *
-         * \param &deformationGradient: A reference to the deformation gradient.
-         * \param &E: The resulting Green-Lagrange strain.
+         * \param &deformationGradient: A reference to the deformation gradient ( \f$F\f$ ).
+         * \param &E: The resulting Green-Lagrange strain ( \f$E\f$ ).
          *
          * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
          *
@@ -192,12 +192,12 @@ namespace constitutiveTools{
 
     errorOut computeGreenLagrangeStrain( const floatVector &deformationGradient, floatVector &E, floatMatrix &dEdF){
         /*!
-         * Compute the Green-Lagrange strain ( E ) from the deformation gradient ( F ) and it's jacobian.
+         * Compute the Green-Lagrange strain ( \f$E\f$ ) from the deformation gradient ( \f$F\f$ ) and it's jacobian.
          *
-         * \param &deformationGradient: A reference to the deformation gradient.
-         * \param &E: The resulting Green-Lagrange strain.
+         * \param &deformationGradient: A reference to the deformation gradient ( \f$F\f$ ).
+         * \param &E: The resulting Green-Lagrange strain ( \f$E\f$ ).
          * \param &dEdF: The jacobian of the Green-Lagrange strain w.r.t. the
-         *     deformation gradient.
+         *     deformation gradient ( \f$\frac{\partial E}{\partial F}\f$ ).
          *
          * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
          *
@@ -224,14 +224,14 @@ namespace constitutiveTools{
 
     errorOut computeDGreenLagrangeStrainDF(const floatVector &deformationGradient, floatMatrix &dEdF){
         /*!
-         * Compute the derivative of the Green-Lagrange strain ( E )w.r.t. the deformation gradient ( F ).
+         * Compute the derivative of the Green-Lagrange strain ( \f$E\f$ )w.r.t. the deformation gradient ( \f$F\f$ ).
          *
-         * \f$\frac{dE_{IJ}}{dF_{kK}} = 0.5 ( \delta_{IK} F_{kJ} + F_{kI} \delta_{JK})\f$
+         * \f$\frac{\partial E_{IJ}}{\partial F_{kK}} = 0.5 ( \delta_{IK} F_{kJ} + F_{kI} \delta_{JK})\f$
          *
-         * Where F is the deformation gradient and \f$\delta\f$ is the kronecker delta.
+         * Where \f$F\f$ is the deformation gradient and \f$\delta\f$ is the kronecker delta.
          *
-         * \param &deformationGradient: A reference to the deformation gradient.
-         * \param &dEdF: The resulting gradient.
+         * \param &deformationGradient: A reference to the deformation gradient ( \f$F\f$ ).
+         * \param &dEdF: The resulting gradient ( \f$\frac{\partial E}{\partial F}\f$ ).
          *
          * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
          */
