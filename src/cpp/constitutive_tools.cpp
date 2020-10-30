@@ -1181,12 +1181,12 @@ namespace constitutiveTools{
 
     errorOut computeSymmetricPart( const floatVector &A, floatVector &symmA, unsigned int &dim ){
         /*!
-         * Compute the symmetric part of a second order tensor and return it.
+         * Compute the symmetric part of a second order tensor ( \f$A\f$ ) and return it.
          *
          * \f$symm( A )_ij = \frac{1}{2}\left(A_{ij} + A_{ji}\right)\f$
          *
-         * \param &A: A constant reference to the second order tensor to process
-         * \param &symmA: The symmetric part of A
+         * \param &A: A constant reference to the second order tensor to process ( \f$A\f$ )
+         * \param &symmA: The symmetric part of A ( \f$A^{symm}\f$ )
          * \param &dim: The dimension of A
          */
         
@@ -1210,13 +1210,12 @@ namespace constitutiveTools{
 
     errorOut computeSymmetricPart( const floatVector &A, floatVector &symmA ){
         /*!
-         * Compute the symmetric part of a second order tensor and return it.
+         * Compute the symmetric part of a second order tensor ( \f$A\f$ ) and return it.
          *
          * \f$symm( A )_ij = \frac{1}{2}\left(A_{ij} + A_{ji}\right)\f$
          *
-         * \param &A: A constant reference to the second order tensor to process
-         * \param &symmA: The symmetric part of A
-         * \param &dim: The dimension of A
+         * \param &A: A constant reference to the second order tensor to process ( \f$A\f$ )
+         * \param &symmA: The symmetric part of A ( \f$A^{symm}\f$ )
          */
     
         unsigned int dim;
@@ -1225,16 +1224,17 @@ namespace constitutiveTools{
 
     errorOut computeSymmetricPart( const floatVector &A, floatVector &symmA, floatMatrix &dSymmAdA ){
         /*!
-         * Compute the symmetric part of a second order tensor and return it.
+         * Compute the symmetric part of a second order tensor ( \f$A\f$ ) and return it.
          *
          * \f$( A )^{symm}_{ij} = \frac{1}{2}\left(A_{ij} + A_{ji}\right)\f$
          *
          * Also computes the jacobian
+         * 
          * \f$\frac{\partial A^{symm}_{ij}}{\partial A_{kl}} = \frac{1}{2}\left( \delta_{ik} \delta_{jl} + \delta_{jk}\delta_{il} \right)
          *
-         * \param &A: A constant reference to the second order tensor to process
-         * \param &symmA: The symmetric part of A
-         * \param &dSymmAdA: The Jacobian of the symmetric part of A w.r.t. A
+         * \param &A: A constant reference to the second order tensor to process ( \f$A\f$ )
+         * \param &symmA: The symmetric part of A ( \f$A^{symm}\f$ )
+         * \param &dSymmAdA: The Jacobian of the symmetric part of A w.r.t. A ( \f$\frac{\partial A^{symm}}{\partial A}\f$ )
          */
         
         unsigned int dim;
