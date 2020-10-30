@@ -120,6 +120,12 @@ namespace constitutiveTools{
 
     errorOut pullBackAlmansiStrain( const floatVector &almansiStrain, const floatVector &deformationGradient,
                                     floatVector &greenLagrangeStrain, floatMatrix &dEde, floatMatrix &dEdF );
+
+    errorOut computeSymmetricPart( const floatVector &A, floatVector &symmA, unsigned int &dim );
+
+    errorOut computeSymmetricPart( const floatVector &A, floatVector &symmA );
+
+    errorOut computeSymmetricPart( const floatVector &A, floatVector &symmA, floatMatrix &dSymmAdA );
 }
 
 #endif

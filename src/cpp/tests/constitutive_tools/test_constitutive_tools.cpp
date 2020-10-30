@@ -1475,6 +1475,75 @@ int testComputeRightCauchyGreen( std::ofstream &results ){
     return 0;
 }
 
+int testComputeSymmetricPart( std::ofstream &results ){
+    /*!
+     * Test the computation of the symmetric part of a matrix
+     *
+     * \param &results: The output file
+     */
+
+    floatVector A = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    
+    floatVector answer = { 1., 3., 5., 3., 5., 7., 5., 7., 9. };
+    
+    floatVector result;
+    
+    errorOut error = constitutiveTools::computeSymmetricPart( A, result );
+    
+    if ( error ){
+        error->print( );
+        results << "testComputeSymmetricPart & False\n";
+        return 1;
+    }
+    
+    if( !vectorTools::fuzzyEquals( result, answer ) ){
+        results << "testComputeSymmetricPart (test 1) & False\n";
+        return 1;
+    }
+    
+    floatVector resultJ;
+    floatMatrix dSymmAdA;
+    
+    error = constitutiveTools::computeSymmetricPart( A, resultJ, dSymmAdA );
+    
+    if ( error ){
+        error->print( );
+        results << "testComputeSymmetricPart & False\n";
+        return 1;
+    }
+    
+    if ( !vectorTools::fuzzyEquals( resultJ, answer ) ){
+        results << "testComputeSymmetricPart (test 2) & False\n";
+        return 1;
+    }
+    
+    floatType eps = 1e-6;
+    for ( unsigned int i = 0; i < A.size( ); i++ ){
+        floatVector delta( A.size( ), 0 );
+        delta[ i ] = eps * fabs( A[ i ] ) + eps;
+    
+        error = constitutiveTools::computeSymmetricPart( A + delta, resultJ );
+    
+        if ( error ){
+            error->print( );
+            results << "testCoputeSymmetricPart & False\n";
+            return 1;
+        }
+    
+        floatVector gradCol = ( resultJ - result ) / delta[ i ];
+    
+        for ( unsigned int j = 0; j < gradCol.size( ); j++ ){
+            if ( !vectorTools::fuzzyEquals( gradCol[ j ], dSymmAdA[ j ][ i ] ) ){
+                results << "testComputeSymmetricPart (test 3) & False\n";
+    	        return 1;
+            }
+        }
+    }
+
+    results << "testComputeSymmetricPart & True\n";
+    return 0;
+}
+
 int main(){
     /*!
     The main loop which runs the tests defined in the 
@@ -1505,6 +1574,7 @@ int main(){
     testPushForwardGreenLagrangeStrain( results );
     testPullBackAlmansiStrain( results );
     testComputeRightCauchyGreen( results );
+    testComputeSymmetricPart( results );
 
     //Close the results file
     results.close();
