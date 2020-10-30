@@ -370,12 +370,12 @@ namespace constitutiveTools{
         /*!
          * An implementation of the Williams-Landel-Ferry equation.
          *
-         * \f$factor = 10**((-C1*(T - Tr))/(C2 + T - Tr))\f$
+         * \f$factor = 10**((-C_1*(T - T_r))/(C_2 + T - T_r))\f$
          *
-         * where T is the temperature, Tr is the reference temperature, and C1 and C2 are parameters
+         * where \f$T\f$ is the temperature, \f$T_r\f$ is the reference temperature, and \f$C_1\f$ and \f$C_2\f$ are parameters
          *
-         * \param &temperature: The temperature
-         * \param &WLFParameters: The parameters for the function [Tr, C1, C2]
+         * \param &temperature: The temperature \f$T\f$
+         * \param &WLFParameters: The parameters for the function [\f$T_r\f$, \f$C_1\f$, \f$C_2\f$]
          * \param &factor: The shift factor
          */
 
@@ -398,12 +398,12 @@ namespace constitutiveTools{
 
     errorOut WLF(const floatType &temperature, const floatVector &WLFParameters, floatType &factor, floatType &dfactordT){
         /*!
-         * An implementation of the Williams-Landel-Ferry equation that also returns the gradient w.r.t. T
+         * An implementation of the Williams-Landel-Ferry equation that also returns the gradient w.r.t. \f$T\f$
          *
-         * \param &temperature: The temperature
-         * \param &WLFParameters: The parameters for the function [Tr, C1, C2]
+         * \param &temperature: The temperature ( \f$T\f$ )
+         * \param &WLFParameters: The parameters for the function [\f$T_r\f$, \f$C_1\f$, \f$C_2\f$]
          * \param &factor: The shift factor
-         * \param &dfactordT: The derivative of the shift factor w.r.t. the temperature.
+         * \param &dfactordT: The derivative of the shift factor w.r.t. the temperature ( \f$\frac{\partial factor}{\partial T}\f$ )
          */
 
         errorOut error = WLF(temperature, WLFParameters, factor);
