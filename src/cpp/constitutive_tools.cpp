@@ -80,12 +80,12 @@ namespace constitutiveTools{
 
     errorOut computeRightCauchyGreen( const floatVector &deformationGradient, floatVector &C ){
         /*!
-         * Compute the Right Cauchy-Green deformation tensor
+         * Compute the Right Cauchy-Green deformation tensor ( \f$C\f$ )
          *
          * \f$C_{IJ} = F_{iI} F_{iJ}\f$
          *
-         * \param &deformationGradient: A reference to the deformation gradient
-         * \param &C: The resulting Right Cauchy-Green deformation tensor
+         * \param &deformationGradient: A reference to the deformation gradient ( \f$F\f$ )
+         * \param &C: The resulting Right Cauchy-Green deformation tensor ( \f$C\f$ )
          *
          * The deformation gradient is organized as F11, F12, F13, F21, F22, F23, F31, F32, F33
          *
@@ -107,14 +107,14 @@ namespace constitutiveTools{
 
     errorOut computeRightCauchyGreen( const floatVector &deformationGradient, floatVector &C, floatMatrix &dCdF ){
         /*!
-         * Compute the Right Cauchy-Green deformation tensor ( C ) from the deformation gradient ( F )
+         * Compute the Right Cauchy-Green deformation tensor ( \f$C\f$ ) from the deformation gradient ( \f$F\f$ )
          * 
          * \f$C_{IJ} = F_{iI} F_{iJ}\f$
          * 
-         * \param &deformationGradient: A reference to the deformation gradient
-         * \param &C: The resulting Right Cauchy-Green deformation tensor
+         * \param &deformationGradient: A reference to the deformation gradient ( \f$F\f$ )
+         * \param &C: The resulting Right Cauchy-Green deformation tensor ( \f$C\f$ )
          * \param &dCdF: The Jacobian of the Right Cauchy-Green deformation tensor
-         *     with regards to the deformation gradient.
+         *     with regards to the deformation gradient ( \f$\frac{\partial C}{\partial F}\f$ ).
          *
          * The deformation gradient is organized as F11, F12, F13, F21, F22, F23, F31, F32, F33
          *
