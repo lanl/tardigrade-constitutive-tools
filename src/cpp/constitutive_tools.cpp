@@ -24,7 +24,7 @@ namespace constitutiveTools{
 
     floatType deltaDirac(const unsigned int i, const unsigned int j){
         /*!
-         * The delta dirac function
+         * The delta dirac function \f$\delta\f$
          *
          * if i==j return 1
          * if i!=j return 0
@@ -41,14 +41,14 @@ namespace constitutiveTools{
 
     errorOut rotateMatrix(const floatVector &A, const floatVector &Q, floatVector &rotatedA){
         /*!
-         * Rotate a matrix A using the orthogonal matrix Q with the form
+         * Rotate a matrix \f$A\f$ using the orthogonal matrix \f$Q\f$ with the form
          * \f$A'_{ij} = Q_{Ii} A_{IJ} Q_{Jj}\f$
          *
          * TODO: Generalize to non square matrices
          *
-         * \param &A: The matrix to be rotated
-         * \param &Q: The rotation matrix
-         * \param &rotatedA: The rotated matrix
+         * \param &A: The matrix to be rotated ( \f$A\f$ )
+         * \param &Q: The rotation matrix ( \f$Q\f$Q )
+         * \param &rotatedA: The rotated matrix ( \f$A'\f$ )
          */
 
         //Check the size of A
@@ -78,99 +78,175 @@ namespace constitutiveTools{
         return NULL;
     }
 
-    errorOut computeGreenLagrangeStrain(const floatVector &F,
-                                        floatVector &E){
+    errorOut computeRightCauchyGreen( const floatVector &deformationGradient, floatVector &C ){
         /*!
-         * Compute the Green-Lagrange strain from the deformation gradient. The operation is:
+         * Compute the Right Cauchy-Green deformation tensor ( \f$C\f$ )
+         *
+         * \f$C_{IJ} = F_{iI} F_{iJ}\f$
+         *
+         * \param &deformationGradient: A reference to the deformation gradient ( \f$F\f$ )
+         * \param &C: The resulting Right Cauchy-Green deformation tensor ( \f$C\f$ )
+         *
+         * The deformation gradient is organized as F11, F12, F13, F21, F22, F23, F31, F32, F33
+         *
+         * The Right Cauchy-Green deformation tensor is organized as C11, C12, C13, C21, C22, C23, C31, C32, C33
+         */
+
+        //Assume 3D
+        unsigned int dim = 3;
+
+        if ( deformationGradient.size( ) != dim * dim ){
+            return new errorNode( "computeRightCauchyGreen",
+			          "The deformation gradient must be 3D" );
+        }
+
+        C = vectorTools::matrixMultiply( deformationGradient, deformationGradient, dim, dim, dim, dim, 1, 0 );
+
+        return NULL;
+    }
+
+    errorOut computeRightCauchyGreen( const floatVector &deformationGradient, floatVector &C, floatMatrix &dCdF ){
+        /*!
+         * Compute the Right Cauchy-Green deformation tensor ( \f$C\f$ ) from the deformation gradient ( \f$F\f$ )
+         * 
+         * \f$C_{IJ} = F_{iI} F_{iJ}\f$
+         * 
+         * \param &deformationGradient: A reference to the deformation gradient ( \f$F\f$ )
+         * \param &C: The resulting Right Cauchy-Green deformation tensor ( \f$C\f$ )
+         * \param &dCdF: The Jacobian of the Right Cauchy-Green deformation tensor
+         *     with regards to the deformation gradient ( \f$\frac{\partial C}{\partial F}\f$ ).
+         *
+         * The deformation gradient is organized as F11, F12, F13, F21, F22, F23, F31, F32, F33
+         *
+         * The Right Cauchy-Green deformation tensor is organized as C11, C12, C13, C21, C22, C23, C31, C32, C33
+         */
+
+        //Assume 3D
+        unsigned int dim = 3;
+
+        errorOut error = computeRightCauchyGreen( deformationGradient, C );
+
+        if ( error ){
+            errorOut result = new errorNode( "computeRightCauchyGreen (jacobian)",
+                                             "Error in computation of Right Cauchy green deformation tensor" );
+            result->addNext( error );
+            return result;
+        }
+        
+        //Assemble the Jacobian
+        floatVector eye( dim * dim );
+        vectorTools::eye( eye );
+        
+        dCdF = floatMatrix( C.size( ), floatVector( deformationGradient.size( ), 0 ) );
+        
+        for ( unsigned int I = 0; I < dim; I++ ){
+            for ( unsigned int J = 0; J < dim; J++ ){
+                for ( unsigned int k = 0; k < dim; k++ ){
+                    for ( unsigned int K =0 ; K < dim; K++ ){
+                        dCdF[ dim * I + J ][ dim * k + K ] = eye[ dim * I + K ] * deformationGradient[ dim * k + J ]
+                                                           + deformationGradient[ dim * k + I ] * eye[ dim * J + K ];
+                    }
+                }
+            }
+        }
+
+        return NULL;
+
+    }
+
+    errorOut computeGreenLagrangeStrain( const floatVector &deformationGradient,
+                                         floatVector &E ){
+        /*!
+         * Compute the Green-Lagrange strain ( \f$E\f$ ) from the deformation gradient ( \f$F\f$ ). The operation is:
          *
          * \f$E = 0.5 (F_{iI} F_{iJ} - \delta_{IJ})\f$
          *
-         * Where F is the deformation gradient and \f$\delta\f$ is the kronecker delta.
+         * Where \f$F\f$ is the deformation gradient and \f$\delta\f$ is the kronecker delta.
          *
-         * \param &F: A reference to the deformation gradient.
-         * \param &E: The resulting Green-Lagrange strain.
+         * \param &deformationGradient: A reference to the deformation gradient ( \f$F\f$ ).
+         * \param &E: The resulting Green-Lagrange strain ( \f$E\f$ ).
          *
          * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
          *
          * The Green-Lagrange strain is organized as E11, E12, E13, E21, E22, E23, E31, E32, E33
          */
 
-        if (F.size() != 9){
-            return new errorNode("computeGreenLagrangeStrain", "The deformation gradient must be 3D.");
+        if ( deformationGradient.size( ) != 9 ){
+            return new errorNode( "computeGreenLagrangeStrain", "The deformation gradient must be 3D." );
         }
 
         const unsigned int dim=3;
-        E.resize(dim*dim);
+        E.resize( dim * dim );
 
-        for (unsigned int I=0; I<dim; I++){
-            for (unsigned int J=0; J<dim; J++){
-                E[dim*I + J] = -deltaDirac(I, J);
-                for (unsigned int i=0; i<dim; i++){
-                    E[dim*I + J] += F[dim*i + I]*F[dim*i + J];
+        for ( unsigned int I = 0; I < dim; I++ ){
+            for ( unsigned int J = 0; J < dim; J++ ){
+                E[ dim * I + J ] = -deltaDirac( I, J );
+                for ( unsigned int i = 0; i < dim; i++ ){
+                    E[ dim * I + J ] += deformationGradient[ dim * i + I ] * deformationGradient[ dim * i + J ];
                 }
-                E[dim*I + J] *= 0.5;
+                E[ dim * I + J ] *= 0.5;
             }
         }
         return NULL;
     }
 
-    errorOut computeGreenLagrangeStrain(const floatVector &F, floatVector &E, floatMatrix &dEdF){
+    errorOut computeGreenLagrangeStrain( const floatVector &deformationGradient, floatVector &E, floatMatrix &dEdF){
         /*!
-         * Compute the Green-Lagrange strain from the deformation gradient and it's jacobian.
+         * Compute the Green-Lagrange strain ( \f$E\f$ ) from the deformation gradient ( \f$F\f$ ) and it's jacobian.
          *
-         * \param &F: A reference to the deformation gradient.
-         * \param &E: The resulting Green-Lagrange strain.
+         * \param &deformationGradient: A reference to the deformation gradient ( \f$F\f$ ).
+         * \param &E: The resulting Green-Lagrange strain ( \f$E\f$ ).
          * \param &dEdF: The jacobian of the Green-Lagrange strain w.r.t. the
-         *     deformation gradient.
+         *     deformation gradient ( \f$\frac{\partial E}{\partial F}\f$ ).
          *
          * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
          *
          * The Green-Lagrange strain is organized as E11, E12, E13, E21, E22, E23, E31, E32, E33
          */
 
-        errorOut error = computeGreenLagrangeStrain(F, E);
+        errorOut error = computeGreenLagrangeStrain( deformationGradient, E );
 
-        if (error){
-            errorOut result = new errorNode("computeGreenLagrangeStrain (jacobian)", "Error in computation of Green-Lagrange strain");
-            result->addNext(error);
+        if ( error ){
+            errorOut result = new errorNode( "computeGreenLagrangeStrain (jacobian)", "Error in computation of Green-Lagrange strain" );
+            result->addNext( error );
             return result;
         }
 
-        error = computeDGreenLagrangeStrainDF(F, dEdF);
+        error = computeDGreenLagrangeStrainDF( deformationGradient, dEdF );
 
-        if (error){
-            errorOut result = new errorNode("computeGreenLagrangeStrain (jacobian)", "Error in computation of Green-Lagrange strain jacobian");
-            result->addNext(error);
+        if ( error ){
+            errorOut result = new errorNode( "computeGreenLagrangeStrain (jacobian)", "Error in computation of Green-Lagrange strain jacobian" );
+            result->addNext( error );
             return result;
         }
         return NULL;
     }
 
-    errorOut computeDGreenLagrangeStrainDF(const floatVector &F,
-                                        floatMatrix &dEdF){
+    errorOut computeDGreenLagrangeStrainDF(const floatVector &deformationGradient, floatMatrix &dEdF){
         /*!
-         * Compute the derivative of the Green-Lagrange strain w.r.t. the deformation gradient.
+         * Compute the derivative of the Green-Lagrange strain ( \f$E\f$ )w.r.t. the deformation gradient ( \f$F\f$ ).
          *
-         * \f$\frac{dE_{IJ}}{dF_{kK}} = 0.5 ( \delta_{IK} F_{kJ} + F_{kI} \delta_{JK})\f$
+         * \f$\frac{\partial E_{IJ}}{\partial F_{kK}} = 0.5 ( \delta_{IK} F_{kJ} + F_{kI} \delta_{JK})\f$
          *
-         * Where F is the deformation gradient and \f$\delta\f$ is the kronecker delta.
+         * Where \f$F\f$ is the deformation gradient and \f$\delta\f$ is the kronecker delta.
          *
-         * \param &F: A reference to the deformation gradient.
-         * \param &dEdF: The resulting gradient.
+         * \param &deformationGradient: A reference to the deformation gradient ( \f$F\f$ ).
+         * \param &dEdF: The resulting gradient ( \f$\frac{\partial E}{\partial F}\f$ ).
          *
          * The deformation gradient is organized as  F11, F12, F13, F21, F22, F23, F31, F32, F33
          */
 
-        if (F.size() != 9){
-            return new errorNode("decomposeGreenLagrangeStrain", "the Green-Lagrange strain must be 3D");
+        if ( deformationGradient.size( ) != 9 ){
+            return new errorNode( "decomposeGreenLagrangeStrain", "the Green-Lagrange strain must be 3D" );
         }
 
-        dEdF = floatMatrix(F.size(), floatVector(F.size(), 0));
-        for (unsigned int I=0; I<3; I++){
-            for (unsigned int J=0; J<3; J++){
-                for (unsigned int k=0; k<3; k++){
-                    for (unsigned int K=0; K<3; K++){
-                        dEdF[3*I + J][3*k + K] = 0.5*(deltaDirac(I, K)*F[3*k + J] + F[3*k + I]*deltaDirac(J, K));
+        dEdF = floatMatrix( deformationGradient.size(), floatVector( deformationGradient.size( ), 0 ) );
+        for ( unsigned int I = 0; I < 3; I++ ){
+            for ( unsigned int J = 0; J < 3; J++ ){
+                for ( unsigned int k = 0; k < 3; k++ ){
+                    for (unsigned int K = 0; K < 3; K++ ){
+                        dEdF[ 3 * I + J ][ 3 * k + K ] = 0.5 * ( deltaDirac( I, K ) * deformationGradient[ 3 * k + J ]
+                                                       + deformationGradient[ 3 * k + I ] * deltaDirac( J, K ) );
                     }
                 }
             }
@@ -179,18 +255,18 @@ namespace constitutiveTools{
         return NULL;
     }
 
-    errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J){
+    errorOut decomposeGreenLagrangeStrain( const floatVector &E, floatVector &Ebar, floatType &J ){
         /*!
-         * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts where
+         * Decompose the Green-Lagrange strain tensor ( \f$E\f$ ) into isochoric ( \f$\bar{E}\f$ ) and volumetric ( \f$J\f$ ) parts where
          *
          * \f$J = det(F) = sqrt(det(2*E + I))\f$
          *
-         * \f$Ebar_{IJ} = 0.5*((1/(J**(2/3))) F_{iI} F_{iJ} - I_{IJ}) = (1/(J**(2/3)))*E_{IJ} + 0.5(1/(J**(2/3)) - 1)*I_{IJ}\f$
+         * \f$\bar{E}_{IJ} = 0.5*((1/(J**(2/3))) F_{iI} F_{iJ} - I_{IJ}) = (1/(J**(2/3)))*E_{IJ} + 0.5(1/(J**(2/3)) - 1)*I_{IJ}\f$
          *
-         * \param &E: The Green-Lagrange strain tensor
-         * \param &Ebar: The isochoric Green-Lagrange strain tensor.
+         * \param &E: The Green-Lagrange strain tensor ( \f$E\f$ )
+         * \param &Ebar: The isochoric Green-Lagrange strain tensor ( \f$\bar{E}\f$ ).
          *     format = E11, E12, E13, E21, E22, E23, E31, E32, E33
-         * \param &J: The Jacobian of deformation (det(F))
+         * \param &J: The Jacobian of deformation ( \f$J\f$ )
          */
 
         if (E.size() != 9){
@@ -213,20 +289,20 @@ namespace constitutiveTools{
     errorOut decomposeGreenLagrangeStrain(const floatVector &E, floatVector &Ebar, floatType &J,
                                           floatMatrix &dEbardE, floatVector &dJdE){
         /*!
-         * Decompose the Green-Lagrange strain tensor into isochoric and volumetric parts where
+         * Decompose the Green-Lagrange strain tensor ( \f$E\f$ ) into isochoric ( \f$\bar{E}\f$ ) and volumetric ( \f$J\f$ ) parts where
          *
          * \f$J = det(F) = sqrt(det(2*E + I))\f$
          *
-         * \f$Ebar_{IJ} = 0.5*((1/(J**(2/3))) F_{iI} F_{iJ} - I_{IJ}) = (1/(J**(2/3)))*E_{IJ} + 0.5(1/(J**(2/3)) - 1)*I_{IJ}\f$
+         * \f$\bar{E}_{IJ} = 0.5*((1/(J**(2/3))) F_{iI} F_{iJ} - I_{IJ}) = (1/(J**(2/3)))*E_{IJ} + 0.5(1/(J**(2/3)) - 1)*I_{IJ}\f$
          *
-         * \param &E: The Green-Lagrange strain tensor
-         * \param &Ebar: The isochoric Green-Lagrange strain tensor.
+         * \param &E: The Green-Lagrange strain tensor ( \f$E\f$ )
+         * \param &Ebar: The isochoric Green-Lagrange strain tensor ( \f$\bar{E}\f$ ).
          *     format = E11, E12, E13, E21, E22, E23, E31, E32, E33
-         * \param &J: The Jacobian of deformation (det(F))
+         * \param &J: The Jacobian of deformation ( \f$J\f$ )
          * \param &dEbardE: The derivative of the isochoric Green-Lagrange strain
-         *     tensor w.r.t. the total strain tensor.
+         *     tensor w.r.t. the total strain tensor ( \f$\frac{\partial \bar{E}}{\partial E}\f$ ).
          * \param &dJdE: The derivative of the jacobian of deformation w.r.t. the
-         *     Green-Lagrange strain tensor.
+         *     Green-Lagrange strain tensor ( \f$\frac{\partial J}{\partial E}\f$ ).
          */
 
         errorOut error = decomposeGreenLagrangeStrain(E, Ebar, J);
@@ -253,15 +329,15 @@ namespace constitutiveTools{
 
     errorOut mapPK2toCauchy(const floatVector &PK2Stress, const floatVector &deformationGradient, floatVector &cauchyStress){
         /*!
-         * Map the PK2 stress to the current configuration resulting in the Cauchy stress.
+         * Map the PK2 stress ( \f$P^{II}\f$ ) to the current configuration resulting in the Cauchy stress ( \f$\sigma\f$ ).
          *
-         * \f$cauchy_{ij} = (1/det(F)) F_{iI} PK2_{IJ} F_{jJ}\f$
+         * \f$\sigma_{ij} = (1/det(F)) F_{iI} P^{II}_{IJ} F_{jJ}\f$
          *
-         * where F is the deformation gradient
+         * where \f$F\f$ is the deformation gradient
          *
-         * \param &PK2Stress: The Second Piola-Kirchoff stress
-         * \param &deformationGradient: The total deformation gradient.
-         * \param &cauchyStress: The Cauchy stress.
+         * \param &PK2Stress: The Second Piola-Kirchoff stress ( \f$P^{II}\f$ )
+         * \param &deformationGradient: The total deformation gradient ( \f$F\f$ ).
+         * \param &cauchyStress: The Cauchy stress (\f$\sigma\f$ ).
          */
 
         if (PK2Stress.size() != 9){
@@ -294,12 +370,12 @@ namespace constitutiveTools{
         /*!
          * An implementation of the Williams-Landel-Ferry equation.
          *
-         * \f$factor = 10**((-C1*(T - Tr))/(C2 + T - Tr))\f$
+         * \f$factor = 10**((-C_1*(T - T_r))/(C_2 + T - T_r))\f$
          *
-         * where T is the temperature, Tr is the reference temperature, and C1 and C2 are parameters
+         * where \f$T\f$ is the temperature, \f$T_r\f$ is the reference temperature, and \f$C_1\f$ and \f$C_2\f$ are parameters
          *
-         * \param &temperature: The temperature
-         * \param &WLFParameters: The parameters for the function [Tr, C1, C2]
+         * \param &temperature: The temperature \f$T\f$
+         * \param &WLFParameters: The parameters for the function [\f$T_r\f$, \f$C_1\f$, \f$C_2\f$]
          * \param &factor: The shift factor
          */
 
@@ -322,12 +398,12 @@ namespace constitutiveTools{
 
     errorOut WLF(const floatType &temperature, const floatVector &WLFParameters, floatType &factor, floatType &dfactordT){
         /*!
-         * An implementation of the Williams-Landel-Ferry equation that also returns the gradient w.r.t. T
+         * An implementation of the Williams-Landel-Ferry equation that also returns the gradient w.r.t. \f$T\f$
          *
-         * \param &temperature: The temperature
-         * \param &WLFParameters: The parameters for the function [Tr, C1, C2]
+         * \param &temperature: The temperature ( \f$T\f$ )
+         * \param &WLFParameters: The parameters for the function [\f$T_r\f$, \f$C_1\f$, \f$C_2\f$]
          * \param &factor: The shift factor
-         * \param &dfactordT: The derivative of the shift factor w.r.t. the temperature.
+         * \param &dfactordT: The derivative of the shift factor w.r.t. the temperature ( \f$\frac{\partial factor}{\partial T}\f$ )
          */
 
         errorOut error = WLF(temperature, WLFParameters, factor);
@@ -393,6 +469,10 @@ namespace constitutiveTools{
          * \param &velocityGradient: The velocity gradient \f$L_{ij}\f$
          * \param &deformationGradient: The deformation gradient \f$F_{iI}\f$
          * \param &DFDt: The total time derivative of the deformation gradient
+         * \param &dDFDtdL: The derivative of the total time derivative of the deformation gradient
+         *     with respect to the velocity gradient.
+         * \param &dDFDtdF: The derivative of the total time derivative of the deformation gradient
+         *     with respect to the deformation gradient.
          */
 
         //Assume 3D
@@ -541,10 +621,10 @@ namespace constitutiveTools{
         return midpointEvolution(Dt, Ap, DApDt, DADt, A, DADADt, alpha*floatVector(Ap.size(), 1));
     }
 
-    errorOut evolveF(const floatType &Dt, const floatVector &Fp, const floatVector &Lp, const floatVector &L,
-                     floatVector &F, const floatType alpha, const unsigned int mode){
+    errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
+                     floatVector &deformationGradient, const floatType alpha, const unsigned int mode){
         /*!
-         * Evolve F using the midpoint integration method.
+         * Evolve the deformation gradient ( F ) using the midpoint integration method.
          *
          * mode 1:
          * \f$F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha \right) L_{ij}^{t+1} \right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t} \right]\f$
@@ -553,12 +633,12 @@ namespace constitutiveTools{
          * \f$F_{iI}^{t + 1} = \left[F_{iJ}^{t} + \Delta t \alpha \dot{F}_{iJ}^{t} \right] \left[\delta_{IJ} - \Delta T \left( 1- \alpha \right) L_{IJ}^{t+1} \right]^{-1}\f$
          *
          * \param &Dt: The change in time.
-         * \param &Fp: The previous value of the deformation gradient
+         * \param &previousDeformationGradient: The previous value of the deformation gradient
          * \param &Lp: The previous velocity gradient in the current configuration (mode 1) or
          *     reference configuration (mode 2).
          * \param &L: The current velocity gradient in the current configuration (mode 1) or
          *     reference configuration (mode 2).
-         * \param &F: The computed current deformation gradient.
+         * \param &deformationGradient: The computed current deformation gradient.
          * \param alpha: The integration parameter.
          * \param mode: The mode of the ODE. Whether the velocity gradient is known in the
          *     current (mode 1) or reference (mode 2) configuration.
@@ -566,57 +646,57 @@ namespace constitutiveTools{
 
         //Assumes 3D
         const unsigned int dim = 3;
-        if (Fp.size() != dim*dim){
-            return new errorNode("evolveF", "The deformation gradient doesn't have enough terms (require 9 for 3D)");
+        if ( previousDeformationGradient.size( ) != dim * dim ){
+            return new errorNode( "evolveF", "The deformation gradient doesn't have enough terms (require 9 for 3D)" );
         }
 
-        if (Lp.size() != Fp.size()){
-            return new errorNode("evolveF", "The previous velocity gradient and deformation gradient aren't the same size");
+        if ( Lp.size( ) != previousDeformationGradient.size( ) ){
+            return new errorNode( "evolveF", "The previous velocity gradient and deformation gradient aren't the same size" );
         }
 
-        if (Fp.size() != L.size()){
-            return new errorNode("evolveF", "The previous deformation gradient and the current velocity gradient aren't the same size");
+        if ( previousDeformationGradient.size( ) != L.size( ) ){
+            return new errorNode( "evolveF", "The previous deformation gradient and the current velocity gradient aren't the same size" );
         }
 
-        if ((mode != 1) && (mode != 2)){
-            return new errorNode("evolveF", "The mode of evolution is not recognized");
+        if ( ( mode != 1 ) && ( mode != 2 ) ){
+            return new errorNode( "evolveF", "The mode of evolution is not recognized" );
         }
 
         //Compute the time-rate of change of the previous deformation gradient from the velocity gradient.
         floatVector DFpDt;
-        if (mode == 1){
-            DFpDt = vectorTools::matrixMultiply(Lp, Fp, dim, dim, dim, dim);
+        if ( mode == 1 ){
+            DFpDt = vectorTools::matrixMultiply( Lp, previousDeformationGradient, dim, dim, dim, dim );
         }
-        if (mode == 2){
-            DFpDt = vectorTools::matrixMultiply(Fp, Lp, dim, dim, dim, dim);
+        if ( mode == 2 ){
+            DFpDt = vectorTools::matrixMultiply(previousDeformationGradient, Lp, dim, dim, dim, dim);
         }
 
         //Compute the left-hand side
-        floatVector eye(dim*dim);
-        vectorTools::eye(eye);
-        floatVector LHS = eye - Dt*(1 - alpha)*L;
+        floatVector eye( dim * dim );
+        vectorTools::eye( eye );
+        floatVector LHS = eye - Dt * ( 1 - alpha ) * L;
 
         //Compute the inverse of the left-hand side
-        floatVector invLHS = vectorTools::inverse(LHS, dim, dim);
+        floatVector invLHS = vectorTools::inverse( LHS, dim, dim );
 
         //Compute the right-hand side
-        floatVector RHS = Fp + Dt*alpha*DFpDt;
-        F = floatVector(dim*dim, 0);
+        floatVector RHS = previousDeformationGradient + Dt * alpha * DFpDt;
+        deformationGradient = floatVector( dim * dim, 0 );
 
         //Compute the new value of F
-        if (mode == 1){
-            F = vectorTools::matrixMultiply(invLHS, RHS, dim, dim, dim, dim);
+        if ( mode == 1 ){
+            deformationGradient = vectorTools::matrixMultiply( invLHS, RHS, dim, dim, dim, dim );
         }
-        if (mode == 2){
-            F = vectorTools::matrixMultiply(RHS, invLHS, dim, dim, dim, dim);
+        if ( mode == 2 ){
+            deformationGradient = vectorTools::matrixMultiply(RHS, invLHS, dim, dim, dim, dim);
         }
         return NULL;
     }
 
-    errorOut evolveF(const floatType &Dt, const floatVector &Fp, const floatVector &Lp, const floatVector &L,
-                     floatVector &F, floatMatrix &dFdL, const floatType alpha, const unsigned int mode){
+    errorOut evolveF( const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
+                      floatVector &deformationGradient, floatMatrix &dFdL, const floatType alpha, const unsigned int mode ){
         /*!
-         * Evolve F using the midpoint integration method and return the jacobian w.r.t. L.
+         * Evolve the deformation gradient ( F ) using the midpoint integration method and return the jacobian w.r.t. L.
          *
          * mode 1:
          * \f$F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha \right) L_{ij}^{t+1} \right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t} \right]\f$
@@ -627,74 +707,76 @@ namespace constitutiveTools{
          * \f$\frac{\partial F_{iJ}^{t + 1}}{\partial L_{KL}} = \Delta t (1 - \alpha) F_{iK}^{t + 1} \left[\delta_{JL} - \right ]\f$
          *
          * \param &Dt: The change in time.
-         * \param &Fp: The previous value of the deformation gradient
+         * \param &previousDeformationGradient: The previous value of the deformation gradient
          * \param &Lp: The previous velocity gradient.
          * \param &L: The current velocity gradient.
-         * \param &F: The computed current deformation gradient.
-         * \param alpha: The integration parameter.
+         * \param &deformationGradient: The computed current deformation gradient.
+         * \param &dFdL: The derivative of the deformation gradient w.r.t. the velocity gradient
+         * \param alpha: The integration parameter ( 0 for implicit, 1 for explicit )
+         * \param mode: The form of the ODE. See above for details.
          */
 
         //Assumes 3D
         const unsigned int dim = 3;
-        if (Fp.size() != dim*dim){
-            return new errorNode("evolveF", "The deformation gradient doesn't have enough terms (require 9 for 3D)");
+        if ( previousDeformationGradient.size( ) != dim * dim ){
+            return new errorNode( "evolveF", "The deformation gradient doesn't have enough terms (require 9 for 3D)" );
         }
 
-        if (Lp.size() != Fp.size()){
-            return new errorNode("evolveF", "The previous velocity gradient and deformation gradient aren't the same size");
+        if ( Lp.size( ) != previousDeformationGradient.size( ) ){
+             return new errorNode( "evolveF", "The previous velocity gradient and deformation gradient aren't the same size" );
         }
 
-        if (Fp.size() != L.size()){
-            return new errorNode("evolveF", "The previous deformation gradient and the current velocity gradient aren't the same size");
+        if ( previousDeformationGradient.size( ) != L.size( ) ){
+            return new errorNode( "evolveF", "The previous deformation gradient and the current velocity gradient aren't the same size" );
         }
 
         //Compute the time-rate of change of the previous deformation gradient from the velocity gradient.
         floatVector DFpDt;
-        if (mode == 1){
-            DFpDt = vectorTools::matrixMultiply(Lp, Fp, dim, dim, dim, dim);
+        if ( mode == 1 ){
+             DFpDt = vectorTools::matrixMultiply( Lp, previousDeformationGradient, dim, dim, dim, dim );
         }
-        if (mode == 2){
-            DFpDt = vectorTools::matrixMultiply(Fp, Lp, dim, dim, dim, dim);
+        if ( mode == 2 ){
+             DFpDt = vectorTools::matrixMultiply( previousDeformationGradient, Lp, dim, dim, dim, dim );
         }
 
         //Compute the left-hand side
-        floatVector eye(dim*dim);
-        vectorTools::eye(eye);
-        floatVector LHS = eye - Dt*(1 - alpha)*L;
+        floatVector eye( dim * dim );
+        vectorTools::eye( eye );
+        floatVector LHS = eye - Dt * ( 1 - alpha ) * L;
 
         //Compute the inverse of the left-hand side
-        floatVector invLHS = vectorTools::inverse(LHS, dim, dim);
+        floatVector invLHS = vectorTools::inverse( LHS, dim, dim );
 
         //Compute the right-hand side
-        floatVector RHS = Fp + Dt*alpha*DFpDt;
+        floatVector RHS = previousDeformationGradient + Dt * alpha * DFpDt;
 
         //Evolve the deformation gradient
-        if (mode == 1){
-            F = vectorTools::matrixMultiply(invLHS, RHS, dim, dim, dim, dim);
+        if ( mode == 1 ){
+            deformationGradient = vectorTools::matrixMultiply( invLHS, RHS, dim, dim, dim, dim );
         }
-        if (mode == 2){
-            F = vectorTools::matrixMultiply(RHS, invLHS, dim, dim, dim, dim);
+        if ( mode == 2 ){
+            deformationGradient = vectorTools::matrixMultiply( RHS, invLHS, dim, dim, dim, dim );
         }
 
         //Compute the jacobian
-        dFdL = floatMatrix(F.size(), floatVector(L.size(), 0));
-        if (mode == 1){
-            for (unsigned int j=0; j<dim; j++){
-                for (unsigned int I=0; I<dim; I++){
-                    for (unsigned int k=0; k<dim; k++){
-                        for (unsigned int l=0; l<dim; l++){
-                            dFdL[dim*j + I][dim*k + l] = invLHS[dim*j + k] * Dt * (1 - alpha)*F[dim*l + I];
+        dFdL = floatMatrix( deformationGradient.size( ), floatVector( L.size( ), 0 ) );
+        if ( mode == 1 ){
+            for ( unsigned int j = 0; j < dim; j++ ){
+                for ( unsigned int I = 0; I < dim; I++ ){
+                    for ( unsigned int k = 0; k < dim; k++ ){
+                        for ( unsigned int l = 0; l < dim; l++ ){
+                            dFdL[ dim * j + I ][ dim * k + l ] = invLHS[ dim * j + k ] * Dt * ( 1 - alpha ) * deformationGradient[ dim * l + I ];
                         }
                     }
                 }
             }
         }
-        if (mode == 2){
-            for (unsigned int j=0; j<dim; j++){
-                for (unsigned int I=0; I<dim; I++){
-                    for (unsigned int K=0; K<dim; K++){
-                        for (unsigned int L=0; L<dim; L++){
-                            dFdL[dim*j + I][dim*K + L] = invLHS[dim*L + I] * Dt * (1 - alpha)*F[dim*j + K];
+        if ( mode == 2 ){
+            for ( unsigned int j = 0; j < dim; j++ ){
+                for ( unsigned int I = 0; I < dim; I++ ){
+                    for ( unsigned int K = 0; K < dim; K++ ){
+                        for ( unsigned int L = 0; L < dim; L++ ){
+                            dFdL[ dim * j + I ][ dim * K + L ] = invLHS[ dim * L + I ] * Dt * ( 1 - alpha ) * deformationGradient[ dim * j + K ];
                         }
                     }
                 }
@@ -1058,6 +1140,8 @@ namespace constitutiveTools{
          * \param &deformationGradient: The deformation gradient between configurations.
          * \param &greenLagrangeStrain: The Green-Lagrange strain which corresponds to the reference
          *     configuration of the deformation gradient.
+         * \param &dEde: The derivative of the Green-Lagrange strain w.r.t. the Almansi strain.
+         * \param &dEdF: The derivative of the Green-Lagrange strain w.r.t. the deformation gradient
          */
 
         //Assume 3d
