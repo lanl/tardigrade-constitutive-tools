@@ -31,7 +31,7 @@ FetchContent_MakeAvailable(error_tools vector_tools)
 # Add project source directories
 add_subdirectory ("src/cpp")
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    add_subdirectory ("src/cpp/tests/${PROJECT_NAME}")
+    add_subdirectory ("src/cpp/tests")
     add_subdirectory ("docs")
 endif()
 
