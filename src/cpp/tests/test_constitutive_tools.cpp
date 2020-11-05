@@ -940,7 +940,6 @@ BOOST_AUTO_TEST_CASE( testPullBackAlmansiStrain ){
 BOOST_AUTO_TEST_CASE( testComputeRightCauchyGreen ){
     /*!
      * Test the computation of the Right Cauchy-Green deformation tensor
-     * \param &results: The output file
      */
 
     floatVector deformationGradient = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -953,10 +952,7 @@ BOOST_AUTO_TEST_CASE( testComputeRightCauchyGreen ){
 
     BOOST_CHECK( ! error  );
 
-    if( !vectorTools::fuzzyEquals( result, answer ) ){
-        results << "testComputeRightCauchyGreen (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( result, answer )  );
 
     //Test Jacobian
 
@@ -1004,10 +1000,7 @@ BOOST_AUTO_TEST_CASE( testComputeSymmetricPart ){
     
     BOOST_CHECK( ! error  );
     
-    if( !vectorTools::fuzzyEquals( result, answer ) ){
-        results << "testComputeSymmetricPart (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( vectorTools::fuzzyEquals( result, answer )  );
     
     floatVector resultJ;
     floatMatrix dSymmAdA;
