@@ -51,15 +51,9 @@ BOOST_AUTO_TEST_CASE( testDeltaDirac ){
      * :param std::ofstream &results: The output file
      */
 
-    if (constitutiveTools::deltaDirac(1, 2) != 0){
-        results << "deltaDirac & False\n";
-        return 1;
-    }
+    BOOST_CHECK( constitutiveTools::deltaDirac(1, 2) == 0);
 
-    if (constitutiveTools::deltaDirac(1, 1) != 1){
-        results << "deltaDirac & False\n";
-        return 1;
-    }
+    BOOST_CHECK( constitutiveTools::deltaDirac(1, 1) == 1);
 
     results << "deltaDirac & True\n";
     return 0;
