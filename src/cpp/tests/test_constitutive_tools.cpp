@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE( testDecomposeGreenLagrangeStrain ){
 
         BOOST_CHECK( ! ret );
 
-        BOOST_CHECK( vectorTools::fuzzyEquals( (JOut2 - JOut )/delta[ i ], dJdE[ i ], 1e-4, 1e-4 ) );
+        BOOST_CHECK( vectorTools::fuzzyEquals( ( JOut2 - JOut )/delta[ i ], dJdE[ i ], 1e-4, 1e-4 ) );
     }
 
     for ( unsigned int i=0; i<E.size( ); i++ ){
