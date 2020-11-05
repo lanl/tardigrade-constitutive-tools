@@ -46,7 +46,15 @@ ls -l ~/include/eigen3/Eigen/Dense || true
 source set_vars.sh
 
 # Clean and build repo tests
-./new_build.sh
+case $OSTYPE in
+    darwin*)
+        compiler='c++'
+        ;;
+    linux-gnu*)
+        compiler='g++'
+        ;;
+esac
+./new_build.sh ${compiler}
 
 # Perform repo tests
 cd "build/${tests}"

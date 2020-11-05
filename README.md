@@ -135,7 +135,7 @@ $ pwd
 3) View test results
 
 ```
-cat build/src/cpp/tests/constitutive_tools/results.tex
+cat build/src/cpp/tests/results.tex
 ```
 
 4) Display docs
