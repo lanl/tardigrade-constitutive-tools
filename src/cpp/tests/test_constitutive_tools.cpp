@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE( testRotateMatrix ){
                       0.80901699, -0.3454915 , -0.47552826 };
 
     floatVector A = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    
+
     floatVector rotatedA;
     errorOut ret = constitutiveTools::rotateMatrix( A, Q, rotatedA );
 
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE( testRotateMatrix ){
                                                       -1.68701666,  6.92240128, 12.8622303 }) );
 
     //Test rotation back to original frame
-    
+
     floatVector QT( Q.size( ), 0 );
     for ( unsigned int i=0; i<3; i++ ){
         for ( unsigned int j=0; j<3; j++ ){
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
     ret = constitutiveTools::computeGreenLagrangeStrain( F, E );
 
     BOOST_CHECK( ! ret );
-    
+
     BOOST_CHECK( vectorTools::fuzzyEquals( E, { 0, 0, 0, 0, 0, 0, 0, 0, 0 }) );
 
     F = { 0.69646919, 0.28613933, 0.22685145,
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
 
 BOOST_AUTO_TEST_CASE( testDecomposeGreenLagrangeStrain ){
     /*!
-     * Test the decomposition of the Green-Lagrange strain into isochoric and 
+     * Test the decomposition of the Green-Lagrange strain into isochoric and
      * volumetric parts.
      */
 
@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_CASE( testDecomposeGreenLagrangeStrain ){
     for ( unsigned int i=0; i<E.size( ); i++ ){
         floatVector delta( E.size( ), 0 );
         delta[ i ] =  fabs( eps*E[ i ]);
-     
+
         ret = constitutiveTools::decomposeGreenLagrangeStrain( E + delta, EbarOut2, JOut2 );
 
         BOOST_CHECK( ! ret );
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE( testDecomposeGreenLagrangeStrain ){
     for ( unsigned int i=0; i<E.size( ); i++ ){
         floatVector delta( E.size( ), 0 );
         delta[ i ] = fabs( eps*E[ i ]);
-     
+
         ret = constitutiveTools::decomposeGreenLagrangeStrain( E + delta, EbarOut2, JOut2 );
 
         BOOST_CHECK( ! ret );
@@ -229,10 +229,10 @@ BOOST_AUTO_TEST_CASE( testDecomposeGreenLagrangeStrain ){
 
 BOOST_AUTO_TEST_CASE( testMapPK2toCauchy ){
     /*!
-     * Test the mapping of the PK2 stress from the reference 
+     * Test the mapping of the PK2 stress from the reference
      * configuration to the current configuration.
      */
-    
+
     floatVector F = { 1.96469186, -2.13860665, -2.73148546,
                      0.51314769,  2.1946897,  -0.7689354,
                      4.80764198,  1.84829739, -0.19068099 };
@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_CASE( testWLF ){
     floatType Tr = 27.5;
     floatType C1 = 18.2;
     floatType C2 = 282.7;
-    
+
     floatType factor, dfactordT;
 
     floatVector WLFParameters { Tr, C1, C2 };
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE( testWLF ){
 
     floatType factor2;
     constitutiveTools::WLF( T, WLFParameters, factor2, dfactordT );
-    
+
     BOOST_CHECK( vectorTools::fuzzyEquals( factor, factor2 ) );
 
     floatType delta = fabs( 1e-6*T );
@@ -285,7 +285,7 @@ BOOST_AUTO_TEST_CASE( testWLF ){
 
 BOOST_AUTO_TEST_CASE( testComputeDGreenLagrangeStrainDF ){
     /*!
-     * Test the computation of the gradient of the Green-Lagrange 
+     * Test the computation of the gradient of the Green-Lagrange
      * strain w.r.t. the deformation gradient.
      */
 
@@ -382,14 +382,14 @@ BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
             BOOST_CHECK( vectorTools::fuzzyEquals( DADADt[ j ][ i ], gradCol[ j ]) );
         }
-        
+
     }
-    
+
 }
 
 BOOST_AUTO_TEST_CASE( testComputeDFDt ){
     /*!
-     * Test the computation of the total time derivative of the 
+     * Test the computation of the total time derivative of the
      * deformation gradient.
      */
 
@@ -463,7 +463,7 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
     /*!
      * Test the evolution of the deformation gradient.
      */
-    
+
     floatType Dt = 2.7;
 
     floatVector Fp = { 0.69646919, 0.28613933, 0.22685145,
@@ -471,7 +471,7 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
                       0.98076420, 0.68482974, 0.4809319 };
 
     floatVector Lp = { 0.69006282, 0.0462321 , 0.88086378,
-                      0.8153887 , 0.54987134, 0.72085876, 
+                      0.8153887 , 0.54987134, 0.72085876,
                       0.66559485, 0.63708462, 0.54378588 };
 
     floatVector L = { 0.57821272, 0.27720263, 0.45555826,
@@ -595,7 +595,7 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
         }
 
     }
-    
+
 }
 
 BOOST_AUTO_TEST_CASE( testMac ){
@@ -695,7 +695,7 @@ BOOST_AUTO_TEST_CASE( testPullBackVelocityGradient ){
                                        0.55131477, 0.71946897, 0.42310646,
                                        0.98076420, 0.68482974, 0.4809319 };
 
-    floatVector pullBackL;    
+    floatVector pullBackL;
     floatVector expectedPullBackL = { 6.32482111,   3.11877752,   2.43195977,
                                     20.19439192,  10.22175689,   7.88052809,
                                    -38.85113898, -18.79212468, -14.76285795 };
@@ -708,9 +708,9 @@ BOOST_AUTO_TEST_CASE( testPullBackVelocityGradient ){
 
     floatVector pullBackLJ;
     floatMatrix dpbLdL, dpbLdF;
-    
+
     //Test of the jacobian
-    error = constitutiveTools::pullBackVelocityGradient( velocityGradient, deformationGradient, pullBackLJ, 
+    error = constitutiveTools::pullBackVelocityGradient( velocityGradient, deformationGradient, pullBackLJ,
                                                         dpbLdL, dpbLdF );
 
     BOOST_CHECK( ! error );
@@ -754,7 +754,7 @@ BOOST_AUTO_TEST_CASE( testPullBackVelocityGradient ){
 
 BOOST_AUTO_TEST_CASE( testQuadraticThermalExpansion ){
     /*!
-     * Test the computation of the thermal expansion using a 
+     * Test the computation of the thermal expansion using a
      * quadratic form.
      */
 
@@ -765,8 +765,8 @@ BOOST_AUTO_TEST_CASE( testQuadraticThermalExpansion ){
     floatVector quadraticParameters = { 5, 6, 7, 8 };
 
     floatVector thermalExpansion;
-    errorOut error = constitutiveTools::quadraticThermalExpansion(     temperature, referenceTemperature, 
-                                                                  linearParameters,  quadraticParameters, 
+    errorOut error = constitutiveTools::quadraticThermalExpansion(     temperature, referenceTemperature,
+                                                                  linearParameters,  quadraticParameters,
                                                                   thermalExpansion );
 
     BOOST_CHECK( ! error );
@@ -790,7 +790,7 @@ BOOST_AUTO_TEST_CASE( testQuadraticThermalExpansion ){
                                                                  thermalExpansionJ );
 
     BOOST_CHECK( ! error );
-    
+
     BOOST_CHECK( vectorTools::fuzzyEquals( thermalExpansionJacobian, ( thermalExpansionJ - thermalExpansion )/delta, 1e-4 ) );
 
 }
@@ -814,7 +814,7 @@ BOOST_AUTO_TEST_CASE( testPushForwardGreenLagrangeStrain ){
                                  -0.29053383,  0.11588247, -0.56150741 };
 
     floatVector result;
-    error = constitutiveTools::pushForwardGreenLagrangeStrain( greenLagrangeStrain, deformationGradient, 
+    error = constitutiveTools::pushForwardGreenLagrangeStrain( greenLagrangeStrain, deformationGradient,
                                                               result );
 
     BOOST_CHECK( ! error );
@@ -824,7 +824,7 @@ BOOST_AUTO_TEST_CASE( testPushForwardGreenLagrangeStrain ){
     //Test the jacobian
     floatVector resultJ;
     floatMatrix dedE, dedF;
-    error = constitutiveTools::pushForwardGreenLagrangeStrain( greenLagrangeStrain, deformationGradient, 
+    error = constitutiveTools::pushForwardGreenLagrangeStrain( greenLagrangeStrain, deformationGradient,
                                                               resultJ, dedE, dedF );
 
     BOOST_CHECK( ! error );
@@ -837,9 +837,9 @@ BOOST_AUTO_TEST_CASE( testPushForwardGreenLagrangeStrain ){
         floatVector delta( greenLagrangeStrain.size( ), 0 );
         delta[ i ] = eps*fabs( greenLagrangeStrain[ i ]) + eps;
 
-        error = constitutiveTools::pushForwardGreenLagrangeStrain( greenLagrangeStrain + delta, deformationGradient, 
+        error = constitutiveTools::pushForwardGreenLagrangeStrain( greenLagrangeStrain + delta, deformationGradient,
                                                                   resultJ );
-    
+
         BOOST_CHECK( ! error );
 
         floatVector grad = ( resultJ - result )/delta[ i ];
@@ -854,9 +854,9 @@ BOOST_AUTO_TEST_CASE( testPushForwardGreenLagrangeStrain ){
         floatVector delta( deformationGradient.size( ), 0 );
         delta[ i ] = eps*fabs( deformationGradient[ i ]) + eps;
 
-        error = constitutiveTools::pushForwardGreenLagrangeStrain( greenLagrangeStrain, deformationGradient + delta, 
+        error = constitutiveTools::pushForwardGreenLagrangeStrain( greenLagrangeStrain, deformationGradient + delta,
                                                                   resultJ );
-    
+
         BOOST_CHECK( ! error );
 
         floatVector grad = ( resultJ - result )/delta[ i ];
@@ -902,7 +902,7 @@ BOOST_AUTO_TEST_CASE( testPullBackAlmansiStrain ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, resultJ )  );
 
-    //Testing dEde    
+    //Testing dEde
     floatType eps = 1e-6;
     for ( unsigned int i = 0; i < almansiStrain.size( ); i++ ){
         floatVector delta( almansiStrain.size( ), 0 );
@@ -943,7 +943,7 @@ BOOST_AUTO_TEST_CASE( testComputeRightCauchyGreen ){
      */
 
     floatVector deformationGradient = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    
+
     floatVector answer = { 66, 78, 90, 78, 93, 108, 90, 108, 126 };
 
     floatVector result;
@@ -960,7 +960,7 @@ BOOST_AUTO_TEST_CASE( testComputeRightCauchyGreen ){
     floatMatrix dCdF;
 
     error = constitutiveTools::computeRightCauchyGreen( deformationGradient, resultJ, dCdF );
-    
+
     BOOST_CHECK( ! error  );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( resultJ, answer )  );
@@ -991,37 +991,37 @@ BOOST_AUTO_TEST_CASE( testComputeSymmetricPart ){
      */
 
     floatVector A = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    
+
     floatVector answer = { 1., 3., 5., 3., 5., 7., 5., 7., 9. };
-    
+
     floatVector result;
-    
+
     errorOut error = constitutiveTools::computeSymmetricPart( A, result );
-    
+
     BOOST_CHECK( ! error  );
-    
+
     BOOST_CHECK( vectorTools::fuzzyEquals( result, answer )  );
-    
+
     floatVector resultJ;
     floatMatrix dSymmAdA;
-    
+
     error = constitutiveTools::computeSymmetricPart( A, resultJ, dSymmAdA );
-    
+
     BOOST_CHECK( ! error  );
-    
+
     BOOST_CHECK( vectorTools::fuzzyEquals( resultJ, answer )  );
-    
+
     floatType eps = 1e-6;
     for ( unsigned int i = 0; i < A.size( ); i++ ){
         floatVector delta( A.size( ), 0 );
         delta[ i ] = eps * fabs( A[ i ] ) + eps;
-    
+
         error = constitutiveTools::computeSymmetricPart( A + delta, resultJ );
-    
+
         BOOST_CHECK( ! error  );
-    
+
         floatVector gradCol = ( resultJ - result ) / delta[ i ];
-    
+
         for ( unsigned int j = 0; j < gradCol.size( ); j++ ){
             BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dSymmAdA[ j ][ i ] )  );
         }
