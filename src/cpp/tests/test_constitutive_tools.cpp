@@ -83,10 +83,7 @@ BOOST_AUTO_TEST_CASE( testRotateMatrix ){
     floatVector rotatedA;
     errorOut ret = constitutiveTools::rotateMatrix(A, Q, rotatedA);
 
-    if (ret){
-        results << "testRotatedMatrix (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( ! ret );
 
     if (! vectorTools::fuzzyEquals( rotatedA, {-0.09485264, -3.38815017, -5.39748037,
                                                -1.09823916,  2.23262233,  4.68884658,
@@ -107,10 +104,7 @@ BOOST_AUTO_TEST_CASE( testRotateMatrix ){
     floatVector App;
     ret = constitutiveTools::rotateMatrix(rotatedA, QT, App);
 
-    if (ret){
-        results << "testRotateMatrix (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( ! ret );
 
     BOOST_CHECK( vectorTools::fuzzyEquals(A, App) );
 
@@ -131,10 +125,7 @@ BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
     constitutiveTools::errorOut ret;
     ret = constitutiveTools::computeGreenLagrangeStrain(F, E);
 
-    if (ret){
-        results << "testComputeGreenLagrangeStrain (test 1) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( ! ret );
     
     BOOST_CHECK( vectorTools::fuzzyEquals(E, {0, 0, 0, 0, 0, 0, 0, 0, 0}) );
 
@@ -144,10 +135,7 @@ BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
 
     ret = constitutiveTools::computeGreenLagrangeStrain(F, E);
 
-    if (ret){
-        results << "testComputeGreenLagrangeStrain (test 2) & False\n";
-        return 1;
-    }
+    BOOST_CHECK( ! ret );
 
     if (! vectorTools::fuzzyEquals(E, {0.37545786,  0.63379879,  0.43147034,
                                        0.63379879,  0.03425154,  0.34933978,
@@ -160,10 +148,7 @@ BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
     floatMatrix dEdF;
     ret = constitutiveTools::computeGreenLagrangeStrain(F, EJ, dEdF);
 
-    if (ret){
-        results << "testComputeGreenLagrangeStrain & False\n";
-        return 1;
-    }
+    BOOST_CHECK( ! ret );
 
     BOOST_CHECK( vectorTools::fuzzyEquals(E, EJ) );
 
@@ -175,10 +160,7 @@ BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
 
         ret = constitutiveTools::computeGreenLagrangeStrain(F + delta, EJ);
 
-        if (ret){
-            results << "testComputeGreenLagrangeStrain & False\n";
-            return 1;
-        }
+        BOOST_CHECK( ! ret );
 
         floatVector gradCol = (EJ - E)/delta[i];
 
@@ -1261,10 +1243,7 @@ BOOST_AUTO_TEST_CASE( testComputeRightCauchyGreen ){
 
     error = constitutiveTools::computeRightCauchyGreen( deformationGradient, resultJ, dCdF );
     
-    if ( error ){
-        error->print( );
-        results << "testComputeRightCauchyGreen & False\n";
-    }
+    BOOST_CHECK( ! error  );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( resultJ, answer )  );
 
@@ -1275,10 +1254,7 @@ BOOST_AUTO_TEST_CASE( testComputeRightCauchyGreen ){
 
         error = constitutiveTools::computeRightCauchyGreen( deformationGradient + delta, resultJ );
 
-        if ( error ){
-            error->print( );
-            results << "testComputeRightCauchyGreen & False\n";
-        }
+        BOOST_CHECK( ! error  );
 
         floatVector gradCol = ( resultJ - result ) / delta[ i ];
 
