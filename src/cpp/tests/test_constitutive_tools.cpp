@@ -668,17 +668,17 @@ BOOST_AUTO_TEST_CASE( testComputeUnitNormal ){
 
     error = constitutiveTools::computeUnitNormal( A, Anorm );
 
-    BOOST_CHECK( ! error  );
+    BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( Anorm, A )  );
+    BOOST_CHECK( vectorTools::fuzzyEquals( Anorm, A ) );
 
     error = constitutiveTools::computeUnitNormal( A, Anorm, dAnormdA );
 
-    BOOST_CHECK( ! error  );
+    BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( Anorm, A )  );
+    BOOST_CHECK( vectorTools::fuzzyEquals( Anorm, A ) );
 
-    BOOST_CHECK( std::isnan( vectorTools::l2norm( dAnormdA ) )  );
+    BOOST_CHECK( std::isnan( vectorTools::l2norm( dAnormdA ) ) );
 
 }
 
@@ -888,9 +888,9 @@ BOOST_AUTO_TEST_CASE( testPullBackAlmansiStrain ){
     floatVector result;
     errorOut error = constitutiveTools::pullBackAlmansiStrain( almansiStrain, deformationGradient, result );
 
-    BOOST_CHECK( ! error  );
+    BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( answer, result )  );
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer, result ) );
 
     //Test the jacobians
     floatVector resultJ;
@@ -898,9 +898,9 @@ BOOST_AUTO_TEST_CASE( testPullBackAlmansiStrain ){
 
     error = constitutiveTools::pullBackAlmansiStrain( almansiStrain, deformationGradient, resultJ, dEde, dEdF );
 
-    BOOST_CHECK( ! error  );
+    BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( answer, resultJ )  );
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer, resultJ ) );
 
     //Testing dEde
     floatType eps = 1e-6;
@@ -910,12 +910,12 @@ BOOST_AUTO_TEST_CASE( testPullBackAlmansiStrain ){
 
         error = constitutiveTools::pullBackAlmansiStrain( almansiStrain + delta, deformationGradient, resultJ );
 
-        BOOST_CHECK( ! error  );
+        BOOST_CHECK( ! error );
 
         floatVector gradCol = ( resultJ - result ) / delta[ i ];
 
         for ( unsigned int j = 0; j < gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dEde[ j ][ i ] )  );
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dEde[ j ][ i ] ) );
         }
     }
 
@@ -926,12 +926,12 @@ BOOST_AUTO_TEST_CASE( testPullBackAlmansiStrain ){
 
         error = constitutiveTools::pullBackAlmansiStrain( almansiStrain, deformationGradient + delta, resultJ );
 
-        BOOST_CHECK( ! error  );
+        BOOST_CHECK( ! error );
 
         floatVector gradCol = ( resultJ - result ) / delta[ i ];
 
         for ( unsigned int j = 0; j < gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dEdF[ j ][ i ] )  );
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dEdF[ j ][ i ] ) );
         }
     }
 
@@ -950,9 +950,9 @@ BOOST_AUTO_TEST_CASE( testComputeRightCauchyGreen ){
 
     errorOut error = constitutiveTools::computeRightCauchyGreen( deformationGradient, result );
 
-    BOOST_CHECK( ! error  );
+    BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( result, answer )  );
+    BOOST_CHECK( vectorTools::fuzzyEquals( result, answer ) );
 
     //Test Jacobian
 
@@ -961,9 +961,9 @@ BOOST_AUTO_TEST_CASE( testComputeRightCauchyGreen ){
 
     error = constitutiveTools::computeRightCauchyGreen( deformationGradient, resultJ, dCdF );
 
-    BOOST_CHECK( ! error  );
+    BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( resultJ, answer )  );
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJ, answer ) );
 
     floatType eps = 1e-6;
     for ( unsigned int i = 0; i < deformationGradient.size( ); i++ ){
@@ -972,12 +972,12 @@ BOOST_AUTO_TEST_CASE( testComputeRightCauchyGreen ){
 
         error = constitutiveTools::computeRightCauchyGreen( deformationGradient + delta, resultJ );
 
-        BOOST_CHECK( ! error  );
+        BOOST_CHECK( ! error );
 
         floatVector gradCol = ( resultJ - result ) / delta[ i ];
 
         for ( unsigned int j = 0; j < gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dCdF[ j ][ i ] )  );
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dCdF[ j ][ i ] ) );
         }
     }
 
@@ -998,18 +998,18 @@ BOOST_AUTO_TEST_CASE( testComputeSymmetricPart ){
 
     errorOut error = constitutiveTools::computeSymmetricPart( A, result );
 
-    BOOST_CHECK( ! error  );
+    BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( result, answer )  );
+    BOOST_CHECK( vectorTools::fuzzyEquals( result, answer ) );
 
     floatVector resultJ;
     floatMatrix dSymmAdA;
 
     error = constitutiveTools::computeSymmetricPart( A, resultJ, dSymmAdA );
 
-    BOOST_CHECK( ! error  );
+    BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( resultJ, answer )  );
+    BOOST_CHECK( vectorTools::fuzzyEquals( resultJ, answer ) );
 
     floatType eps = 1e-6;
     for ( unsigned int i = 0; i < A.size( ); i++ ){
@@ -1018,12 +1018,12 @@ BOOST_AUTO_TEST_CASE( testComputeSymmetricPart ){
 
         error = constitutiveTools::computeSymmetricPart( A + delta, resultJ );
 
-        BOOST_CHECK( ! error  );
+        BOOST_CHECK( ! error );
 
         floatVector gradCol = ( resultJ - result ) / delta[ i ];
 
         for ( unsigned int j = 0; j < gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dSymmAdA[ j ][ i ] )  );
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dSymmAdA[ j ][ i ] ) );
         }
     }
 
