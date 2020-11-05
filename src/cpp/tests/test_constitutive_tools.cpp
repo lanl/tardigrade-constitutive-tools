@@ -1,9 +1,17 @@
-//Tests for constitutive_tools
+/**
+  * \file test_constitutive_tools.cpp
+  *
+  * Tests for constitutive_tools
+  */
 
 #include<constitutive_tools.h>
 #include<sstream>
 #include<fstream>
 #include<iostream>
+
+#define BOOST_TEST_MODULE test_vector_tools
+#include <boost/test/included/unit_test.hpp>
+#include <boost/test/output_test_stream.hpp>
 
 typedef constitutiveTools::errorOut errorOut;
 typedef constitutiveTools::floatType floatType;
@@ -36,7 +44,7 @@ struct cerr_redirect{
         std::streambuf * old;
 };
 
-int testDeltaDirac(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testDeltaDirac ){
     /*!
      * Test the deltaDirac function in constitutive tools
      * 
@@ -58,7 +66,7 @@ int testDeltaDirac(std::ofstream &results){
     
 }
 
-int testRotateMatrix(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testRotateMatrix ){
     /*!
      * Test the rotation of a matrix by an orthogonal rotation matrix..
      * 
@@ -113,7 +121,7 @@ int testRotateMatrix(std::ofstream &results){
     return 0;
 }
 
-int testComputeGreenLagrangeStrain(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
     /*!
      * Test the computation of the Green-Lagrange strain
      * 
@@ -195,7 +203,7 @@ int testComputeGreenLagrangeStrain(std::ofstream &results){
     return 0;
 }
 
-int testDecomposeGreenLagrangeStrain(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testDecomposeGreenLagrangeStrain ){
     /*!
      * Test the decomposition of the Green-Lagrange strain into isochoric and 
      * volumetric parts.
@@ -321,7 +329,7 @@ int testDecomposeGreenLagrangeStrain(std::ofstream &results){
     return 0;
 }
 
-int testMapPK2toCauchy(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testMapPK2toCauchy ){
     /*!
      * Test the mapping of the PK2 stress from the reference 
      * configuration to the current configuration.
@@ -358,7 +366,7 @@ int testMapPK2toCauchy(std::ofstream &results){
     return 0;
 }
 
-int testWLF(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testWLF ){
     /*!
      * Test the computation of the WLF function.
      * 
@@ -401,7 +409,7 @@ int testWLF(std::ofstream &results){
     return 0;
 }
 
-int testComputeDGreenLagrangeStrainDF(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testComputeDGreenLagrangeStrainDF ){
     /*!
      * Test the computation of the gradient of the Green-Lagrange 
      * strain w.r.t. the deformation gradient.
@@ -453,7 +461,7 @@ int testComputeDGreenLagrangeStrainDF(std::ofstream &results){
     return 0;
 }
 
-int testMidpointEvolution(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
     /*!
      * Test the midpoint evolution algorithm.
      * 
@@ -562,7 +570,7 @@ int testMidpointEvolution(std::ofstream &results){
     return 0;
 }
 
-int testComputeDFDt(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testComputeDFDt ){
     /*!
      * Test the computation of the total time derivative of the 
      * deformation gradient.
@@ -666,7 +674,7 @@ int testComputeDFDt(std::ofstream &results){
     return 0;
 }
 
-int testEvolveF(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testEvolveF ){
     /*!
      * Test the evolution of the deformation gradient.
      * 
@@ -879,7 +887,7 @@ int testEvolveF(std::ofstream &results){
     return 0;
 }
 
-int testMac(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testMac ){
     /*!
      * Test the computation of the Macullay brackets.
      * 
@@ -925,7 +933,7 @@ int testMac(std::ofstream &results){
     return 0;
 }
 
-int testComputeUnitNormal(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testComputeUnitNormal ){
     /*!
      * Test the computation of the unit normal.
      * 
@@ -1027,7 +1035,7 @@ int testComputeUnitNormal(std::ofstream &results){
     return 0;
 }
 
-int testPullBackVelocityGradient(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testPullBackVelocityGradient ){
     /*!
      * Test the pull back operation on the velocity gradient.
      * 
@@ -1129,7 +1137,7 @@ int testPullBackVelocityGradient(std::ofstream &results){
     return 0;
 }
 
-int testQuadraticThermalExpansion(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testQuadraticThermalExpansion ){
     /*!
      * Test the computation of the thermal expansion using a 
      * quadratic form.
@@ -1197,7 +1205,7 @@ int testQuadraticThermalExpansion(std::ofstream &results){
     return 0;
 }
 
-int testPushForwardGreenLagrangeStrain(std::ofstream &results){
+BOOST_AUTO_TEST_CASE( testPushForwardGreenLagrangeStrain ){
     /*!
      * Test the push-forward operation on the Green-Lagrange strain.
      * 
@@ -1306,7 +1314,7 @@ int testPushForwardGreenLagrangeStrain(std::ofstream &results){
     return 0;
 }
 
-int testPullBackAlmansiStrain( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testPullBackAlmansiStrain ){
     /*!
      * Test the pull-back operation on the Green-Lagrange strain.
      * 
@@ -1407,7 +1415,7 @@ int testPullBackAlmansiStrain( std::ofstream &results ){
     return 0;
 }
 
-int testComputeRightCauchyGreen( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testComputeRightCauchyGreen ){
     /*!
      * Test the computation of the Right Cauchy-Green deformation tensor
      * \param &results: The output file
@@ -1475,7 +1483,7 @@ int testComputeRightCauchyGreen( std::ofstream &results ){
     return 0;
 }
 
-int testComputeSymmetricPart( std::ofstream &results ){
+BOOST_AUTO_TEST_CASE( testComputeSymmetricPart ){
     /*!
      * Test the computation of the symmetric part of a matrix
      *
@@ -1541,43 +1549,5 @@ int testComputeSymmetricPart( std::ofstream &results ){
     }
 
     results << "testComputeSymmetricPart & True\n";
-    return 0;
-}
-
-int main(){
-    /*!
-    The main loop which runs the tests defined in the 
-    accompanying functions. Each function should output
-    the function name followed by & followed by True or False 
-    if the test passes or fails respectively.
-    */
-
-    //Open the results file
-    std::ofstream results;
-    results.open( "results.tex" );
-
-    //Run the tests
-    testDeltaDirac( results );
-    testRotateMatrix( results );
-    testComputeGreenLagrangeStrain( results );
-    testComputeDGreenLagrangeStrainDF( results );
-    testDecomposeGreenLagrangeStrain( results );
-    testMapPK2toCauchy( results );
-    testWLF( results );
-    testMidpointEvolution( results );
-    testComputeDFDt( results );
-    testEvolveF( results );
-    testMac( results );
-    testComputeUnitNormal( results );
-    testPullBackVelocityGradient( results );
-    testQuadraticThermalExpansion( results );
-    testPushForwardGreenLagrangeStrain( results );
-    testPullBackAlmansiStrain( results );
-    testComputeRightCauchyGreen( results );
-    testComputeSymmetricPart( results );
-
-    //Close the results file
-    results.close();
-
     return 0;
 }
