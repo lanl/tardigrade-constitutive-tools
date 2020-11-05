@@ -47,8 +47,6 @@ struct cerr_redirect{
 BOOST_AUTO_TEST_CASE( testDeltaDirac ){
     /*!
      * Test the deltaDirac function in constitutive tools
-     * 
-     * :param std::ofstream &results: The output file
      */
 
     BOOST_CHECK( constitutiveTools::deltaDirac(1, 2) == 0);
@@ -61,8 +59,6 @@ BOOST_AUTO_TEST_CASE( testDeltaDirac ){
 BOOST_AUTO_TEST_CASE( testRotateMatrix ){
     /*!
      * Test the rotation of a matrix by an orthogonal rotation matrix..
-     * 
-     * :param std::ofstream &results: The output file
      */
 
 
@@ -105,8 +101,6 @@ BOOST_AUTO_TEST_CASE( testRotateMatrix ){
 BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
     /*!
      * Test the computation of the Green-Lagrange strain
-     * 
-     * :param std::ofstream &results: The output file
      */
 
     floatVector F = {1, 0, 0, 0, 1, 0, 0, 0, 1};
@@ -268,8 +262,6 @@ BOOST_AUTO_TEST_CASE( testMapPK2toCauchy ){
     /*!
      * Test the mapping of the PK2 stress from the reference 
      * configuration to the current configuration.
-     * 
-     * :param std::ofstream &results: The output file
      */
     
     floatVector F = {1.96469186, -2.13860665, -2.73148546,
@@ -302,8 +294,6 @@ BOOST_AUTO_TEST_CASE( testMapPK2toCauchy ){
 BOOST_AUTO_TEST_CASE( testWLF ){
     /*!
      * Test the computation of the WLF function.
-     * 
-     * :param std::ofstream &results: The output file
      */
 
     floatType T = 145.;
@@ -335,8 +325,6 @@ BOOST_AUTO_TEST_CASE( testComputeDGreenLagrangeStrainDF ){
     /*!
      * Test the computation of the gradient of the Green-Lagrange 
      * strain w.r.t. the deformation gradient.
-     * 
-     * :param std::ofstream &results: The output file.
      */
 
     floatVector F = {0.69646919, 0.28613933, 0.22685145,
@@ -381,8 +369,6 @@ BOOST_AUTO_TEST_CASE( testComputeDGreenLagrangeStrainDF ){
 BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
     /*!
      * Test the midpoint evolution algorithm.
-     * 
-     * :param std::ofstream &results: The output file
      */
 
     floatType Dt = 2.5;
@@ -471,8 +457,6 @@ BOOST_AUTO_TEST_CASE( testComputeDFDt ){
     /*!
      * Test the computation of the total time derivative of the 
      * deformation gradient.
-     * 
-     * :param std::ofstream &results: The output file
      */
 
     floatVector F = {0.69646919, 0.28613933, 0.22685145,
@@ -560,8 +544,6 @@ BOOST_AUTO_TEST_CASE( testComputeDFDt ){
 BOOST_AUTO_TEST_CASE( testEvolveF ){
     /*!
      * Test the evolution of the deformation gradient.
-     * 
-     * :param std::ofstream &results: The output file
      */
     
     floatType Dt = 2.7;
@@ -741,8 +723,6 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 BOOST_AUTO_TEST_CASE( testMac ){
     /*!
      * Test the computation of the Macullay brackets.
-     * 
-     * :param std::ofstream &results: The output file
      */
 
     floatType x = 1;
@@ -767,8 +747,6 @@ BOOST_AUTO_TEST_CASE( testMac ){
 BOOST_AUTO_TEST_CASE( testComputeUnitNormal ){
     /*!
      * Test the computation of the unit normal.
-     * 
-     * :param std::ofstream &results: The output file
      */
 
     floatVector A = {1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -849,8 +827,6 @@ BOOST_AUTO_TEST_CASE( testComputeUnitNormal ){
 BOOST_AUTO_TEST_CASE( testPullBackVelocityGradient ){
     /*!
      * Test the pull back operation on the velocity gradient.
-     * 
-     * :param std::ofstream &results: The output file.
      */
 
     floatVector velocityGradient = {0.69006282, 0.0462321 , 0.88086378,
@@ -938,8 +914,6 @@ BOOST_AUTO_TEST_CASE( testQuadraticThermalExpansion ){
     /*!
      * Test the computation of the thermal expansion using a 
      * quadratic form.
-     * 
-     * :param std::ofstream &results: The output file.
      */
 
     floatType temperature = 283.15;
@@ -994,8 +968,6 @@ BOOST_AUTO_TEST_CASE( testQuadraticThermalExpansion ){
 BOOST_AUTO_TEST_CASE( testPushForwardGreenLagrangeStrain ){
     /*!
      * Test the push-forward operation on the Green-Lagrange strain.
-     * 
-     * :param std::ofstream &results: The output file.
      */
 
     floatVector deformationGradient = {0.30027935, -0.72811411,  0.26475099,
@@ -1089,8 +1061,6 @@ BOOST_AUTO_TEST_CASE( testPushForwardGreenLagrangeStrain ){
 BOOST_AUTO_TEST_CASE( testPullBackAlmansiStrain ){
     /*!
      * Test the pull-back operation on the Green-Lagrange strain.
-     * 
-     * :param std::ofstream &results: The output file.
      */
 
     floatVector deformationGradient = { 0.1740535 ,  1.2519364 , -0.9531442 ,
