@@ -55,7 +55,6 @@ BOOST_AUTO_TEST_CASE( testDeltaDirac ){
 
     BOOST_CHECK( constitutiveTools::deltaDirac(1, 1) == 1);
 
-    results << "deltaDirac & True\n";
     
 }
 
@@ -101,7 +100,6 @@ BOOST_AUTO_TEST_CASE( testRotateMatrix ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals(A, App) );
 
-    results << "testRotatedMatrix & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
@@ -161,7 +159,6 @@ BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
         }
     }
 
-    results << "testComputeGreenLagrangeStrain & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testDecomposeGreenLagrangeStrain ){
@@ -265,7 +262,6 @@ BOOST_AUTO_TEST_CASE( testDecomposeGreenLagrangeStrain ){
 
     BOOST_CHECK( ret );
 
-    results << "testDecomposeGreenLagrangeStrain & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testMapPK2toCauchy ){
@@ -301,7 +297,6 @@ BOOST_AUTO_TEST_CASE( testMapPK2toCauchy ){
         return 1;
     }
 
-    results << "testMapPK2toCauchy & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testWLF ){
@@ -334,7 +329,6 @@ BOOST_AUTO_TEST_CASE( testWLF ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals(dfactordT, (factor2 - factor)/delta) );
 
-    results << "testWLF & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testComputeDGreenLagrangeStrainDF ){
@@ -382,7 +376,6 @@ BOOST_AUTO_TEST_CASE( testComputeDGreenLagrangeStrainDF ){
             BOOST_CHECK( vectorTools::fuzzyEquals(gradCol[j], dEdF[j][i]) );
         }
     }
-    results << "testComputeDGreenLagrangeStrainDF & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
@@ -472,7 +465,6 @@ BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
         
     }
     
-    results << "testMidpointEvolution & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testComputeDFDt ){
@@ -563,7 +555,6 @@ BOOST_AUTO_TEST_CASE( testComputeDFDt ){
 
     }
 
-    results << "testComputeDFDt & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testEvolveF ){
@@ -745,7 +736,6 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     }
     
-    results << "testEvolveF & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testMac ){
@@ -772,7 +762,6 @@ BOOST_AUTO_TEST_CASE( testMac ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals(dmacdx, 0.) );
 
-    results << "testMac & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testComputeUnitNormal ){
@@ -855,7 +844,6 @@ BOOST_AUTO_TEST_CASE( testComputeUnitNormal ){
 
     BOOST_CHECK( std::isnan( vectorTools::l2norm( dAnormdA ) )  );
 
-    results << "testComputeUnitNormal & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testPullBackVelocityGradient ){
@@ -944,7 +932,6 @@ BOOST_AUTO_TEST_CASE( testPullBackVelocityGradient ){
         }
     }
 
-    results << "testPullBackVelocityGradient & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testQuadraticThermalExpansion ){
@@ -1002,7 +989,6 @@ BOOST_AUTO_TEST_CASE( testQuadraticThermalExpansion ){
     
     BOOST_CHECK( vectorTools::fuzzyEquals(thermalExpansionJacobian, (thermalExpansionJ - thermalExpansion)/delta, 1e-4) );
 
-    results << "testQuadraticThermalExpansion & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testPushForwardGreenLagrangeStrain ){
@@ -1098,7 +1084,6 @@ BOOST_AUTO_TEST_CASE( testPushForwardGreenLagrangeStrain ){
         }
     }
 
-    results << "testPushForwardGreenLagrangeStrain & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testPullBackAlmansiStrain ){
@@ -1186,7 +1171,6 @@ BOOST_AUTO_TEST_CASE( testPullBackAlmansiStrain ){
         }
     }
 
-    results << "testPullBackAlansiStrain & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testComputeRightCauchyGreen ){
@@ -1241,7 +1225,6 @@ BOOST_AUTO_TEST_CASE( testComputeRightCauchyGreen ){
         }
     }
 
-    results << "testComputeRightCauchyGreen & True\n";
 }
 
 BOOST_AUTO_TEST_CASE( testComputeSymmetricPart ){
@@ -1303,5 +1286,4 @@ BOOST_AUTO_TEST_CASE( testComputeSymmetricPart ){
         }
     }
 
-    results << "testComputeSymmetricPart & True\n";
 }
