@@ -62,8 +62,8 @@ BOOST_AUTO_TEST_CASE( testRotateMatrix ){
 
 
     floatVector Q = { -0.44956296, -0.88488713, -0.12193405,
-                     -0.37866166,  0.31242661, -0.87120891,
-                      0.80901699, -0.3454915 , -0.47552826 };
+                      -0.37866166,  0.31242661, -0.87120891,
+                       0.80901699, -0.3454915 , -0.47552826 };
 
     floatVector A = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
@@ -73,8 +73,8 @@ BOOST_AUTO_TEST_CASE( testRotateMatrix ){
     BOOST_CHECK( ! ret );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( rotatedA, { -0.09485264, -3.38815017, -5.39748037,
-                                                      -1.09823916,  2.23262233,  4.68884658,
-                                                      -1.68701666,  6.92240128, 12.8622303 } ) );
+                                                       -1.09823916,  2.23262233,  4.68884658,
+                                                       -1.68701666,  6.92240128, 12.8622303 } ) );
 
     //Test rotation back to original frame
 
@@ -110,16 +110,16 @@ BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
     BOOST_CHECK( vectorTools::fuzzyEquals( E, { 0, 0, 0, 0, 0, 0, 0, 0, 0 } ) );
 
     F = { 0.69646919, 0.28613933, 0.22685145,
-         0.55131477, 0.71946897, 0.42310646,
-         0.98076420, 0.68482974, 0.4809319 };
+          0.55131477, 0.71946897, 0.42310646,
+          0.98076420, 0.68482974, 0.4809319 };
 
     ret = constitutiveTools::computeGreenLagrangeStrain( F, E );
 
     BOOST_CHECK( ! ret );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( E, { 0.37545786,  0.63379879,  0.43147034,
-                                              0.63379879,  0.03425154,  0.34933978,
-                                              0.43147034,  0.34933978, -0.26911192 } ) );
+                                                0.63379879,  0.03425154,  0.34933978,
+                                                0.43147034,  0.34933978, -0.26911192 } ) );
 
     floatVector EJ;
     floatMatrix dEdF;
@@ -155,8 +155,8 @@ BOOST_AUTO_TEST_CASE( testDecomposeGreenLagrangeStrain ){
      */
 
     floatVector F = { 0.69646919, 0.28613933, 0.22685145,
-                     0.55131477, 0.71946897, 0.42310646,
-                     0.98076420, 0.68482974, 0.4809319 };
+                      0.55131477, 0.71946897, 0.42310646,
+                      0.98076420, 0.68482974, 0.4809319 };
 
     floatType J = vectorTools::determinant( F, 3, 3 );
     floatVector Fbar = F/pow( J, 1./3 );
@@ -234,12 +234,12 @@ BOOST_AUTO_TEST_CASE( testMapPK2toCauchy ){
      */
 
     floatVector F = { 1.96469186, -2.13860665, -2.73148546,
-                     0.51314769,  2.1946897,  -0.7689354,
-                     4.80764198,  1.84829739, -0.19068099 };
+                      0.51314769,  2.1946897,  -0.7689354,
+                      4.80764198,  1.84829739, -0.19068099 };
 
     floatVector PK2 = { -1.07882482, -1.56821984,  2.29049707,
-                       -0.61427755, -4.40322103, -1.01955745,
-                        2.37995406, -3.1750827,  -3.24548244 };
+                        -0.61427755, -4.40322103, -1.01955745,
+                         2.37995406, -3.1750827,  -3.24548244 };
 
     floatVector cauchy;
 
@@ -248,8 +248,8 @@ BOOST_AUTO_TEST_CASE( testMapPK2toCauchy ){
     BOOST_CHECK( ! error );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( cauchy, { -2.47696057,  0.48015011, -0.28838671,
-                                                    0.16490963, -0.57481137, -0.92071407,
-                                                   -0.21450698, -1.22714923, -1.73532173 } ) );
+                                                      0.16490963, -0.57481137, -0.92071407,
+                                                     -0.21450698, -1.22714923, -1.73532173 } ) );
 
 }
 
@@ -290,8 +290,8 @@ BOOST_AUTO_TEST_CASE( testComputeDGreenLagrangeStrainDF ){
      */
 
     floatVector F = { 0.69646919, 0.28613933, 0.22685145,
-                     0.55131477, 0.71946897, 0.42310646,
-                     0.98076420, 0.68482974, 0.4809319 };
+                      0.55131477, 0.71946897, 0.42310646,
+                      0.98076420, 0.68482974, 0.4809319 };
 
     floatMatrix dEdF;
 
@@ -394,16 +394,16 @@ BOOST_AUTO_TEST_CASE( testComputeDFDt ){
      */
 
     floatVector F = { 0.69646919, 0.28613933, 0.22685145,
-                     0.55131477, 0.71946897, 0.42310646,
-                     0.98076420, 0.68482974, 0.4809319 };
+                      0.55131477, 0.71946897, 0.42310646,
+                      0.98076420, 0.68482974, 0.4809319 };
 
     floatVector L = { 0.57821272, 0.27720263, 0.45555826,
-                     0.82144027, 0.83961342, 0.95322334,
-                     0.4768852 , 0.93771539, 0.1056616 };
+                      0.82144027, 0.83961342, 0.95322334,
+                      0.4768852 , 0.93771539, 0.1056616 };
 
     floatVector answer = { 1.00232848, 0.67686793, 0.46754712,
-                          1.96988645, 1.49191786, 1.00002629,
-                          0.95274131, 0.88347295, 0.55575157 };
+                           1.96988645, 1.49191786, 1.00002629,
+                           0.95274131, 0.88347295, 0.55575157 };
 
     floatVector DFDt;
 
@@ -467,16 +467,16 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
     floatType Dt = 2.7;
 
     floatVector Fp = { 0.69646919, 0.28613933, 0.22685145,
-                      0.55131477, 0.71946897, 0.42310646,
-                      0.98076420, 0.68482974, 0.4809319 };
+                       0.55131477, 0.71946897, 0.42310646,
+                       0.98076420, 0.68482974, 0.4809319 };
 
     floatVector Lp = { 0.69006282, 0.0462321 , 0.88086378,
-                      0.8153887 , 0.54987134, 0.72085876,
-                      0.66559485, 0.63708462, 0.54378588 };
+                       0.8153887 , 0.54987134, 0.72085876,
+                       0.66559485, 0.63708462, 0.54378588 };
 
     floatVector L = { 0.57821272, 0.27720263, 0.45555826,
-                     0.82144027, 0.83961342, 0.95322334,
-                     0.4768852 , 0.93771539, 0.1056616 };
+                      0.82144027, 0.83961342, 0.95322334,
+                      0.4768852 , 0.93771539, 0.1056616 };
 
     //Test 1 ( mode 1 fully explicit )
     floatVector F;
@@ -485,8 +485,8 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
     BOOST_CHECK( ! error );
 
     floatVector answer = { 4.39551129, 2.53782698, 1.84614498,
-                          4.81201673, 3.75047725, 2.48674399,
-                          4.62070491, 3.44211354, 2.32252023 };
+                           4.81201673, 3.75047725, 2.48674399,
+                           4.62070491, 3.44211354, 2.32252023 };
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
@@ -495,9 +495,9 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     BOOST_CHECK( ! error );
 
-    answer = { 0.63522182, -0.1712192 , -0.00846781,
-             -0.81250979, -0.19375022, -0.20193394,
-             -0.36163914, -0.03662069, -0.05769288 };
+    answer = {  0.63522182, -0.1712192 , -0.00846781,
+               -0.81250979, -0.19375022, -0.20193394,
+               -0.36163914, -0.03662069, -0.05769288 };
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
@@ -506,9 +506,9 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     BOOST_CHECK( ! error );
 
-    answer = { 0.20004929, -0.4409338 , -0.18955924,
-             -3.59005736, -2.17210401, -1.55661536,
-             -1.88391214, -1.13150095, -0.80579654 };
+    answer = {  0.20004929, -0.4409338 , -0.18955924,
+               -3.59005736, -2.17210401, -1.55661536,
+               -1.88391214, -1.13150095, -0.80579654 };
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
@@ -545,8 +545,8 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
     BOOST_CHECK( ! error );
 
     answer = { 3.03173544, 1.1881084 , 2.77327313,
-              3.92282144, 2.58424672, 3.75584617,
-              5.18006647, 2.65125419, 4.85252662 };
+               3.92282144, 2.58424672, 3.75584617,
+               5.18006647, 2.65125419, 4.85252662 };
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
@@ -555,9 +555,9 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     BOOST_CHECK( ! error );
 
-    answer = { 0.65045472, -0.42475879, -0.09274688,
-             -0.25411831, -0.08867872, -0.16467241,
-              0.45611733, -0.45427799, -0.17799727 };
+    answer = {  0.65045472, -0.42475879, -0.09274688,
+               -0.25411831, -0.08867872, -0.16467241,
+                0.45611733, -0.45427799, -0.17799727 };
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
@@ -567,8 +567,8 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
     BOOST_CHECK( ! error );
 
     answer = { -0.02066217, -1.43862233, -0.42448874,
-              -0.96426544, -1.72139966, -0.83831629,
-              -0.59802055, -2.37943476, -0.88998505 };
+               -0.96426544, -1.72139966, -0.83831629,
+               -0.59802055, -2.37943476, -0.88998505 };
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
@@ -688,17 +688,17 @@ BOOST_AUTO_TEST_CASE( testPullBackVelocityGradient ){
      */
 
     floatVector velocityGradient = { 0.69006282, 0.0462321 , 0.88086378,
-                                    0.8153887 , 0.54987134, 0.72085876,
-                                    0.66559485, 0.63708462, 0.54378588 };
+                                     0.8153887 , 0.54987134, 0.72085876,
+                                     0.66559485, 0.63708462, 0.54378588 };
 
     floatVector deformationGradient = { 0.69646919, 0.28613933, 0.22685145,
-                                       0.55131477, 0.71946897, 0.42310646,
-                                       0.98076420, 0.68482974, 0.4809319 };
+                                        0.55131477, 0.71946897, 0.42310646,
+                                        0.98076420, 0.68482974, 0.4809319 };
 
     floatVector pullBackL;
-    floatVector expectedPullBackL = { 6.32482111,   3.11877752,   2.43195977,
-                                    20.19439192,  10.22175689,   7.88052809,
-                                   -38.85113898, -18.79212468, -14.76285795 };
+    floatVector expectedPullBackL = {   6.32482111,   3.11877752,   2.43195977,
+                                       20.19439192,  10.22175689,   7.88052809,
+                                      -38.85113898, -18.79212468, -14.76285795 };
 
     errorOut error = constitutiveTools::pullBackVelocityGradient( velocityGradient, deformationGradient, pullBackL );
 
@@ -785,9 +785,9 @@ BOOST_AUTO_TEST_CASE( testQuadraticThermalExpansion ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( thermalExpansion, thermalExpansionJ ) );
 
-    error = constitutiveTools::quadraticThermalExpansion(      temperature + delta,     referenceTemperature,
-                                                                  linearParameters,      quadraticParameters,
-                                                                 thermalExpansionJ );
+    error = constitutiveTools::quadraticThermalExpansion( temperature + delta,   referenceTemperature,
+                                                             linearParameters,    quadraticParameters,
+                                                            thermalExpansionJ );
 
     BOOST_CHECK( ! error );
 
@@ -800,9 +800,9 @@ BOOST_AUTO_TEST_CASE( testPushForwardGreenLagrangeStrain ){
      * Test the push-forward operation on the Green-Lagrange strain.
      */
 
-    floatVector deformationGradient = { 0.30027935, -0.72811411,  0.26475099,
-                                       1.2285819 ,  0.57663593,  1.43113814,
-                                      -0.45871432,  0.2175795 ,  0.54013937 };
+    floatVector deformationGradient = {  0.30027935, -0.72811411,  0.26475099,
+                                         1.2285819 ,  0.57663593,  1.43113814,
+                                        -0.45871432,  0.2175795 ,  0.54013937 };
 
     floatVector greenLagrangeStrain;
     errorOut error = constitutiveTools::computeGreenLagrangeStrain( deformationGradient, greenLagrangeStrain );
@@ -810,8 +810,8 @@ BOOST_AUTO_TEST_CASE( testPushForwardGreenLagrangeStrain ){
     BOOST_CHECK( ! error );
 
     floatVector almansiStrain = { -0.33393717,  0.0953188 , -0.29053383,
-                                  0.0953188 ,  0.35345526,  0.11588247,
-                                 -0.29053383,  0.11588247, -0.56150741 };
+                                   0.0953188 ,  0.35345526,  0.11588247,
+                                  -0.29053383,  0.11588247, -0.56150741 };
 
     floatVector result;
     error = constitutiveTools::pushForwardGreenLagrangeStrain( greenLagrangeStrain, deformationGradient,
@@ -873,17 +873,17 @@ BOOST_AUTO_TEST_CASE( testPullBackAlmansiStrain ){
      * Test the pull-back operation on the Green-Lagrange strain.
      */
 
-    floatVector deformationGradient = { 0.1740535 ,  1.2519364 , -0.9531442 ,
-                                       -0.7512021 , -0.60229072,  0.32640812,
-                                       -0.59754476, -0.06209685, -1.50856757 };
+    floatVector deformationGradient = {  0.1740535 ,  1.2519364 , -0.9531442 ,
+                                        -0.7512021 , -0.60229072,  0.32640812,
+                                        -0.59754476, -0.06209685, -1.50856757 };
 
     floatVector almansiStrain = { 0.25045537, 0.48303426, 0.98555979,
                                   0.51948512, 0.61289453, 0.12062867,
                                   0.8263408 , 0.60306013, 0.54506801 };
 
-    floatVector answer = { 0.55339061, -0.59325289,  0.92984685,
-                          -0.83130342, -0.25274097, -1.5877536 ,
-                           1.67911302, -0.83554021,  3.47033811 };
+    floatVector answer = {  0.55339061, -0.59325289,  0.92984685,
+                           -0.83130342, -0.25274097, -1.5877536 ,
+                            1.67911302, -0.83554021,  3.47033811 };
 
     floatVector result;
     errorOut error = constitutiveTools::pullBackAlmansiStrain( almansiStrain, deformationGradient, result );
