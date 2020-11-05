@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE( testRotateMatrix ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( rotatedA, { -0.09485264, -3.38815017, -5.39748037,
                                                       -1.09823916,  2.23262233,  4.68884658,
-                                                      -1.68701666,  6.92240128, 12.8622303 }) );
+                                                      -1.68701666,  6.92240128, 12.8622303 } ) );
 
     //Test rotation back to original frame
 
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
 
     BOOST_CHECK( ! ret );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( E, { 0, 0, 0, 0, 0, 0, 0, 0, 0 }) );
+    BOOST_CHECK( vectorTools::fuzzyEquals( E, { 0, 0, 0, 0, 0, 0, 0, 0, 0 } ) );
 
     F = { 0.69646919, 0.28613933, 0.22685145,
          0.55131477, 0.71946897, 0.42310646,
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( E, { 0.37545786,  0.63379879,  0.43147034,
                                               0.63379879,  0.03425154,  0.34933978,
-                                              0.43147034,  0.34933978, -0.26911192 }) );
+                                              0.43147034,  0.34933978, -0.26911192 } ) );
 
     floatVector EJ;
     floatMatrix dEdF;
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
     for ( unsigned int i=0; i<F.size( ); i++ ){
         floatVector delta( F.size( ), 0 );
 
-        delta[ i ] = eps * fabs( F[ i ]) + eps;
+        delta[ i ] = eps * fabs( F[ i ] ) + eps;
 
         ret = constitutiveTools::computeGreenLagrangeStrain( F + delta, EJ );
 
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE( testComputeGreenLagrangeStrain ){
         floatVector gradCol = ( EJ - E )/delta[ i ];
 
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dEdF[ j ][ i ]) );
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dEdF[ j ][ i ] ) );
         }
     }
 
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE( testDecomposeGreenLagrangeStrain ){
     floatType eps = 1e-8;
     for ( unsigned int i=0; i<E.size( ); i++ ){
         floatVector delta( E.size( ), 0 );
-        delta[ i ] =  fabs( eps*E[ i ]);
+        delta[ i ] =  fabs( eps*E[ i ] );
 
         ret = constitutiveTools::decomposeGreenLagrangeStrain( E + delta, EbarOut2, JOut2 );
 
@@ -206,7 +206,7 @@ BOOST_AUTO_TEST_CASE( testDecomposeGreenLagrangeStrain ){
 
     for ( unsigned int i=0; i<E.size( ); i++ ){
         floatVector delta( E.size( ), 0 );
-        delta[ i ] = fabs( eps*E[ i ]);
+        delta[ i ] = fabs( eps*E[ i ] );
 
         ret = constitutiveTools::decomposeGreenLagrangeStrain( E + delta, EbarOut2, JOut2 );
 
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE( testMapPK2toCauchy ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( cauchy, { -2.47696057,  0.48015011, -0.28838671,
                                                     0.16490963, -0.57481137, -0.92071407,
-                                                   -0.21450698, -1.22714923, -1.73532173 }) );
+                                                   -0.21450698, -1.22714923, -1.73532173 } ) );
 
 }
 
@@ -269,7 +269,7 @@ BOOST_AUTO_TEST_CASE( testWLF ){
 
     constitutiveTools::WLF( T, WLFParameters, factor );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( factor, pow( 10, -C1*( T - Tr )/( C2 + ( T - Tr )) )) );
+    BOOST_CHECK( vectorTools::fuzzyEquals( factor, pow( 10, -C1*( T - Tr )/( C2 + ( T - Tr ) ) ) ) );
 
     floatType factor2;
     constitutiveTools::WLF( T, WLFParameters, factor2, dfactordT );
@@ -308,14 +308,14 @@ BOOST_AUTO_TEST_CASE( testComputeDGreenLagrangeStrainDF ){
     for ( unsigned int i=0; i<F.size( ); i++ ){
         floatVector delta( F.size( ), 0 );
 
-        delta[ i ] = fabs( eps*F[ i ]);
+        delta[ i ] = fabs( eps*F[ i ] );
 
         error = constitutiveTools::computeGreenLagrangeStrain( F + delta, E2 );
 
         floatVector gradCol = ( E2 - E )/delta[ i ];
 
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dEdF[ j ][ i ]) );
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dEdF[ j ][ i ] ) );
         }
     }
 }
@@ -351,13 +351,13 @@ BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
 
     BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( A, Ap + Dt*0.5*( DApDt + DADt )) );
+    BOOST_CHECK( vectorTools::fuzzyEquals( A, Ap + Dt*0.5*( DApDt + DADt ) ) );
 
     error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, A, alphaVec );
 
     BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( A, { 20.5, 23. , 25.5, 28. }) );
+    BOOST_CHECK( vectorTools::fuzzyEquals( A, { 20.5, 23. , 25.5, 28. } ) );
 
     //Add test for the jacobian
     floatType eps = 1e-6;
@@ -373,14 +373,14 @@ BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
 
     for ( unsigned int i=0; i<DADt.size( ); i++ ){
         floatVector delta = floatVector( DADt.size( ), 0 );
-        delta[ i ] = eps*( DADt[ i ]) + eps;
+        delta[ i ] = eps*( DADt[ i ] ) + eps;
 
         error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt + delta, Ai, alphaVec );
 
         floatVector gradCol = ( Ai - A0 )/delta[ i ];
 
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( DADADt[ j ][ i ], gradCol[ j ]) );
+            BOOST_CHECK( vectorTools::fuzzyEquals( DADADt[ j ][ i ], gradCol[ j ] ) );
         }
 
     }
@@ -428,7 +428,7 @@ BOOST_AUTO_TEST_CASE( testComputeDFDt ){
 
         //Compute finite difference gradient w.r.t. L
         floatVector delta( L.size( ), 0 );
-        delta[ i ] = eps*fabs( L[ i ]) + eps;
+        delta[ i ] = eps*fabs( L[ i ] ) + eps;
 
         error = constitutiveTools::computeDFDt( L + delta, F, DFDtJ );
 
@@ -437,12 +437,12 @@ BOOST_AUTO_TEST_CASE( testComputeDFDt ){
         floatVector gradCol = ( DFDtJ - DFDt )/delta[ i ];
 
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( dDFDtdL[ j ][ i ], gradCol[ j ]) );
+            BOOST_CHECK( vectorTools::fuzzyEquals( dDFDtdL[ j ][ i ], gradCol[ j ] ) );
         }
 
         //Compute finite difference gradient w.r.t. F
         delta = floatVector( F.size( ), 0 );
-        delta[ i ] = eps*fabs( F[ i ]) + eps;
+        delta[ i ] = eps*fabs( F[ i ] ) + eps;
 
         error = constitutiveTools::computeDFDt( L, F + delta, DFDtJ );
 
@@ -451,7 +451,7 @@ BOOST_AUTO_TEST_CASE( testComputeDFDt ){
         gradCol = ( DFDtJ - DFDt )/delta[ i ];
 
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( dDFDtdF[ j ][ i ], gradCol[ j ]) );
+            BOOST_CHECK( vectorTools::fuzzyEquals( dDFDtdF[ j ][ i ], gradCol[ j ] ) );
         }
 
 
@@ -525,7 +525,7 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
     for ( unsigned int i=0; i<L.size( ); i++ ){
 
         floatVector delta( L.size( ), 0 );
-        delta[ i ] = eps*fabs( L[ i ]) + eps;
+        delta[ i ] = eps*fabs( L[ i ] ) + eps;
 
         error = constitutiveTools::evolveF( Dt, Fp, Lp, L + delta, FJ, 0.5, 1 );
 
@@ -582,7 +582,7 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
     for ( unsigned int i=0; i<L.size( ); i++ ){
 
         floatVector delta( L.size( ), 0 );
-        delta[ i ] = eps*fabs( L[ i ]) + eps;
+        delta[ i ] = eps*fabs( L[ i ] ) + eps;
 
         error = constitutiveTools::evolveF( Dt, Fp, Lp, L + delta, FJ, 0.5, 2 );
 
@@ -611,12 +611,12 @@ BOOST_AUTO_TEST_CASE( testMac ){
 
     floatType xJ = 2;
     floatType dmacdx;
-    BOOST_CHECK( vectorTools::fuzzyEquals( constitutiveTools::mac( xJ ), constitutiveTools::mac( xJ, dmacdx )) );
+    BOOST_CHECK( vectorTools::fuzzyEquals( constitutiveTools::mac( xJ ), constitutiveTools::mac( xJ, dmacdx ) ) );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( dmacdx, 1. ) );
 
     xJ = -2;
-    BOOST_CHECK( vectorTools::fuzzyEquals( constitutiveTools::mac( xJ ), constitutiveTools::mac( xJ, dmacdx )) );
+    BOOST_CHECK( vectorTools::fuzzyEquals( constitutiveTools::mac( xJ ), constitutiveTools::mac( xJ, dmacdx ) ) );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( dmacdx, 0. ) );
 
@@ -651,7 +651,7 @@ BOOST_AUTO_TEST_CASE( testComputeUnitNormal ){
     floatType eps = 1e-6;
     for ( unsigned int i=0; i<A.size( ); i++ ){
         floatVector delta( A.size( ), 0 );
-        delta[ i ] = eps*fabs( A[ i ]) + eps;
+        delta[ i ] = eps*fabs( A[ i ] ) + eps;
 
         error = constitutiveTools::computeUnitNormal( A + delta, AnormJ, dAnormdA );
 
@@ -660,7 +660,7 @@ BOOST_AUTO_TEST_CASE( testComputeUnitNormal ){
         floatVector gradCol = ( AnormJ - Anorm )/delta[ i ];
 
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( dAnormdA[ j ][ i ], gradCol[ j ]) );
+            BOOST_CHECK( vectorTools::fuzzyEquals( dAnormdA[ j ][ i ], gradCol[ j ] ) );
         }
     }
 
@@ -721,7 +721,7 @@ BOOST_AUTO_TEST_CASE( testPullBackVelocityGradient ){
     floatType eps = 1e-6;
     for ( unsigned int i=0; i<velocityGradient.size( ); i++ ){
         floatVector delta( velocityGradient.size( ), 0 );
-        delta[ i ] = eps*fabs( velocityGradient[ i ]) + eps;
+        delta[ i ] = eps*fabs( velocityGradient[ i ] ) + eps;
 
         error = constitutiveTools::pullBackVelocityGradient( velocityGradient + delta, deformationGradient, pullBackLJ );
 
@@ -730,14 +730,14 @@ BOOST_AUTO_TEST_CASE( testPullBackVelocityGradient ){
         floatVector gradCol = ( pullBackLJ - pullBackL )/delta[ i ];
 
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dpbLdL[ j ][ i ]) );
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dpbLdL[ j ][ i ] ) );
         }
     }
 
     //Check dpbLdF
     for ( unsigned int i=0; i<deformationGradient.size( ); i++ ){
         floatVector delta( deformationGradient.size( ), 0 );
-        delta[ i ] = eps*fabs( deformationGradient[ i ]) + eps;
+        delta[ i ] = eps*fabs( deformationGradient[ i ] ) + eps;
 
         error = constitutiveTools::pullBackVelocityGradient( velocityGradient, deformationGradient + delta, pullBackLJ );
 
@@ -771,7 +771,7 @@ BOOST_AUTO_TEST_CASE( testQuadraticThermalExpansion ){
 
     BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( thermalExpansion, { 510., 620., 730., 840. }) );
+    BOOST_CHECK( vectorTools::fuzzyEquals( thermalExpansion, { 510., 620., 730., 840. } ) );
 
     floatVector thermalExpansionJ, thermalExpansionJacobian;
     floatType eps = 1e-6;
@@ -835,7 +835,7 @@ BOOST_AUTO_TEST_CASE( testPushForwardGreenLagrangeStrain ){
     floatType eps = 1e-6;
     for ( unsigned int i=0; i<greenLagrangeStrain.size( ); i++ ){
         floatVector delta( greenLagrangeStrain.size( ), 0 );
-        delta[ i ] = eps*fabs( greenLagrangeStrain[ i ]) + eps;
+        delta[ i ] = eps*fabs( greenLagrangeStrain[ i ] ) + eps;
 
         error = constitutiveTools::pushForwardGreenLagrangeStrain( greenLagrangeStrain + delta, deformationGradient,
                                                                   resultJ );
@@ -845,14 +845,14 @@ BOOST_AUTO_TEST_CASE( testPushForwardGreenLagrangeStrain ){
         floatVector grad = ( resultJ - result )/delta[ i ];
 
         for ( unsigned int j=0; j<grad.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( grad[ j ], dedE[ j ][ i ]) );
+            BOOST_CHECK( vectorTools::fuzzyEquals( grad[ j ], dedE[ j ][ i ] ) );
         }
     }
 
     //Check dedF
     for ( unsigned int i=0; i<deformationGradient.size( ); i++ ){
         floatVector delta( deformationGradient.size( ), 0 );
-        delta[ i ] = eps*fabs( deformationGradient[ i ]) + eps;
+        delta[ i ] = eps*fabs( deformationGradient[ i ] ) + eps;
 
         error = constitutiveTools::pushForwardGreenLagrangeStrain( greenLagrangeStrain, deformationGradient + delta,
                                                                   resultJ );
