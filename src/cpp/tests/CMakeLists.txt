@@ -5,5 +5,5 @@ add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 
 set_target_properties(${TEST_NAME} PROPERTIES CXX_STANDARD 11)
 
-target_include_directories(${TEST_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
-target_link_libraries(${TEST_NAME} PUBLIC ${PROJECT_NAME} error_tools)
+target_include_directories(${TEST_NAME} PRIVATE ${Boost_INCLUDE_DIRS} ${Python_INCLUDE_DIRS})
+target_link_libraries(${TEST_NAME} PUBLIC ${PROJECT_NAME} error_tools PRIVATE ${Python_LIBRARIES})

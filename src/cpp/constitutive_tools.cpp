@@ -19,6 +19,7 @@
   */
 
 #include<constitutive_tools.h>
+#include<boost/python.hpp>
 
 namespace constitutiveTools{
 
@@ -1267,4 +1268,13 @@ namespace constitutiveTools{
         
         return NULL;
     }
+
+    void test(){std::cout << "Hello World!\n";}
+}
+
+BOOST_PYTHON_MODULE(constitutive_tools){
+
+    using namespace boost::python;
+
+    def("greet", constitutiveTools::test);
 }
