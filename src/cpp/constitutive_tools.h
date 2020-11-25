@@ -29,7 +29,6 @@
 #define USE_EIGEN
 #include<vector_tools.h>
 #include<error_tools.h>
-#include<boost/python.hpp>
 
 namespace constitutiveTools{
 

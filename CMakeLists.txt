@@ -2,6 +2,9 @@ cmake_minimum_required (VERSION 3.14)
 project (constitutive_tools VERSION 0.0.1)
 enable_testing()
 
+# Make the code position independent
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # Configure version
 configure_file("src/cpp/config.h.in" "${PROJECT_BINARY_DIR}/config.h")
 
@@ -31,22 +34,11 @@ FetchContent_MakeAvailable(error_tools vector_tools)
 # Add project source directories
 add_subdirectory ("src/cpp")
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    # Find Boost. Required for tests and the python interface
-    find_package(Boost 1.53.0 REQUIRED COMPONENTS unit_test_framework python)
-    # Add the current conda environment to the CMAKE_PREFIX_PATH
-    set(Python_ROOT_DIR $ENV{$CONDA_PREFIX})
-    set(Python_FIND_STRATEGY "LOCATION")
-    find_package(Python REQUIRED COMPONENTS Interpreter Development)
-    message("PythonINCLUDE_DIRS: ${Python_INCLUDE_DIRS}")
-    message("Python_ROOT_DIR: ${Python_ROOT_DIR}")
+    # Find Boost. Required for tests
+    find_package(Boost 1.53.0 REQUIRED COMPONENTS unit_test_framework)
     # Add tests and docs
     add_subdirectory ("src/cpp/tests")
     add_subdirectory ("docs")
-    # Link the libraries for the python interface
-    target_link_libraries(constitutive_tools ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-    target_include_directories(constitutive_tools PRIVATE ${Python_INCLUDE_DIRS})
-    message("PYTHON LIBRARIES: ${Python_LIBRARIES}")
-    message("PYTHON INCLUDE: ${Python_INCLUDE_DIRS}")
 endif()
 
 # Set the c++ standard
