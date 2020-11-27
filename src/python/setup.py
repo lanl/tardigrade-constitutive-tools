@@ -1,0 +1,87 @@
+import os
+import re
+from distutils.core import setup
+from distutils.extension import Extension
+import pathlib
+
+import numpy
+from Cython.Distutils import build_ext
+
+import settings
+
+
+# Open the project cmake cache
+with open(settings.PROJECT_CMAKE_CACHE, 'r') as cmake_file:
+    cmake_contents = cmake_file.read()
+
+# Get the project name
+project_name_regex = '(?<=CMAKE_PROJECT_NAME:STATIC=).*'
+project_name_search = re.search(project_name_regex, cmake_contents)
+
+if project_name_search.group:
+    project_name = project_name_search.group(0)
+else:
+    ValueError("CMAKE_PROJECT_NAME was not found in CMakeCache.txt")
+
+###############################
+# Get the include directories #
+###############################
+
+include_dirs = [numpy.get_include(), settings.CPP_SOURCE_DIRECTORY]
+
+# Get the Eigen library
+eigen_regex = '(?<=CMAKE_EIGEN_DIR:PATH=).*'
+eigen_search = re.search(eigen_regex, cmake_contents)
+
+if eigen_search.group:
+    include_dirs.append(eigen_search.group(0))
+else:
+    ValueError("CMAKE_EIGEN_DIR was not found in CMakeCache.txt")
+
+############################
+# Get the static libraries #
+############################
+
+static_libraries = []
+
+# Get all of the static libraries
+static_libraries = [str(lib.resolve()) for lib in pathlib.Path(settings.CPP_BUILD_DIRECTORY).glob("**/*.a")]
+
+# Ignore all of the libraries except for the one associated with this project
+static_libaries = [sl for sl in static_libraries if ("lib" + project_name) in sl]
+
+###################################
+# Get all of the pyx source files #
+###################################
+
+sources = [str(f.resolve()) for f in pathlib.Path(settings.PYTHON_SOURCE_DIRECTORY).glob("**/*.pyx")]
+
+# Get all of the include locations
+for source_type in (settings.PYTHON_SOURCE_SUBDIRECTORY, settings.CPP_SOURCE_SUBDIRECTORY):
+    
+    for dir in pathlib.Path(settings.CPP_BUILD_DIRECTORY).glob(f"**/*-src*/{source_type}"):
+        if not dir.is_dir():
+            continue
+    
+        include_dirs.append(str(dir))
+
+print("sources:\n", sources)
+print("static_libraries:\n", static_libraries)
+print("include_dirs:\n", include_dirs)
+
+# Define the build configuration
+ext_modules = [Extension("constitutive_tools",
+                     sources = sources,
+                     language='c++',
+                     extra_objects=static_libraries,
+#                     libraries=static_libraries,
+                     include_dirs=include_dirs,
+                     extra_compile_args=[f"-std=c++{settings.CMAKE_CXX_STANDARD}"],
+                     extra_link_args=[f"-std=c++{settings.CMAKE_CXX_STANDARD}"]
+                     )]
+
+setup(
+  name = 'constitutive_tools',
+  cmdclass = {'build_ext': build_ext},
+  ext_modules = ext_modules
+)
