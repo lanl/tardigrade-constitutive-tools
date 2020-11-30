@@ -67,10 +67,9 @@ for source_type in (settings.PYTHON_SOURCE_SUBDIRECTORY, settings.CPP_SOURCE_SUB
 
 # Define the build configuration
 ext_modules = [Extension("constitutive_tools",
-                     sources = sources,
+                     sources=sources,
                      language='c++',
                      extra_objects=static_libraries,
-#                     libraries=static_libraries,
                      include_dirs=include_dirs,
                      extra_compile_args=[f"-std=c++{settings.CMAKE_CXX_STANDARD}"],
                      extra_link_args=[f"-std=c++{settings.CMAKE_CXX_STANDARD}"]
