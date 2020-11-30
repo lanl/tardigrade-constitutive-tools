@@ -164,19 +164,19 @@ $ module load python/2019.10-python-3.7
 $ sv3r
 ```
 
-2) Perform the initial configuration
+2) Define convenience environment variables
+$ my_error_tools=/path/to/my/error_tools
+$ my_vector_tools=/path/to/my/vector_tools
+
+3) Perform the initial configuration
 
 ```
 $ pwd
 /path/to/constitutive_tools
 $ mkdir build
 $ cd build
-$ ccmake .. -DCMAKE_FETCH_SOURCE=LOCAL
+$ cmake .. -DCMAKE_FETCH_SOURCE=LOCAL -DCMAKE_ERROR_TOOLS_PATH=${my_error_tools} -DCMAKE_VECTOR_TOOLS_PATH=${my_vector_tools}
 ```
-
-The configuration will throw errors because `error_tools` and `vector_tools` cannot be located. The user
-must define the path to these repositories in the `CMAKE_ERROR_TOOLS_PATH` and `CMAKE_VECTOR_TOOLS_PATH`
-cache variables. Once defined, one configures cmake by entering `c` and then generating with `g`.
 
 3) Building the library
 
