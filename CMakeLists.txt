@@ -2,6 +2,9 @@ cmake_minimum_required (VERSION 3.14)
 project (constitutive_tools VERSION 0.0.1)
 enable_testing()
 
+# Make the code position independent
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # Configure version
 configure_file("src/cpp/config.h.in" "${PROJECT_BINARY_DIR}/config.h")
 
@@ -9,6 +12,9 @@ configure_file("src/cpp/config.h.in" "${PROJECT_BINARY_DIR}/config.h")
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} $ENV{HOME}/.local $ENV{HOME}/local/ $ENV{HOME})
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 include_directories(${EIGEN3_INCLUDE_DIR})
+
+# Save the eigen directory for use in the python interface
+set(CMAKE_EIGEN_DIR ${EIGEN3_INCLUDE_DIR} CACHE PATH "The path to the eigen include directory")
 
 # Add the cmake folder to locate the FindSphinx module
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
