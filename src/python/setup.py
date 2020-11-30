@@ -65,10 +65,6 @@ for source_type in (settings.PYTHON_SOURCE_SUBDIRECTORY, settings.CPP_SOURCE_SUB
     
         include_dirs.append(str(dir))
 
-print("sources:\n", sources)
-print("static_libraries:\n", static_libraries)
-print("include_dirs:\n", include_dirs)
-
 # Define the build configuration
 ext_modules = [Extension("constitutive_tools",
                      sources = sources,
