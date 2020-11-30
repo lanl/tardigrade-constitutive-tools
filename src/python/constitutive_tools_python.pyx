@@ -3,7 +3,7 @@ from libcpp.vector cimport vector
 import numpy as np
 cimport numpy as np
 
-include "error_tools_python.pyx"
+cimport error_tools_python
 cimport constitutive_tools_python
 
 

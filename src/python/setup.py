@@ -75,8 +75,6 @@ static_libaries = [sl for sl in static_libraries if ("lib" + project_name) in sl
 # Get all of the pyx source files #
 ###################################
 
-sources = [str(f.resolve()) for f in pathlib.Path(settings.PYTHON_SOURCE_DIRECTORY).glob("**/*.pyx")]
-
 # Get all of the include locations
 for source_type in (settings.PYTHON_SOURCE_SUBDIRECTORY, settings.CPP_SOURCE_SUBDIRECTORY):
 
@@ -103,7 +101,7 @@ for source_type in (settings.PYTHON_SOURCE_SUBDIRECTORY, settings.CPP_SOURCE_SUB
 
 # Define the build configuration
 ext_modules = [Extension("constitutive_tools",
-                     sources = sources,
+                     sources = ["main.pyx"],
                      language='c++',
                      extra_objects=static_libraries,
 #                     libraries=static_libraries,
