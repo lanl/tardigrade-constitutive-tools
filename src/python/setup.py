@@ -23,6 +23,27 @@ if project_name_search.group:
 else:
     ValueError("CMAKE_PROJECT_NAME was not found in CMakeCache.txt")
 
+# Get the project fetch source type
+project_fetch_source_regex = '(?<=CMAKE_FETCH_SOURCE:STRING=).*'
+project_fetch_source_search = re.search(project_fetch_source_regex, cmake_contents)
+
+if project_fetch_source_search.group:
+    fetch_source = project_fetch_source_search.group(0)
+else:
+    ValueError("CMAKE_FETCH_SOURCE was not found in CMakeCache.txt")
+
+# Get the sub-project source directories if the fetch type is local
+local_libraries = []
+if fetch_source == "LOCAL":
+    for source_variable_name in settings.LIBRARY_SOURCE_VARIABLE_NAMES:
+        regex = f'(?<={source_variable_name}:PATH=).*'
+        search = re.search(regex, cmake_contents)
+
+        if search.group:
+            local_libraries.append(search.group(0))
+        else:
+            ValueError(f"{source_variable_name} was not found in CMakeCache.txt")
+
 ###############################
 # Get the include directories #
 ###############################
@@ -54,24 +75,33 @@ static_libaries = [sl for sl in static_libraries if ("lib" + project_name) in sl
 # Get all of the pyx source files #
 ###################################
 
-sources = [str(f.resolve()) for f in pathlib.Path(settings.PYTHON_SOURCE_DIRECTORY).glob("**/*.pyx")]
-
 # Get all of the include locations
 for source_type in (settings.PYTHON_SOURCE_SUBDIRECTORY, settings.CPP_SOURCE_SUBDIRECTORY):
-    
-    for dir in pathlib.Path(settings.CPP_BUILD_DIRECTORY).glob(f"**/*-src*/{source_type}"):
-        if not dir.is_dir():
-            continue
-    
-        include_dirs.append(str(dir))
 
-print("sources:\n", sources)
-print("static_libraries:\n", static_libraries)
-print("include_dirs:\n", include_dirs)
+    if fetch_source == "REPO":
+    
+        for dir in pathlib.Path(settings.CPP_BUILD_DIRECTORY).glob(f"**/*-src*/{source_type}"):
+            if not dir.is_dir():
+                continue
+        
+            include_dirs.append(str(dir))
+
+    elif fetch_source == "LOCAL":
+
+        for local_library in local_libraries:
+            
+            for dir in pathlib.Path(local_library).glob(f"**/{source_type}"):
+                if not dir.is_dir():
+                    continue
+
+                include_dirs.append(str(dir))
+
+    else:
+        raise ValueError(f"fetch source {fetch_source} is not recognized")
 
 # Define the build configuration
 ext_modules = [Extension("constitutive_tools",
-                     sources = sources,
+                     sources = ["main.pyx"],
                      language='c++',
                      extra_objects=static_libraries,
 #                     libraries=static_libraries,
