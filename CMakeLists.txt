@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.14)
-project (constitutive_tools VERSION 0.0.1)
+project (constitutive_tools VERSION 0.1.0)
 enable_testing()
 
 # Make the code position independent
