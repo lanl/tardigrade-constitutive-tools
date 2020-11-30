@@ -155,7 +155,7 @@ In some cases it is not convenient to pull down every repository required but it
 versions of the repository are used. An example of when this may be needed is if development is across
 multiple libraries and is proceeding faster than collaborators can check in results. In this case, and
 outside of developers no-one should need to do this, a version of the code using local repositories can be
-built. The steps below assume that the user has a working version of ccmake in addition to cmake.
+built.
 
 1) Activate a [W-13 Python Environment](https://xcp-confluence.lanl.gov/display/PYT/The+W-13+Python+3+environment)
 
