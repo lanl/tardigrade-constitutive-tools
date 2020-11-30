@@ -149,6 +149,43 @@ firefox build/docs/sphinx/index.html &
 firefox build/docs/doxygen/html/index.html &
 ```
 
+### Local development
+
+In some cases it is not convenient to pull down every repository required but it may be desired that local
+versions of the repository are used. An example of when this may be needed is if development is across
+multiple libraries and is proceeding faster than collaborators can check in results. In this case, and
+outside of developers no-one should need to do this, a version of the code using local repositories can be
+built.
+
+1) Activate a [W-13 Python Environment](https://xcp-confluence.lanl.gov/display/PYT/The+W-13+Python+3+environment)
+
+```
+$ module load python/2019.10-python-3.7
+$ sv3r
+```
+
+2) Define convenience environment variables
+$ my_error_tools=/path/to/my/error_tools
+$ my_vector_tools=/path/to/my/vector_tools
+
+3) Perform the initial configuration
+
+```
+$ pwd
+/path/to/constitutive_tools
+$ mkdir build
+$ cd build
+$ cmake .. -DCMAKE_FETCH_SOURCE=LOCAL -DCMAKE_ERROR_TOOLS_PATH=${my_error_tools} -DCMAKE_VECTOR_TOOLS_PATH=${my_vector_tools}
+```
+
+4) Building the library
+
+```
+$ pwd
+/path/to/constitutive_tools/build
+$ make
+```
+
 ### Building the documentation
 
 To build just the documentation pick up the steps here:
