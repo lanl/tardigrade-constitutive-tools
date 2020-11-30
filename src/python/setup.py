@@ -76,11 +76,11 @@ static_libaries = [sl for sl in static_libraries if ("lib" + project_name) in sl
 ###################################
 
 # Get all of the include locations
-for source_type in (settings.PYTHON_SOURCE_SUBDIRECTORY, settings.CPP_SOURCE_SUBDIRECTORY):
+for source_subpath in (settings.PYTHON_SOURCE_SUBDIRECTORY, settings.CPP_SOURCE_SUBDIRECTORY):
 
     if fetch_source == "REPO":
     
-        for dir in pathlib.Path(settings.CPP_BUILD_DIRECTORY).glob(f"**/*-src*/{source_type}"):
+        for dir in pathlib.Path(settings.CPP_BUILD_DIRECTORY).glob(f"**/*-src*/{source_subpath}"):
             if not dir.is_dir():
                 continue
         
@@ -90,7 +90,7 @@ for source_type in (settings.PYTHON_SOURCE_SUBDIRECTORY, settings.CPP_SOURCE_SUB
 
         for local_library in local_libraries:
             
-            for dir in pathlib.Path(local_library).glob(f"**/{source_type}"):
+            for dir in pathlib.Path(local_library).glob(f"**/{source_subpath}"):
                 if not dir.is_dir():
                     continue
 
