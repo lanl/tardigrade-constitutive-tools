@@ -178,14 +178,13 @@ $ cd build
 $ cmake .. -DCMAKE_FETCH_SOURCE=LOCAL -DCMAKE_ERROR_TOOLS_PATH=${my_error_tools} -DCMAKE_VECTOR_TOOLS_PATH=${my_vector_tools}
 ```
 
-3) Building the library
+4) Building the library
 
 ```
 $ pwd
 /path/to/constitutive_tools/build
 $ make
 ```
-
 
 ### Building the documentation
 
