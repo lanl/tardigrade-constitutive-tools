@@ -57,9 +57,9 @@ static_libaries = [sl for sl in static_libraries if ("lib" + project_name) in sl
 sources = [str(f.resolve()) for f in pathlib.Path(settings.PYTHON_SOURCE_DIRECTORY).glob("**/*.pyx")]
 
 # Get all of the include locations
-for source_type in (settings.PYTHON_SOURCE_SUBDIRECTORY, settings.CPP_SOURCE_SUBDIRECTORY):
+for source_subpath in (settings.PYTHON_SOURCE_SUBDIRECTORY, settings.CPP_SOURCE_SUBDIRECTORY):
     
-    for dir in pathlib.Path(settings.CPP_BUILD_DIRECTORY).glob(f"**/*-src*/{source_type}"):
+    for dir in pathlib.Path(settings.CPP_BUILD_DIRECTORY).glob(f"**/*-src*/{source_subpath}"):
         if not dir.is_dir():
             continue
     
