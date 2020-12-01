@@ -65,7 +65,7 @@ elif fetch_source == "LOCAL":
         else:
             raise ValueError(f"{source_variable_name} was not found in CMakeCache.txt")
 else:
-    raise ValueError(f"CMAKE_FETCH_SOURCE {fetch_source} not recognized")
+    raise ValueError(f"FETCH_SOURCE {fetch_source} not recognized")
 
 ###############################
 # Get the include directories #
