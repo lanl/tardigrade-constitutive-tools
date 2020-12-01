@@ -175,7 +175,7 @@ $ pwd
 /path/to/constitutive_tools
 $ mkdir build
 $ cd build
-$ cmake .. -DCMAKE_FETCH_SOURCE=LOCAL -DCMAKE_ERROR_TOOLS_PATH=${my_error_tools} -DCMAKE_VECTOR_TOOLS_PATH=${my_vector_tools}
+$ cmake .. -DFETCH_SOURCE=LOCAL -DERROR_TOOLS_PATH=${my_error_tools} -DVECTOR_TOOLS_PATH=${my_vector_tools}
 ```
 
 4) Building the library
