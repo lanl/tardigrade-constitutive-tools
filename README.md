@@ -10,7 +10,7 @@ Note: In order to use the Intel compiler one must run the following command in a
 bash prompt:
 
 ```
-source /apps/intel2016/bin/ifortvars.sh -arch intel64 -platform linux
+source /path/to/ifortvars.sh -arch intel64 -platform linux
 ```
 
 This is the same command that the abaqus command issues. It may be that
@@ -47,8 +47,8 @@ $ conda env create --file environment.yaml
 
 * eigen >= 3.3.7
 * BOOST >= 1.53.0
-* error\_tools: https://xcp-stash.lanl.gov/projects/MM/repos/error_tools
-* vector\_tools: https://xcp-stash.lanl.gov/projects/MM/repos/vector_tools
+* error\_tools: error_tools
+* vector\_tools: vector_tools
 
 #### "Internal" project libraries
 
@@ -70,8 +70,6 @@ insall Eigen to your home directory in ``~/include`` (or possibly in
 [Reference](https://unix.stackexchange.com/questions/36871/where-should-a-local-executable-be-placed)
 
 ```
-# sstelmo
-ssh -X sstelmo.lanl.gov
 # (OPTIONAL) source Intel compilers. c++/g++ compilers from GNU 4.8.5 also work.
 source /apps/intel2016/bin/ifortvars.sh -arch intel64 -platform linux
 # Create personal include file directory
@@ -81,8 +79,6 @@ $ mkdir .local/include
 # Move to repository directory
 $ cd /preferred/path/to/repos
 # Example
-$ pwd
-/projects/$USER/e13repos
 # Clone eigen
 $ git clone https://gitlab.com/libeigen/eigen.git
 $ cd eigen
@@ -108,46 +104,7 @@ This repository is now built completely with cmake.
 
 A build script has been created for convenience, ``new_build.sh``. It will build
 everything including the library binary, the test binary, and the documentation.
-This is the same build script used by ``jenkins_build.sh`` for CI builds and
-testing.
 
-### sstelmo
-
-1) Activate a [W-13 Python Environment](https://xcp-confluence.lanl.gov/display/PYT/The+W-13+Python+3+environment)
-
-```
-$ module load python/2019.10-python-3.7
-$ sv3r
-```
-
-2) Build everything
-
-```
-$ pwd
-/path/to/constitutive_tools/
-
-# Just perform the build
-./new_build.sh
-
-# Build and perform tests
-./jenkins_build.sh
-```
-
-3) View test results
-
-```
-cat build/src/cpp/tests/results.tex
-```
-
-4) Display docs
-
-```
-# Sphinx
-firefox build/docs/sphinx/index.html &
-
-# Doxygen
-firefox build/docs/doxygen/html/index.html &
-```
 
 ### Local development
 
@@ -157,11 +114,10 @@ multiple libraries and is proceeding faster than collaborators can check in resu
 outside of developers no-one should need to do this, a version of the code using local repositories can be
 built.
 
-1) Activate a [W-13 Python Environment](https://xcp-confluence.lanl.gov/display/PYT/The+W-13+Python+3+environment)
+1) Activate a python environment
 
 ```
-$ module load python/2019.10-python-3.7
-$ sv3r
+$ conda activate environment
 ```
 
 2) Define convenience environment variables

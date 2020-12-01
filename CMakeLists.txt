@@ -31,12 +31,12 @@ include(FetchContent)
 if(FETCH_SOURCE STREQUAL "REPO")
     FetchContent_Declare(
         error_tools
-        GIT_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/error_tools.git
+        GIT_REPOSITORY /define/repository/error_tools.git
         GIT_TAG        origin/dev
     )
     FetchContent_Declare(
         vector_tools
-        GIT_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/vector_tools.git
+        GIT_REPOSITORY /define/repository/vector_tools.git
         GIT_TAG        origin/dev
     )
 elseif(FETCH_SOURCE STREQUAL "LOCAL")
