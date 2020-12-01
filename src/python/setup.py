@@ -74,13 +74,13 @@ else:
 include_dirs = [numpy.get_include(), settings.CPP_SOURCE_DIRECTORY]
 
 # Get the Eigen library
-eigen_regex = '(?<=CMAKE_EIGEN_DIR:PATH=).*'
+eigen_regex = '(?<=EIGEN_DIR:PATH=).*'
 eigen_search = re.search(eigen_regex, cmake_cache_contents)
 
 if eigen_search.group:
     include_dirs.append(eigen_search.group(0))
 else:
-    raise ValueError("CMAKE_EIGEN_DIR was not found in CMakeCache.txt")
+    raise ValueError("EIGEN_DIR was not found in CMakeCache.txt")
 
 ############################
 # Get the static libraries #
