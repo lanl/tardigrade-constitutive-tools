@@ -22,13 +22,13 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 # Find related, but external, projects
 
 # Set a variable indicating if the other projects should come from the git repository or a local source
-set(CMAKE_FETCH_SOURCE "REPO" CACHE STRING "The source of the external projects. Options are REPO and LOCAL if LOCAL then the paths must be defined")
-set(CMAKE_ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of error_tools")
-set(CMAKE_VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_tools")
+set(FETCH_SOURCE "REPO" CACHE STRING "The source of the external projects. Options are REPO and LOCAL if LOCAL then the paths must be defined")
+set(ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of error_tools")
+set(VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_tools")
 
 # TODO: Decide how to handle master/dev build differences. bash env variables for GIT TAG?
 include(FetchContent)
-if(CMAKE_FETCH_SOURCE STREQUAL "REPO")
+if(FETCH_SOURCE STREQUAL "REPO")
     FetchContent_Declare(
         error_tools
         GIT_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/error_tools.git
@@ -39,17 +39,17 @@ if(CMAKE_FETCH_SOURCE STREQUAL "REPO")
         GIT_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/vector_tools.git
         GIT_TAG        origin/dev
     )
-elseif(CMAKE_FETCH_SOURCE STREQUAL "LOCAL")
+elseif(FETCH_SOURCE STREQUAL "LOCAL")
     FetchContent_Declare(
         error_tools
-        SOURCE_DIR ${CMAKE_ERROR_TOOLS_PATH}
+        SOURCE_DIR ${ERROR_TOOLS_PATH}
     )
     FetchContent_Declare(
         vector_tools
-        SOURCE_DIR ${CMAKE_VECTOR_TOOLS_PATH}
+        SOURCE_DIR ${VECTOR_TOOLS_PATH}
     )
 else()
-    message(FATAL_ERROR "Fetch source ${CMAKE_FETCH_SOURCE} is not recognized. Options are REPO and LOCAL")
+    message(FATAL_ERROR "Fetch source ${FETCH_SOURCE} is not recognized. Options are REPO and LOCAL")
 endif()
 FetchContent_MakeAvailable(error_tools vector_tools)
 

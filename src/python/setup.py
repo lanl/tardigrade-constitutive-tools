@@ -24,13 +24,13 @@ else:
     raise ValueError("CMAKE_PROJECT_NAME was not found in CMakeCache.txt")
 
 # Get the project fetch source type
-project_fetch_source_regex = '(?<=CMAKE_FETCH_SOURCE:STRING=).*'
+project_fetch_source_regex = '(?<=FETCH_SOURCE:STRING=).*'
 project_fetch_source_search = re.search(project_fetch_source_regex, cmake_contents)
 
 if project_fetch_source_search.group:
     fetch_source = project_fetch_source_search.group(0)
 else:
-    raise ValueError("CMAKE_FETCH_SOURCE was not found in CMakeCache.txt")
+    raise ValueError("FETCH_SOURCE was not found in CMakeCache.txt")
 
 # Get the sub-project source directories if the fetch type is local
 if fetch_source == "REPO":
