@@ -91,9 +91,6 @@ static_libraries = []
 # Get all of the static libraries
 static_libraries = [str(lib.resolve()) for lib in pathlib.Path(settings.CPP_BUILD_DIRECTORY).glob("**/*.a")]
 
-# Ignore all of the libraries except for the one associated with this project
-static_libaries = [sl for sl in static_libraries if ("lib" + project_name) in sl]
-
 ###################################
 # Get all of the pyx source files #
 ###################################
@@ -109,11 +106,20 @@ for source_subpath in (settings.PYTHON_SOURCE_SUBDIRECTORY, settings.CPP_SOURCE_
 
             include_dirs.append(str(dir))
 
+# Re-order the static libraries so they are in the correct include order
+if len(settings.STATIC_LIBRARY_LINKING_ORDER) != len(static_libraries):
+    raise ValueError("The expected static libraries and the detected static libraries have different sizes")
+
+ordered_static_libraries = [None for _ in static_libraries]
+for index, library in enumerate(settings.STATIC_LIBRARY_LINKING_ORDER):
+
+    ordered_static_libraries[index] = [library_path for library_path in static_libraries if ('lib' + library) in library_path][0]
+
 # Define the build configuration
 ext_modules = [Extension(project_name,
                      sources=["main.pyx"],
                      language='c++',
-                     extra_objects=static_libraries,
+                     extra_objects=ordered_static_libraries,
                      include_dirs=include_dirs,
                      extra_compile_args=[f"-std=c++{cxx_standard}"],
                      extra_link_args=[f"-std=c++{cxx_standard}"]
