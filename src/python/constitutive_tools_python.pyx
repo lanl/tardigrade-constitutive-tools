@@ -121,3 +121,61 @@ def py_decomposeGreenLagrangeStrain(np.ndarray greenLagrangeStrain):
     isochoricGreenLagrangeStrain = map_vector_to_1D_array(c_isochoricGreenLagrangeStrain)
 
     return isochoricGreenLagrangeStrain, c_volumetricGreenLagrangeStrain
+
+def py_midpointEvolution(Dt, np.ndarray Ap, np.ndarray DApDt, np.ndarray DADt, np.ndarray alpha,
+                         compute_jacobians=False):
+    """
+    Wrapper for the c++ function constitutiveTools::midpointEvolution that computes the integration of a
+    function using an implicit midpoint rule
+
+    :param float Dt: The change in time
+    :param np.ndarray Ap: The previous value of the vector
+    :param np.ndarray DApDt: The time rate of change of the vector at the previous timestep
+    :param np.ndarray DADt: The time rate of change of the vector at the current timestep
+    :param np.ndarray alpha: The vector of integration parameters
+    :param bool compute_jacobians: A flag indicating if the Jacobians should be computed
+
+    :returns: The updated value of A and, if compute_jacobians is True, the Jacobian w.r.t. the current
+        time rate of change of A
+
+    :rtype: np.ndarray and, if compute_jacobians is True, np.ndarray
+    """
+
+    cdef double c_Dt = Dt
+    cdef vector[double] c_Ap = map_1D_array_to_vector(Ap)
+    cdef vector[double] c_DApDt = map_1D_array_to_vector(DApDt)
+    cdef vector[double] c_DADt = map_1D_array_to_vector(DADt)
+    cdef vector[double] c_alpha = map_1D_array_to_vector(alpha)
+    cdef vector[double] c_A
+    cdef error_tools_python.Node *error
+
+    cdef vector[vector[double]] c_DADADT
+
+    cdef np.ndarray A
+    cdef np.ndarray DADADT
+
+    if compute_jacobians:
+
+        error = constitutive_tools_python.midpointEvolution(c_Dt, c_Ap, c_DApDt, c_DADt, c_A, c_DADADT, alpha)
+
+        if error:
+            error.c_print(True)
+            raise ValueError("Error in the midpoint evolution function")
+
+        A = map_vector_to_1D_array(c_A)
+
+        DADADT = map_matrix_to_2D_array(c_DADADT)
+
+        return A, DADADT
+
+    else:
+
+        error = constitutive_tools_python.midpointEvolution(c_Dt, c_Ap, c_DApDt, c_DADt, c_A, alpha)
+
+        if error:
+            error.c_print(True)
+            raise ValueError("Error in the midpoint evolution function")
+
+        A = map_vector_to_1D_array(c_A)
+
+        return A
