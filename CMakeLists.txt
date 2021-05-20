@@ -21,39 +21,47 @@ set(EIGEN_DIR ${EIGEN3_INCLUDE_DIR} CACHE PATH "The path to the eigen include di
 # Add the cmake folder to locate the FindSphinx module
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
-# Find related, but external, projects
-
-# Set a variable indicating if the other projects should come from the git repository or a local source
-set(FETCH_SOURCE "REPO" CACHE STRING "The source of the external projects. Options are REPO and LOCAL if LOCAL then the paths must be defined")
-set(ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of error_tools")
-set(VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_tools")
-
-# TODO: Decide how to handle master/dev build differences. bash env variables for GIT TAG?
-include(FetchContent)
-if(FETCH_SOURCE STREQUAL "REPO")
-    FetchContent_Declare(
-        error_tools
-        GIT_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/error_tools.git
-        GIT_TAG        origin/dev
-    )
-    FetchContent_Declare(
-        vector_tools
-        GIT_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/vector_tools.git
-        GIT_TAG        origin/dev
-    )
-elseif(FETCH_SOURCE STREQUAL "LOCAL")
-    FetchContent_Declare(
-        error_tools
-        SOURCE_DIR ${ERROR_TOOLS_PATH}
-    )
-    FetchContent_Declare(
-        vector_tools
-        SOURCE_DIR ${VECTOR_TOOLS_PATH}
-    )
-else()
-    message(FATAL_ERROR "Fetch source ${FETCH_SOURCE} is not recognized. Options are REPO and LOCAL")
+# Find related, but external, projects in installed environment
+find_package(error_tools CONFIG)
+if(error_tools_FOUND)
+    message(STATUS "Found error_tools: ${error_tools_INCLUDE_DIR}")
 endif()
-FetchContent_MakeAvailable(error_tools vector_tools)
+find_package(vector_tools CONFIG)
+if(vector_tools_FOUND)
+    message(STATUS "Found vector_tools: ${vector_tools_INCLUDE_DIR}")
+endif()
+
+## Find related, but external, projects using FetchContent and building locally
+## Set a variable indicating if the other projects should come from the git repository or a local source
+#set(FETCH_SOURCE "REPO" CACHE STRING "The source of the external projects. Options are REPO and LOCAL if LOCAL then the paths must be defined")
+#set(ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of error_tools")
+#set(VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_tools")
+## TODO: Decide how to handle master/dev build differences. bash env variables for GIT TAG?
+#include(FetchContent)
+#if(FETCH_SOURCE STREQUAL "REPO")
+#    FetchContent_Declare(
+#        error_tools
+#        GIT_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/error_tools.git
+#        GIT_TAG        origin/dev
+#    )
+#    FetchContent_Declare(
+#        vector_tools
+#        GIT_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/vector_tools.git
+#        GIT_TAG        origin/dev
+#    )
+#elseif(FETCH_SOURCE STREQUAL "LOCAL")
+#    FetchContent_Declare(
+#        error_tools
+#        SOURCE_DIR ${ERROR_TOOLS_PATH}
+#    )
+#    FetchContent_Declare(
+#        vector_tools
+#        SOURCE_DIR ${VECTOR_TOOLS_PATH}
+#    )
+#else()
+#    message(FATAL_ERROR "Fetch source ${FETCH_SOURCE} is not recognized. Options are REPO and LOCAL")
+#endif()
+#FetchContent_MakeAvailable(error_tools vector_tools)
 
 # Add project source directories
 add_subdirectory("src/cpp")
