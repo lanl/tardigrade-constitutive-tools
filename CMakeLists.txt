@@ -9,9 +9,11 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 configure_file("src/cpp/config.h.in" "${PROJECT_BINARY_DIR}/config.h")
 
 # Find eigen
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} $ENV{HOME}/.local $ENV{HOME}/local/ $ENV{HOME})
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 include_directories(${EIGEN3_INCLUDE_DIR})
+if(EIGEN3_FOUND)
+    message(STATUS "Found Eigen3: ${EIGEN3_INCLUDE_DIR}")
+endif()
 
 # Save the eigen directory for use in the python interface
 set(EIGEN_DIR ${EIGEN3_INCLUDE_DIR} CACHE PATH "The path to the eigen include directory")

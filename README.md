@@ -9,93 +9,65 @@ extraneous things.
 Note: In order to use the Intel compiler one must run the following command in a
 bash prompt:
 
-```
-source /apps/intel2016/bin/ifortvars.sh -arch intel64 -platform linux
-```
+    source /apps/intel2016/bin/ifortvars.sh -arch intel64 -platform linux
 
 This is the same command that the abaqus command issues. It may be that
 this command will change on different platforms.
 
 ---
 
----
-
 ## Dependencies:
+
+### Compilers
+
+* c++11 compiler (listed version number has been tested at some point)
+
+  * g++ >= GNU 4.8.5
 
 ### Executables
 
-* CMake >= 3.14
-* Doxygen >= 1.8.5
+* [CMake](https://cmake.org/cmake/help/v3.14/) >= 3.14
+* [Doxygen](https://www.doxygen.nl/manual/docblocks.html) >= 1.8.5
+* [LaTeX](https://www.latex-project.org/help/documentation/) >= 2017
 
 ### Python Modules (for documentation)
 
-* Sphinx >= 3.0.4
-* Breathe >= 4.18.1
-* sphinx\_rtd\_theme >= 0.4.3
-
 For convenience, the minimal Python environment requirements for the
-documentation build are included in ``environment.yaml`` and
-``requirements.txt``. A minimal anaconda environment for building the
-documentation can be created from an existing anaconda installation with the
-following commands.
+documentation build are included in ``configuration_files/environment.yaml``.
+This file was created from the [pipreqs](https://github.com/bndr/pipreqs)
+command line tool and Sphinx configuration inspection, e.g. the extension
+packages.
 
-```
-$ conda env create --file environment.yaml
-```
+    $ pwd
+    path/to/cpp_stub/
+    $ pipreqs --use-local --print --no-pin .
 
-### Libraries
+A minimal anaconda environment for building the documentation can be created
+from an existing anaconda installation with the following commands.
 
-* eigen >= 3.3.7
-* BOOST >= 1.53.0
+    $ conda env create --file environment.yaml
+
+You can learn more about Anaconda Python environment creation and management in
+the [Anaconda
+Documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)
+
+### C++ Libraries
+
+> **NOTE: Non-admin installations for Eigen and Boost are no longer required.** This project is built and deployed
+> against C++ libraries managed in Conda. See the Conda environment file and README discussion for non-admin environment
+> management.
+
+* [Eigen](https://eigen.tuxfamily.org/dox/) >= 3.3.7
+* [BOOST](https://www.boost.org/doc/libs/1_53_0/) >= 1.53.0
+
+### "Internal" project libraries
+
 * error\_tools: https://xcp-stash.lanl.gov/projects/MM/repos/error_tools
 * vector\_tools: https://xcp-stash.lanl.gov/projects/MM/repos/vector_tools
-
-#### "Internal" project libraries
 
 All of the ``{error,vector}_tools`` libraries are pulled from their git repos by
 branch name and built with their respective cmake files as part of the cmake
 build for this project.
-
-#### Eigen
-
-https://gitlab.com/libeigen/eigen
-
-Eigen must be "installed" following the ``eigen/INSTALL`` instructions. The
-Eigen dependence is easiest to resolve if eigen is installed in the default
-install directory.  However, if you don't have admin privileges, you can also
-insall Eigen to your home directory in ``~/include`` (or possibly in
-``~/.local/include``, but this is untested by this project).
-
-#### Non-admin Eigen install for constitutive_tools
-[Reference](https://unix.stackexchange.com/questions/36871/where-should-a-local-executable-be-placed)
-
-```
-# sstelmo
-ssh -X sstelmo.lanl.gov
-# (OPTIONAL) source Intel compilers. c++/g++ compilers from GNU 4.8.5 also work.
-source /apps/intel2016/bin/ifortvars.sh -arch intel64 -platform linux
-# Create personal include file directory
-$ pwd
-/home/$USER
-$ mkdir .local/include
-# Move to repository directory
-$ cd /preferred/path/to/repos
-# Example
-$ pwd
-/projects/$USER/e13repos
-# Clone eigen
-$ git clone https://gitlab.com/libeigen/eigen.git
-$ cd eigen
-$ git checkout 3.3.7
-# Build eigen
-$ mkdir build
-$ cd build
-$ export CXX=$(command -v icpc) # OPTIONAL
-$ cmake3 .. -DCMAKE_INSTALL_PREFIX=$HOME/.local
-$ make install
-```
-
----
 
 ---
 
@@ -115,39 +87,31 @@ testing.
 
 1) Activate a [W-13 Python Environment](https://xcp-confluence.lanl.gov/display/PYT/The+W-13+Python+3+environment)
 
-```
-$ module load python/2019.10-python-3.7
-$ sv3r
-```
+       $ module load python/2019.10-python-3.7
+       $ sv3r
 
 2) Build everything
 
-```
-$ pwd
-/path/to/constitutive_tools/
-
-# Just perform the build
-./new_build.sh
-
-# Build and perform tests
-./jenkins_build.sh
-```
+       $ pwd
+       /path/to/constitutive_tools/
+       
+       # Just perform the build
+       ./new_build.sh
+       
+       # Build and perform tests
+       ./jenkins_build.sh
 
 3) View test results
 
-```
-cat build/src/cpp/tests/results.tex
-```
+       cat build/src/cpp/tests/results.tex
 
 4) Display docs
 
-```
-# Sphinx
-firefox build/docs/sphinx/index.html &
-
-# Doxygen
-firefox build/docs/doxygen/html/index.html &
-```
+       # Sphinx
+       firefox build/docs/sphinx/index.html &
+       
+       # Doxygen
+       firefox build/docs/doxygen/html/index.html &
 
 ### Local development
 
@@ -159,32 +123,27 @@ built.
 
 1) Activate a [W-13 Python Environment](https://xcp-confluence.lanl.gov/display/PYT/The+W-13+Python+3+environment)
 
-```
-$ module load python/2019.10-python-3.7
-$ sv3r
-```
+       $ module load python/2019.10-python-3.7
+       $ sv3r
 
 2) Define convenience environment variables
-$ my_error_tools=/path/to/my/error_tools
-$ my_vector_tools=/path/to/my/vector_tools
+
+       $ my_error_tools=/path/to/my/error_tools
+       $ my_vector_tools=/path/to/my/vector_tools
 
 3) Perform the initial configuration
 
-```
-$ pwd
-/path/to/constitutive_tools
-$ mkdir build
-$ cd build
-$ cmake .. -DFETCH_SOURCE=LOCAL -DERROR_TOOLS_PATH=${my_error_tools} -DVECTOR_TOOLS_PATH=${my_vector_tools}
-```
+       $ pwd
+       /path/to/constitutive_tools
+       $ mkdir build
+       $ cd build
+       $ cmake .. -DFETCH_SOURCE=LOCAL -DERROR_TOOLS_PATH=${my_error_tools} -DVECTOR_TOOLS_PATH=${my_vector_tools}
 
 4) Building the library
 
-```
-$ pwd
-/path/to/constitutive_tools/build
-$ make
-```
+       $ pwd
+       /path/to/constitutive_tools/build
+       $ make
 
 ### Building the documentation
 
@@ -192,45 +151,33 @@ To build just the documentation pick up the steps here:
 
 2) Create the build directory and move there
 
-```
-$ pwd
-/path/to/constitutive_tools/
-$ mkdir build/
-$ cd build/
-```
+       $ pwd
+       /path/to/constitutive_tools/
+       $ mkdir build/
+       $ cd build/
 
 3) Run cmake3 configuration
 
-```
-$ pwd
-/path/to/constitutive_tools/build/
-$ cmake3 ..
-```
+       $ pwd
+       /path/to/constitutive_tools/build/
+       $ cmake3 ..
 
 4) Build the docs
 
-```
-$ cmake3 --build docs
-```
+       $ cmake3 --build docs
 
 5) Documentation builds to:
 
-```
-constitutive_tools/build/docs/sphinx/index.html
-```
+       constitutive_tools/build/docs/sphinx/index.html
 
 6) Display docs
 
-```
-$ pwd
-/path/to/constitutive_tools/build/
-$ firefox docs/sphinx/index.html &
-```
+       $ pwd
+       /path/to/constitutive_tools/build/
+       $ firefox docs/sphinx/index.html &
 
 7) While the Sphinx API is still a WIP, try the doxygen API
 
-```
-$ pwd
-/path/to/constitutive_tools/build/
-$ firefox docs/doxygen/html/index.html &
-```
+       $ pwd
+       /path/to/constitutive_tools/build/
+       $ firefox docs/doxygen/html/index.html &
