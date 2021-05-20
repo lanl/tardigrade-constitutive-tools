@@ -30,6 +30,7 @@ find_package(vector_tools CONFIG)
 if(vector_tools_FOUND)
     message(STATUS "Found vector_tools: ${vector_tools_INCLUDE_DIR}")
 endif()
+include_directories(/projects/python/beta/include)
 
 ## Find related, but external, projects using FetchContent and building locally
 ## Set a variable indicating if the other projects should come from the git repository or a local source
