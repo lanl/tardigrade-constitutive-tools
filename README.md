@@ -9,9 +9,7 @@ extraneous things.
 Note: In order to use the Intel compiler one must run the following command in a
 bash prompt:
 
-```
-source /apps/intel2016/bin/ifortvars.sh -arch intel64 -platform linux
-```
+    source /apps/intel2016/bin/ifortvars.sh -arch intel64 -platform linux
 
 This is the same command that the abaqus command issues. It may be that
 this command will change on different platforms.
@@ -89,39 +87,31 @@ testing.
 
 1) Activate a [W-13 Python Environment](https://xcp-confluence.lanl.gov/display/PYT/The+W-13+Python+3+environment)
 
-```
-$ module load python/2019.10-python-3.7
-$ sv3r
-```
+       $ module load python/2019.10-python-3.7
+       $ sv3r
 
 2) Build everything
 
-```
-$ pwd
-/path/to/constitutive_tools/
-
-# Just perform the build
-./new_build.sh
-
-# Build and perform tests
-./jenkins_build.sh
-```
+       $ pwd
+       /path/to/constitutive_tools/
+       
+       # Just perform the build
+       ./new_build.sh
+       
+       # Build and perform tests
+       ./jenkins_build.sh
 
 3) View test results
 
-```
-cat build/src/cpp/tests/results.tex
-```
+       cat build/src/cpp/tests/results.tex
 
 4) Display docs
 
-```
-# Sphinx
-firefox build/docs/sphinx/index.html &
-
-# Doxygen
-firefox build/docs/doxygen/html/index.html &
-```
+       # Sphinx
+       firefox build/docs/sphinx/index.html &
+       
+       # Doxygen
+       firefox build/docs/doxygen/html/index.html &
 
 ### Local development
 
@@ -133,32 +123,27 @@ built.
 
 1) Activate a [W-13 Python Environment](https://xcp-confluence.lanl.gov/display/PYT/The+W-13+Python+3+environment)
 
-```
-$ module load python/2019.10-python-3.7
-$ sv3r
-```
+       $ module load python/2019.10-python-3.7
+       $ sv3r
 
 2) Define convenience environment variables
-$ my_error_tools=/path/to/my/error_tools
-$ my_vector_tools=/path/to/my/vector_tools
+
+       $ my_error_tools=/path/to/my/error_tools
+       $ my_vector_tools=/path/to/my/vector_tools
 
 3) Perform the initial configuration
 
-```
-$ pwd
-/path/to/constitutive_tools
-$ mkdir build
-$ cd build
-$ cmake .. -DFETCH_SOURCE=LOCAL -DERROR_TOOLS_PATH=${my_error_tools} -DVECTOR_TOOLS_PATH=${my_vector_tools}
-```
+       $ pwd
+       /path/to/constitutive_tools
+       $ mkdir build
+       $ cd build
+       $ cmake .. -DFETCH_SOURCE=LOCAL -DERROR_TOOLS_PATH=${my_error_tools} -DVECTOR_TOOLS_PATH=${my_vector_tools}
 
 4) Building the library
 
-```
-$ pwd
-/path/to/constitutive_tools/build
-$ make
-```
+       $ pwd
+       /path/to/constitutive_tools/build
+       $ make
 
 ### Building the documentation
 
@@ -166,45 +151,33 @@ To build just the documentation pick up the steps here:
 
 2) Create the build directory and move there
 
-```
-$ pwd
-/path/to/constitutive_tools/
-$ mkdir build/
-$ cd build/
-```
+       $ pwd
+       /path/to/constitutive_tools/
+       $ mkdir build/
+       $ cd build/
 
 3) Run cmake3 configuration
 
-```
-$ pwd
-/path/to/constitutive_tools/build/
-$ cmake3 ..
-```
+       $ pwd
+       /path/to/constitutive_tools/build/
+       $ cmake3 ..
 
 4) Build the docs
 
-```
-$ cmake3 --build docs
-```
+       $ cmake3 --build docs
 
 5) Documentation builds to:
 
-```
-constitutive_tools/build/docs/sphinx/index.html
-```
+       constitutive_tools/build/docs/sphinx/index.html
 
 6) Display docs
 
-```
-$ pwd
-/path/to/constitutive_tools/build/
-$ firefox docs/sphinx/index.html &
-```
+       $ pwd
+       /path/to/constitutive_tools/build/
+       $ firefox docs/sphinx/index.html &
 
 7) While the Sphinx API is still a WIP, try the doxygen API
 
-```
-$ pwd
-/path/to/constitutive_tools/build/
-$ firefox docs/doxygen/html/index.html &
-```
+       $ pwd
+       /path/to/constitutive_tools/build/
+       $ firefox docs/doxygen/html/index.html &
