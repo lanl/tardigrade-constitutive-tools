@@ -38,7 +38,7 @@ foreach(package ${upstream_packages})
     if(${package}_FOUND)
         message(STATUS "Found ${package}: ${${package}_DIR}")
     else()
-        message(WARNING "Did not find ${package} package")
+        message(WARNING "Did not find an installed ${package} package")
     endif()
 endforeach(package)
 
