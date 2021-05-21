@@ -30,6 +30,7 @@ set(upstream_required "")
 if(cmake_build_type_lower STREQUAL "release")
     set(upstream_required "REQUIRED")
 endif()
+
 # Find related, but external, projects in installed environment
 set(upstream_packages "error_tools" "vector_tools")
 foreach(package ${upstream_packages})
