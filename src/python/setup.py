@@ -63,6 +63,7 @@ else:
 ###############################
 # Get the include directories #
 ###############################
+# FIXME: use the installed upstream packages for the "include_dirs" whenever possible
 
 include_dirs = [numpy.get_include(), settings.CPP_SOURCE_DIRECTORY]
 
@@ -73,6 +74,7 @@ include_dirs.append(return_group_or_error(eigen_regex, cmake_cache_contents))
 ############################
 # Get the static libraries #
 ############################
+# FIXME: use the installed upstream packages for the "ordered_static_libraries" whenever possible
 
 static_libraries = []
 

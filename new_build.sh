@@ -9,13 +9,21 @@ set -Eeuxo pipefail
 script=`basename "$0"`
 
 # Parse arguments
-if [ "$#" -ne 1 ]; then
+if [ "$#" -lt 1 ]; then
     echo "${script} USAGE:"
     echo "./${script} CXX_compiler"
     echo "    CXX_compiler: desired c++ compiler"
+    echo "    CMAKE_BUILD_TYPE: cmake build type string"
     exit 1
 fi
 cxx_path=$1  # Path to CXX compiler
+cmake_build_type='None'
+if [ "$#" -ge 2 ]; then
+    cmake_build_type=$2
+fi
+if [ "$#" -gt 2 ]; then
+    echo "I only know how to use the first two arguments"
+fi
 
 # Verify compiler command and set CXX env variable
 if [ -x "$(command -v ${cxx_path})" ]; then
@@ -44,5 +52,5 @@ fi
 rm -rf build/
 mkdir build
 cd build
-${cmake_exec} ..
+${cmake_exec} .. -DCMAKE_BUILD_TYPE=${cmake_build_type}
 ${cmake_exec} --build . --verbose
