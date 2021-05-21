@@ -22,7 +22,7 @@ def return_group_or_error(regex, contents):
     if search_results:
         return search_results.group(0).strip()
     else:
-        raise ValueError(f"'{regex}' pattern not found in string contents")
+        raise ValueError(f"'{regex}' pattern not found in CMake string contents")
 
 # Search operations on the cmake lists file
 # Open the project root CMake configuration file

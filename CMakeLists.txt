@@ -28,6 +28,12 @@ if(cmake_build_type_lower STREQUAL "release")
     set(upstream_required "REQUIRED")
 endif()
 
+# Set a variable indicating if upstream projects should come from the git repository or a local source
+include(FetchContent)
+set(FETCH_SOURCE "REPO" CACHE STRING "The source of the external projects. Options are REPO and LOCAL if LOCAL then the paths must be defined")
+set(ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of error_tools")
+set(VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_tools")
+
 # Find related, but external, projects in installed environment
 set(upstream_packages "error_tools" "vector_tools")
 foreach(package ${upstream_packages})
@@ -35,44 +41,26 @@ foreach(package ${upstream_packages})
     if(${package}_FOUND)
         message(STATUS "Found ${package}: ${${package}_DIR}")
     else()
-        message(WARNING "Did not find an installed ${package} package")
+        # Find related, but external, projects using FetchContent and building locally
+        message(WARNING "Did not find an installed ${package} package. Attempting local build.")
+        # TODO: Decide how to handle master/dev build differences. bash env variables for GIT TAG?
+        if(FETCH_SOURCE STREQUAL "REPO")
+            FetchContent_Declare(
+                ${pacakage} 
+                GIT_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/${package}.git
+                GIT_TAG        origin/dev
+            )
+        elseif(FETCH_SOURCE STREQUAL "LOCAL")
+            FetchContent_Declare(
+                ${package} 
+                SOURCE_DIR ${${error_tools_PATH}
+            )
+        else()
+            message(FATAL_ERROR "Fetch source ${FETCH_SOURCE} is not recognized. Options are REPO and LOCAL")
+        endif()
+        FetchContent_MakeAvailable(${package})
     endif()
 endforeach(package)
-
-# Find related, but external, projects using FetchContent and building locally
-if(NOT error_tools_FOUND AND NOT vector_tools_FOUND)
-    message(STATUS "Upstream package(s) not found. Attempting local dependencies build(s).")
-    # Set a variable indicating if the other projects should come from the git repository or a local source
-    set(FETCH_SOURCE "REPO" CACHE STRING "The source of the external projects. Options are REPO and LOCAL if LOCAL then the paths must be defined")
-    set(ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of error_tools")
-    set(VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_tools")
-    # TODO: Decide how to handle master/dev build differences. bash env variables for GIT TAG?
-    include(FetchContent)
-    if(FETCH_SOURCE STREQUAL "REPO")
-        FetchContent_Declare(
-            error_tools
-            GIT_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/error_tools.git
-            GIT_TAG        origin/dev
-        )
-        FetchContent_Declare(
-            vector_tools
-            GIT_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/vector_tools.git
-            GIT_TAG        origin/dev
-        )
-    elseif(FETCH_SOURCE STREQUAL "LOCAL")
-        FetchContent_Declare(
-            error_tools
-            SOURCE_DIR ${ERROR_TOOLS_PATH}
-        )
-        FetchContent_Declare(
-            vector_tools
-            SOURCE_DIR ${VECTOR_TOOLS_PATH}
-        )
-    else()
-        message(FATAL_ERROR "Fetch source ${FETCH_SOURCE} is not recognized. Options are REPO and LOCAL")
-    endif()
-    FetchContent_MakeAvailable(error_tools vector_tools)
-endif()
 
 # Add project source directories
 add_subdirectory("src/cpp")
