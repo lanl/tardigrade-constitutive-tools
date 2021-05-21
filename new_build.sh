@@ -1,6 +1,6 @@
 # USAGE:
 #
-# ./new_build.sh CXX_compiler
+# ./new_build.sh cxx_path cmake_build_type
 
 # Make bash script more like high-level languages.
 set -Eeuxo pipefail
@@ -9,21 +9,15 @@ set -Eeuxo pipefail
 script=`basename "$0"`
 
 # Parse arguments
-if [ "$#" -lt 1 ]; then
+if [ "$#" -ne 2 ]; then
     echo "${script} USAGE:"
-    echo "./${script} CXX_compiler"
-    echo "    CXX_compiler: desired c++ compiler"
-    echo "    CMAKE_BUILD_TYPE: cmake build type string"
+    echo "./${script} cxx_path cmake_build_type"
+    echo "    cxx_path: desired c++ compiler"
+    echo "    cmake_build_type: string for the CMake config -DCMAKE_BUILD_TYPE=<string> option"
     exit 1
 fi
 cxx_path=$1  # Path to CXX compiler
-cmake_build_type='None'
-if [ "$#" -ge 2 ]; then
-    cmake_build_type=$2
-fi
-if [ "$#" -gt 2 ]; then
-    echo "I only know how to use the first two arguments"
-fi
+cmake_build_type=$2
 
 # Verify compiler command and set CXX env variable
 if [ -x "$(command -v ${cxx_path})" ]; then
