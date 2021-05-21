@@ -54,7 +54,7 @@ if ${master}; then
 # TODO: setup common code for determining version number per branch
 fi
 
-# Build project release version
+# Build project
 ./BUILD.sh
 
 # Install project into conda environment by expected whl name.
