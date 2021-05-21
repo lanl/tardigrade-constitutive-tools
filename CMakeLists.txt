@@ -5,9 +5,6 @@ enable_testing()
 # Make the code position independent
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# Configure version
-configure_file("src/cpp/config.h.in" "${PROJECT_BINARY_DIR}/config.h")
-
 # Find eigen
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 include_directories(${EIGEN3_INCLUDE_DIR})
