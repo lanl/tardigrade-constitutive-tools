@@ -18,7 +18,7 @@ set(EIGEN_DIR ${EIGEN3_INCLUDE_DIR} CACHE PATH "The path to the eigen include di
 # Add the cmake folder to locate the FindSphinx module
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
-# Set build type checks 
+# Set build type checks
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "None")
 endif()
@@ -42,17 +42,17 @@ foreach(package ${upstream_packages})
         message(STATUS "Found ${package}: ${${package}_DIR}")
     else()
         # Find related, but external, projects using FetchContent and building locally
-        message(WARNING "Did not find an installed ${package} package. Attempting local build.")
+        message(WARNING "Did not find an installed ${package} package. Attempting local build with FetchContent.")
         # TODO: Decide how to handle master/dev build differences. bash env variables for GIT TAG?
         if(FETCH_SOURCE STREQUAL "REPO")
             FetchContent_Declare(
-                ${pacakage} 
+                ${package}
                 GIT_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/${package}.git
                 GIT_TAG        origin/dev
             )
         elseif(FETCH_SOURCE STREQUAL "LOCAL")
             FetchContent_Declare(
-                ${package} 
+                ${package}
                 SOURCE_DIR ${${error_tools_PATH}
             )
         else()
