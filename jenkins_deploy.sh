@@ -55,6 +55,8 @@ if ${master}; then
 fi
 
 # Build project release version
+# FIXME: When the Python/Cython build uses the installed upstream package include/library directories
+# Re-write BUILD to use this command and revert the build execution command to './BUILD.sh' here.
 ./new_build.sh c++ Release
 
 # Install project into conda environment by expected whl name.
