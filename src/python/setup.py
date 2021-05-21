@@ -50,7 +50,7 @@ fetch_source = return_group_or_error(project_fetch_source_regex, cmake_cache_con
 if fetch_source == "REPO":
     local_libraries = [settings.CPP_BUILD_DIRECTORY]
     library_search_string = "**/*-src*/"
-    
+
 elif fetch_source == "LOCAL":
     local_libraries = []
     library_search_string = "**/"
@@ -63,7 +63,7 @@ else:
 ###############################
 # Get the include directories #
 ###############################
-# FIXME: use the installed upstream packages for the "include_dirs" whenever possible
+# FIXME: VIP-648 - use the installed upstream packages for the "include_dirs" whenever possible
 
 include_dirs = [numpy.get_include(), settings.CPP_SOURCE_DIRECTORY]
 
@@ -74,7 +74,7 @@ include_dirs.append(return_group_or_error(eigen_regex, cmake_cache_contents))
 ############################
 # Get the static libraries #
 ############################
-# FIXME: use the installed upstream packages for the "ordered_static_libraries" whenever possible
+# FIXME: VIP-648 - use the installed upstream packages for the "ordered_static_libraries" whenever possible
 
 static_libraries = []
 

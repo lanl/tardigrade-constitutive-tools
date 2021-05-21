@@ -31,7 +31,9 @@ set -Eeuxo pipefail
 conda info
 
 # Clean and build project
-./BUILD.sh
+# FIXME: VIP-648 - When the Python/Cython build uses the installed upstream
+# package include/library directories revert the build command to './BUILD.sh'
+./new_build.sh c++ None
 
 # Run project tests
 ./TEST.sh
