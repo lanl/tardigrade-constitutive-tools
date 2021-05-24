@@ -73,7 +73,7 @@ foreach(package ${upstream_packages})
         elseif(FETCH_SOURCE STREQUAL "LOCAL")
             FetchContent_Declare(
                 ${package}
-                SOURCE_DIR ${${error_tools_PATH}
+                SOURCE_DIR ${${package}_PATH}
             )
         else()
             message(FATAL_ERROR "Fetch source ${FETCH_SOURCE} is not recognized. Options are REPO and LOCAL")
