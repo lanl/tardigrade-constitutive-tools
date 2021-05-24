@@ -7,7 +7,7 @@ target_compile_options(${PROJECT_NAME} PUBLIC
 
 # Local builds of upstream projects require local include paths
 if(NOT cmake_build_type_lower STREQUAL "release")
-    target_include_directories(${PROJECT_NAME} PRIVATE
+    target_include_directories(${PROJECT_NAME} PUBLIC
                                "${error_tools_SOURCE_DIR}/src/cpp"
                                "${vector_tools_SOURCE_DIR}/src/cpp")
 endif()

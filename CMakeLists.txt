@@ -108,9 +108,12 @@ configure_package_config_file(
   INSTALL_DESTINATION
   ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
 
-install(EXPORT ${PROJECT_NAME}_Targets
-        FILE ${PROJECT_NAME}Targets.cmake
-        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
+# CMake won't build the targets for local builds of upstream projects
+if(cmake_build_type_lower STREQUAL release)
+    install(EXPORT ${PROJECT_NAME}_Targets
+            FILE ${PROJECT_NAME}Targets.cmake
+            DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
+endif()
 
 install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
               "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
