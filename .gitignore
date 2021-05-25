@@ -1,3 +1,17 @@
 *.swp
 *.o
+*.so
+*.nfs*
 build*/
+*_results.tex
+
+# Python
+*.coverage*
+htmlcov/
+tests/htmlcov/
+__pycache__/
+cobertura.xml
+test_results.xml
+
+# Cython
+src/python/main.cpp

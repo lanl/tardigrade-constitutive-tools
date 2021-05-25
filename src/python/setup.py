@@ -10,81 +10,71 @@ from Cython.Distutils import build_ext
 import settings
 
 
-# Search operations on the cmake lists file
+def return_group_or_error(regex, contents):
+    """
+    Return a regex group or raise a ValueError
 
+    :param str regex: the Python 3 re module regex
+    :param str contents: the string to search for the regex group
+    :returns: string of regex group
+    """
+    search_results = re.search(regex, contents)
+    if search_results:
+        return search_results.group(0).strip()
+    else:
+        raise ValueError(f"'{regex}' pattern not found in CMake string contents")
+
+# Search operations on the cmake lists file
+# Open the project root CMake configuration file
 with open(settings.PROJECT_CMAKE_FILE, 'r') as cmake_lists_file:
     cmake_lists_contents = cmake_lists_file.read()
 
 # Get the CXX standard
 project_cxx_std_regex = '(?<=CMAKE_CXX_STANDARD)(.*)(?=\))'
-project_cxx_std_search = re.search(project_cxx_std_regex, cmake_lists_contents)
-
-if project_cxx_std_search:
-    cxx_standard = project_cxx_std_search.group(0).strip()
-else:
-    raise ValueError("CMAKE_CXX_STANDARD was not found in CMakeLists.txt")
+cxx_standard = return_group_or_error(project_cxx_std_regex, cmake_lists_contents)
 
 # Search operations on the cmake cache file
-
 # Open the project cmake cache
 with open(settings.PROJECT_CMAKE_CACHE, 'r') as cmake_cache_file:
     cmake_cache_contents = cmake_cache_file.read()
 
 # Get the project name
 project_name_regex = '(?<=CMAKE_PROJECT_NAME:STATIC=).*'
-project_name_search = re.search(project_name_regex, cmake_cache_contents)
-
-if project_name_search.group:
-    project_name = project_name_search.group(0)
-else:
-    raise ValueError("CMAKE_PROJECT_NAME was not found in CMakeCache.txt")
+project_name = return_group_or_error(project_name_regex, cmake_cache_contents)
 
 # Get the project fetch source type
 project_fetch_source_regex = '(?<=FETCH_SOURCE:STRING=).*'
-project_fetch_source_search = re.search(project_fetch_source_regex, cmake_cache_contents)
-
-if project_fetch_source_search.group:
-    fetch_source = project_fetch_source_search.group(0)
-else:
-    raise ValueError("FETCH_SOURCE was not found in CMakeCache.txt")
+fetch_source = return_group_or_error(project_fetch_source_regex, cmake_cache_contents)
 
 # Get the sub-project source directories if the fetch type is local
 if fetch_source == "REPO":
     local_libraries = [settings.CPP_BUILD_DIRECTORY]
     library_search_string = "**/*-src*/"
-    
+
 elif fetch_source == "LOCAL":
     local_libraries = []
     library_search_string = "**/"
     for source_variable_name in settings.LIBRARY_SOURCE_VARIABLE_NAMES:
         regex = f'(?<={source_variable_name}:PATH=).*'
-        search = re.search(regex, cmake_cache_contents)
-
-        if search.group:
-            local_libraries.append(search.group(0))
-        else:
-            raise ValueError(f"{source_variable_name} was not found in CMakeCache.txt")
+        local_libraries.append(return_group_or_error(regex, cmake_cache_contents))
 else:
     raise ValueError(f"FETCH_SOURCE {fetch_source} not recognized")
 
 ###############################
 # Get the include directories #
 ###############################
+# FIXME: VIP-648 - use the installed upstream packages for the "include_dirs" whenever possible
 
 include_dirs = [numpy.get_include(), settings.CPP_SOURCE_DIRECTORY]
 
 # Get the Eigen library
 eigen_regex = '(?<=EIGEN_DIR:PATH=).*'
-eigen_search = re.search(eigen_regex, cmake_cache_contents)
-
-if eigen_search.group:
-    include_dirs.append(eigen_search.group(0))
-else:
-    raise ValueError("EIGEN_DIR was not found in CMakeCache.txt")
+include_dirs.append(return_group_or_error(eigen_regex, cmake_cache_contents))
 
 ############################
 # Get the static libraries #
 ############################
+# FIXME: VIP-648 - use the installed upstream packages for the "ordered_static_libraries" whenever possible
 
 static_libraries = []
 
