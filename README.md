@@ -58,7 +58,7 @@ Documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/m
 > management.
 
 * [Eigen](https://eigen.tuxfamily.org/dox/) >= 3.3.7
-* [BOOST](https://www.boost.org/doc/libs/1_53_0/) >= 1.53.0
+* [BOOST](https://www.boost.org/doc/libs/1_59_0/) >= 1.59.0
 
 ### "Internal" project libraries
 

@@ -9,9 +9,9 @@
 #include<fstream>
 #include<iostream>
 
-#define BOOST_TEST_MODULE test_vector_tools
+#define BOOST_TEST_MODULE test_constitutive_tools
 #include <boost/test/included/unit_test.hpp>
-#include <boost/test/output_test_stream.hpp>
+#include <boost/test/tools/output_test_stream.hpp>
 
 typedef constitutiveTools::errorOut errorOut;
 typedef constitutiveTools::floatType floatType;
