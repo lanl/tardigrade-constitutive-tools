@@ -96,7 +96,7 @@ testing.
        /path/to/constitutive_tools/
        
        # Just perform the build. Usage arguments are "compiler cmake_build_type"
-       ./new_build.sh c++ None
+       ./new_build.sh None
        
        # Build and perform tests
        ./jenkins_build.sh
