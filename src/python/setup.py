@@ -61,11 +61,23 @@ include_dirs.append(return_group_or_error(eigen_regex, cmake_cache_contents))
 # Get the static libraries #
 ############################
 # FIXME: VIP-648 - use the installed upstream packages for the "ordered_static_libraries" whenever possible
+# Find current project static library
+project_static_library = pathlib.Path(settings.CPP_BUILD_DIRECTORY) / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{project_name}.a"
+static_libraries = [str(project_static_library.resolve())]
 
-static_libraries = []
+# Get all of the upstream static libraries
+for upstream_project in settings.STATIC_LIBRARY_LINKING_ORDER[1:]:
+    upstream_installed = pathlib.Path(settings.CONDA_ENVIRONMENT) / f"lib/lib{upstream_project}.a"
+    upstream_insource = pathlib.Path(settings.CPP_BUILD_DIRECTORY) / f"_deps/{upstream_project}-build" / settings.CPP_SOURCE_DIRECTORY / f"lib{upstream_project}.a"
+    if upstream_installed.exists() and upstream_installed.is_file():
+        static_libraries.append(str(upstream_installed.resolve()))
+    elif upstream_insource.exists() and upstream_insource.is_file():
+        static_libraries.append(str(upstream_in_source.resolve()))
+    else:
+        raise RuntimeError(f"Could not find upstream static library from '{upstream_project}'")
 
-# Get all of the static libraries
-static_libraries = [str(lib.resolve()) for lib in pathlib.Path(settings.CPP_BUILD_DIRECTORY).glob("**/*.a")]
+import pdb
+pdb.set_trace()
 
 ###################################
 # Get all of the pyx source files #
@@ -81,15 +93,6 @@ for source_subpath in (settings.PYTHON_SOURCE_SUBDIRECTORY, settings.CPP_SOURCE_
                 continue
 
             include_dirs.append(str(dir))
-
-# Re-order the static libraries so they are in the correct include order
-if len(settings.STATIC_LIBRARY_LINKING_ORDER) != len(static_libraries):
-    raise ValueError("The expected static libraries and the detected static libraries have different sizes")
-
-ordered_static_libraries = [None for _ in static_libraries]
-for index, library in enumerate(settings.STATIC_LIBRARY_LINKING_ORDER):
-
-    ordered_static_libraries[index] = [library_path for library_path in static_libraries if ('lib' + library) in library_path][0]
 
 # Define the build configuration
 ext_modules = [Extension(project_name,

@@ -1,6 +1,7 @@
 import os
+import pathlib
 
-
+CONDA_ENVIRONMENT = pathlib.Path(os.environ['CONDA_DEFAULT_ENV'])
 ROOT_DIRECTORY = os.path.abspath(os.path.join("..", ".."))
 PROJECT_CMAKE_FILE = os.path.join(ROOT_DIRECTORY, "CMakeLists.txt")
 PYTHON_SOURCE_SUBDIRECTORY = os.path.join("src", "python")
