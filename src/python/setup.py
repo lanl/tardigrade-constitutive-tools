@@ -92,10 +92,6 @@ for upstream_project in settings.UPSTREAM_PROJECTS:
     if upstream_insource.exists() and upstream_insource.is_dir():
         include_dirs.append(upstream_insource.resolve())
 
-import pdb
-pdb.set_trace()
-
-
 # Define the build configuration
 ext_modules = [Extension(project_name,
                      sources=["main.pyx"],
