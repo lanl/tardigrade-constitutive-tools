@@ -68,7 +68,7 @@ static_libraries = [str(project_static_library.resolve())]
 # Get all of the upstream static libraries
 for upstream_project in settings.STATIC_LIBRARY_LINKING_ORDER[1:]:
     upstream_installed = pathlib.Path(settings.CONDA_ENVIRONMENT) / f"lib/lib{upstream_project}.a"
-    upstream_insource = pathlib.Path(settings.CPP_BUILD_DIRECTORY) / f"_deps/{upstream_project}-build" / settings.CPP_SOURCE_DIRECTORY / f"lib{upstream_project}.a"
+    upstream_insource = pathlib.Path(settings.CPP_BUILD_DIRECTORY) / f"_deps/{upstream_project}-build" / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{upstream_project}.a"
     if upstream_installed.exists() and upstream_installed.is_file():
         static_libraries.append(str(upstream_installed.resolve()))
     elif upstream_insource.exists() and upstream_insource.is_file():
@@ -76,29 +76,31 @@ for upstream_project in settings.STATIC_LIBRARY_LINKING_ORDER[1:]:
     else:
         raise RuntimeError(f"Could not find upstream static library from '{upstream_project}'")
 
+######################################
+# Get all of the include directories #
+######################################
+
+# Append current conda include directories
+include_dirs.append(str(settings.CONDA_ENVIRONMENT_INCLUDE))
+
+# Get all of the possible in source build include locations
+for upstream_project in settings.UPSTREAM_PROJECTS:
+    upstream_insource = pathlib.Path(settings.CPP_BUILD_DIRECTORY) / f"_deps/{upstream_project}-src" / settings.CPP_SOURCE_SUBDIRECTORY 
+    if upstream_insource.exists() and upstream_insource.is_dir():
+        include_dirs.append(upstream_insource.resolve())
+    upstream_insource = pathlib.Path(settings.CPP_BUILD_DIRECTORY) / f"_deps/{upstream_project}-src" / settings.PYTHON_SOURCE_SUBDIRECTORY
+    if upstream_insource.exists() and upstream_insource.is_dir():
+        include_dirs.append(upstream_insource.resolve())
+
 import pdb
 pdb.set_trace()
 
-###################################
-# Get all of the pyx source files #
-###################################
-
-# Get all of the include locations
-for source_subpath in (settings.PYTHON_SOURCE_SUBDIRECTORY, settings.CPP_SOURCE_SUBDIRECTORY):
-
-    for local_library in local_libraries:
-
-        for dir in pathlib.Path(local_library).glob(library_search_string + source_subpath):
-            if not dir.is_dir():
-                continue
-
-            include_dirs.append(str(dir))
 
 # Define the build configuration
 ext_modules = [Extension(project_name,
                      sources=["main.pyx"],
                      language='c++',
-                     extra_objects=ordered_static_libraries,
+                     extra_objects=static_libraries,
                      include_dirs=include_dirs,
                      extra_compile_args=[f"-std=c++{cxx_standard}"],
                      extra_link_args=[f"-std=c++{cxx_standard}"]
