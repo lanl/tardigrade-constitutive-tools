@@ -133,17 +133,17 @@ built.
        $ vector_tools=/path/to/my/vector_tools
        $ vector_tools_version=origin/dev
 
-3) Perform the initial configuration
+3) Perform the initial configuration. Note that the environment variables are mutually independent. Each variable can be
+   used alone or in arbitrary combinations. The default values are found in the root CMakeLists.txt file
 
-   > NOTE: The environment variables are mutually independent. Each variable can be used alone or in arbitrary
-   > combinations. The default values are found in the root CMakeLists.txt file
-   >
-   >    $ grep _TOOLS_ CMakeLists.txt
-   >    set(ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of error_tools")
-   >    set(ERROR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of error_tools")
-   >    set(VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_tools")
-   >    set(VECTOR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of vector_tools")
+       # View the defaults
+       $ grep _TOOLS_ CMakeLists.txt
+       set(ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of error_tools")
+       set(ERROR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of error_tools")
+       set(VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_tools")
+       set(VECTOR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of vector_tools")
 
+       $ Build against local directory paths and possible custom branch
        $ pwd
        /path/to/constitutive_tools
        $ mkdir build
