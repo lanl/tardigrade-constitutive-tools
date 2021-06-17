@@ -54,8 +54,8 @@ foreach(package ${upstream_packages})
         # Find related, but external, projects using FetchContent and building locally
         message(WARNING "Did not find an installed ${package} package. Attempting local build with FetchContent.")
         # TODO: Decide how to handle master/dev build differences. bash env variables for GIT TAG?
-        if(${package}_PATH)
-            set(PACKAGE_REPOSITORY ${${package}_PATH})
+        if(${package_upper}_PATH)
+            set(PACKAGE_REPOSITORY ${${package_upper}_PATH})
         else()
             set(PACKAGE_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/${package}.git)
         endif()
