@@ -49,8 +49,6 @@ library_search_string = "**/*-src*/"
 ###############################
 # Get the include directories #
 ###############################
-# FIXME: VIP-648 - use the installed upstream packages for the "include_dirs" whenever possible
-
 include_dirs = [numpy.get_include(), settings.CPP_SOURCE_DIRECTORY]
 
 # Get the Eigen library
@@ -60,7 +58,6 @@ include_dirs.append(return_group_or_error(eigen_regex, cmake_cache_contents))
 ############################
 # Get the static libraries #
 ############################
-# FIXME: VIP-648 - use the installed upstream packages for the "ordered_static_libraries" whenever possible
 # Find current project static library
 project_static_library = pathlib.Path(settings.CPP_BUILD_DIRECTORY) / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{project_name}.a"
 static_libraries = [str(project_static_library.resolve())]
@@ -72,18 +69,17 @@ for upstream_project in settings.STATIC_LIBRARY_LINKING_ORDER[1:]:
     if upstream_installed.exists() and upstream_installed.is_file():
         static_libraries.append(str(upstream_installed.resolve()))
     elif upstream_insource.exists() and upstream_insource.is_file():
-        static_libraries.append(str(upstream_in_source.resolve()))
+        static_libraries.append(str(upstream_insource.resolve()))
     else:
         raise RuntimeError(f"Could not find upstream static library from '{upstream_project}'")
 
-######################################
-# Get all of the include directories #
-######################################
-
-# Append current conda include directories
+###############################
+# Get the include directories #
+###############################
+# Append conda environment include directories
 include_dirs.append(str(settings.CONDA_ENVIRONMENT_INCLUDE))
 
-# Get all of the possible in source build include locations
+# Get all of the possible in-source build include locations
 for upstream_project in settings.UPSTREAM_PROJECTS:
     upstream_insource = pathlib.Path(settings.CPP_BUILD_DIRECTORY) / f"_deps/{upstream_project}-src" / settings.CPP_SOURCE_SUBDIRECTORY 
     if upstream_insource.exists() and upstream_insource.is_dir():
