@@ -94,10 +94,10 @@ testing.
 
        $ pwd
        /path/to/constitutive_tools/
-       
+
        # Just perform the build. Usage arguments are "compiler cmake_build_type"
        ./new_build.sh None
-       
+
        # Build and perform tests
        ./jenkins_build.sh
 
@@ -109,7 +109,7 @@ testing.
 
        # Sphinx
        firefox build/docs/sphinx/index.html &
-       
+
        # Doxygen
        firefox build/docs/doxygen/html/index.html &
 
@@ -128,16 +128,27 @@ built.
 
 2) Define convenience environment variables
 
-       $ my_error_tools=/path/to/my/error_tools
-       $ my_vector_tools=/path/to/my/vector_tools
+       $ error_tools=/path/to/my/error_tools
+       $ error_tools_version=origin/dev
+       $ vector_tools=/path/to/my/vector_tools
+       $ vector_tools_version=origin/dev
 
 3) Perform the initial configuration
+
+   > NOTE: The environment variables are mutually independent. Each variable can be used alone or in arbitrary
+   > combinations. The default values are found in the root CMakeLists.txt file
+   >
+   >    $ grep _TOOLS_ CMakeLists.txt
+   >    set(ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of error_tools")
+   >    set(ERROR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of error_tools")
+   >    set(VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_tools")
+   >    set(VECTOR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of vector_tools")
 
        $ pwd
        /path/to/constitutive_tools
        $ mkdir build
        $ cd build
-       $ cmake .. -DERROR_TOOLS_PATH=${my_error_tools} -DVECTOR_TOOLS_PATH=${my_vector_tools}
+       $ cmake .. -DERROR_TOOLS_PATH=${my_error_tools} -DERROR_TOOLS_GITTAG=${error_tools_version} -DVECTOR_TOOLS_PATH=${my_vector_tools} -DVECTOR_TOOLS_GITTAG=${vector_tools_version}
 
 4) Building the library
 
