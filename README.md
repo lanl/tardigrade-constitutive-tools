@@ -134,7 +134,7 @@ built.
        $ vector_tools_version=origin/dev
 
 3) Perform the initial configuration. Note that the environment variables are mutually independent. Each variable can be
-   used alone or in arbitrary combinations. The default values are found in the root CMakeLists.txt file
+   used alone or in arbitrary combinations. The default values are found in the root ``CMakeLists.txt`` file.
 
        # View the defaults
        $ grep _TOOLS_ CMakeLists.txt
