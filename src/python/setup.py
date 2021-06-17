@@ -9,30 +9,6 @@ from Cython.Distutils import build_ext
 
 import settings
 
-
-def return_group_or_error(regex, contents):
-    """
-    Return a regex group or raise a ValueError
-
-    :param str regex: the Python 3 re module regex
-    :param str contents: the string to search for the regex group
-    :returns: string of regex group
-    """
-    search_results = re.search(regex, contents)
-    if search_results:
-        return search_results.group(0).strip()
-    else:
-        raise ValueError(f"'{regex}' pattern not found in CMake string contents")
-
-# Search operations on the cmake cache file
-# Open the project cmake cache
-with open(settings.PROJECT_CMAKE_CACHE, 'r') as cmake_cache_file:
-    cmake_cache_contents = cmake_cache_file.read()
-
-# Get the sub-project source directories if the fetch type is local
-local_libraries = [settings.CPP_BUILD_DIRECTORY]
-library_search_string = "**/*-src*/"
-
 ###########################################
 # Get the third-party include directories #
 ###########################################
