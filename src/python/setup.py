@@ -29,22 +29,14 @@ def return_group_or_error(regex, contents):
 with open(settings.PROJECT_CMAKE_CACHE, 'r') as cmake_cache_file:
     cmake_cache_contents = cmake_cache_file.read()
 
-# Get the project name
-project_name_regex = '(?<=CMAKE_PROJECT_NAME:STATIC=).*'
-project_name = return_group_or_error(project_name_regex, cmake_cache_contents)
-
 # Get the sub-project source directories if the fetch type is local
 local_libraries = [settings.CPP_BUILD_DIRECTORY]
 library_search_string = "**/*-src*/"
 
-###############################
-# Get the include directories #
-###############################
-include_dirs = [numpy.get_include(), str(settings.CPP_SOURCE_DIRECTORY)]
-
-# Get the Eigen library
-eigen_regex = '(?<=EIGEN_DIR:PATH=).*'
-include_dirs.append(return_group_or_error(eigen_regex, cmake_cache_contents))
+###########################################
+# Get the third-party include directories #
+###########################################
+include_dirs = [numpy.get_include(), str(settings.CPP_SOURCE_DIRECTORY), settings.EIGEN_DIR, str(settings.CONDA_ENVIRONMENT_INCLUDE)]
 
 ############################
 # Get the static libraries #
@@ -64,11 +56,9 @@ for upstream_project in settings.STATIC_LIBRARY_LINKING_ORDER[1:]:
     else:
         raise RuntimeError(f"Could not find upstream static library from '{upstream_project}'")
 
-###############################
-# Get the include directories #
-###############################
-# Append conda environment include directories
-include_dirs.append(str(settings.CONDA_ENVIRONMENT_INCLUDE))
+################################################
+# Get the upstream project include directories #
+################################################
 
 # Get all of the possible in-source build include locations
 for upstream_project in settings.UPSTREAM_PROJECTS:
