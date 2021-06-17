@@ -59,6 +59,7 @@ foreach(package ${upstream_packages})
         else()
             set(PACKAGE_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/${package}.git)
         endif()
+        message(STATUS "Building ${package} from ${PACKAGE_REPOSITORY}")
         FetchContent_Declare(
             ${package}
             GIT_REPOSITORY ${PACKAGE_REPOSITORY}
