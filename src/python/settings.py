@@ -20,7 +20,8 @@ def return_group_or_error(regex, contents):
 
 CONDA_ENVIRONMENT = pathlib.Path(os.environ['CONDA_DEFAULT_ENV'])
 CONDA_ENVIRONMENT_INCLUDE = CONDA_ENVIRONMENT / "include"
-ROOT_DIRECTORY = pathlib.Path(".").resolve().parent.parent
+# Root directory w.r.t. python build directory, e.g. /project/build/src/python
+ROOT_DIRECTORY = pathlib.Path(".").resolve().parent.parent.parent
 CPP_BUILD_DIRECTORY = ROOT_DIRECTORY / "build"
 PROJECT_CMAKE_CACHE = CPP_BUILD_DIRECTORY / "CMakeCache.txt"
 PROJECT_CMAKE_FILE = ROOT_DIRECTORY / "CMakeLists.txt"
