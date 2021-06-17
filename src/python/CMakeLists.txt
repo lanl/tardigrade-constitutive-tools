@@ -13,3 +13,8 @@ add_custom_command(TARGET CYTHON PRE_BUILD
                    COMMAND python setup.py build_ext --inplace
                    DEPENDS ${CYTHON_SOURCE_FILES}
                   )
+# Add pytests as a ctest function for automated testing under unified CMake/CTest tools
+add_test(NAME pytest
+         COMMAND pytest --cov-report=xml:$(pwd)/cobertura.xml --cov=$(pwd)/. --cov-report=html:$(pwd)/htmlcov
+         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/${PYTHON_SRC_PATH}
+        )
