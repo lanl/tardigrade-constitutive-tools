@@ -47,7 +47,7 @@ static_libraries = [str(project_static_library.resolve())]
 
 # Get all of the upstream static libraries
 for upstream_project in settings.STATIC_LIBRARY_LINKING_ORDER[1:]:
-    upstream_installed = pathlib.Path(settings.CONDA_ENVIRONMENT) / f"lib/lib{upstream_project}.a"
+    upstream_installed = settings.CONDA_ENVIRONMENT / f"lib/lib{upstream_project}.a"
     upstream_insource = settings.CPP_BUILD_DIRECTORY / f"_deps/{upstream_project}-build" / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{upstream_project}.a"
     if upstream_installed.exists() and upstream_installed.is_file():
         static_libraries.append(str(upstream_installed.resolve()))
