@@ -46,14 +46,6 @@ set(VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_too
 # Find related, but external, projects in installed environment
 set(upstream_packages "error_tools" "vector_tools")
 foreach(package ${upstream_packages})
-    # FIXME: VIP-648 - Always search for installed upstream packages after fixing Cython build include/library paths
-    # Returning to conditional search for upstream deletes the following lines
-    #   if(upstream_required STREQUAL "REQUIRED")'
-    #   endif()
-    # And removes the indents from lines
-    #   find_package(${package} ${upstream_required} CONFIG)
-    #   if(${package}_FOUND)
-    #       message(STATUS "Found ${package}: ${${package}_DIR}")
     string(TOUPPER "${package}" package_upper)
     find_package(${package} ${upstream_required} CONFIG)
     if(${package}_FOUND)
