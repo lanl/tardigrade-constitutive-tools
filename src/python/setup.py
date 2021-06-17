@@ -24,15 +24,6 @@ def return_group_or_error(regex, contents):
     else:
         raise ValueError(f"'{regex}' pattern not found in CMake string contents")
 
-# Search operations on the cmake lists file
-# Open the project root CMake configuration file
-with open(settings.PROJECT_CMAKE_FILE, 'r') as cmake_lists_file:
-    cmake_lists_contents = cmake_lists_file.read()
-
-# Get the CXX standard
-project_cxx_std_regex = '(?<=CMAKE_CXX_STANDARD)(.*)(?=\))'
-cxx_standard = return_group_or_error(project_cxx_std_regex, cmake_lists_contents)
-
 # Search operations on the cmake cache file
 # Open the project cmake cache
 with open(settings.PROJECT_CMAKE_CACHE, 'r') as cmake_cache_file:
@@ -94,8 +85,8 @@ ext_modules = [Extension(settings.PROJECT_NAME,
                      language='c++',
                      extra_objects=static_libraries,
                      include_dirs=include_dirs,
-                     extra_compile_args=[f"-std=c++{cxx_standard}"],
-                     extra_link_args=[f"-std=c++{cxx_standard}"]
+                     extra_compile_args=[f"-std=c++{settings.CXX_STANDARD}"],
+                     extra_link_args=[f"-std=c++{settings.CXX_STANDARD}"]
                      )]
 
 setup(
