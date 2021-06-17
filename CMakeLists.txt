@@ -57,7 +57,7 @@ foreach(package ${upstream_packages})
         if(${package}_PATH)
             set(PACKAGE_REPOSITORY ${${package}_PATH})
         else()
-            set(PACKAGE_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/${package}.git})
+            set(PACKAGE_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/${package}.git)
         endif()
         FetchContent_Declare(
             ${package}
