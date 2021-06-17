@@ -45,7 +45,7 @@ packages.
 A minimal anaconda environment for building the documentation can be created
 from an existing anaconda installation with the following commands.
 
-    $ conda env create --file environment.yaml
+    $ conda env create --file configuration_files/environment.yaml
 
 You can learn more about Anaconda Python environment creation and management in
 the [Anaconda
@@ -94,10 +94,10 @@ testing.
 
        $ pwd
        /path/to/constitutive_tools/
-       
+
        # Just perform the build. Usage arguments are "compiler cmake_build_type"
        ./new_build.sh None
-       
+
        # Build and perform tests
        ./jenkins_build.sh
 
@@ -109,7 +109,7 @@ testing.
 
        # Sphinx
        firefox build/docs/sphinx/index.html &
-       
+
        # Doxygen
        firefox build/docs/doxygen/html/index.html &
 
@@ -121,23 +121,44 @@ multiple libraries and is proceeding faster than collaborators can check in resu
 outside of developers no-one should need to do this, a version of the code using local repositories can be
 built.
 
-1) Activate a [W-13 Python Environment](https://xcp-confluence.lanl.gov/display/PYT/The+W-13+Python+3+environment)
+To perform in-source builds of upstream libraries, the active Conda environment can NOT include installed versions of
+the upstream libraries to be built in-source with the current project. It is possible to mix sources with some upstream
+libraries coming from the active Conda environment and others built in-source from a Git repository. Developers may
+build minimal working Conda environments from the Python Modules discussion.
 
-       $ module load python/2019.10-python-3.7
-       $ sv3r
+1) Build and activate a minimal Conda development environment 
+
+       
+       $ conda env create --file configuration_files/environment.yaml
+       $ conda activate environment
 
 2) Define convenience environment variables
 
-       $ my_error_tools=/path/to/my/error_tools
-       $ my_vector_tools=/path/to/my/vector_tools
+       $ error_tools=/path/to/my/error_tools
+       $ error_tools_version=origin/dev
+       $ vector_tools=/path/to/my/vector_tools
+       $ vector_tools_version=origin/dev
 
-3) Perform the initial configuration
+3) Perform the initial configuration. Note that the environment variables are mutually independent. Each variable can be
+   used alone or in arbitrary combinations. The default values are found in the root ``CMakeLists.txt`` file. The ``PATH``
+   variables can accept anything that the [``CMake``
+   ``FetchContent``](https://cmake.org/cmake/help/latest/module/FetchContent.html) ``GIT_REPOSITORY`` option can accept.
+   The ``GITTAG`` variables will accept anything that the [``CMake``
+   ``FetchContent``](https://cmake.org/cmake/help/latest/module/FetchContent.html) ``GIT_TAG`` option can accept.
 
+       # View the defaults
+       $ grep _TOOLS_ CMakeLists.txt
+       set(ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of error_tools")
+       set(ERROR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of error_tools")
+       set(VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_tools")
+       set(VECTOR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of vector_tools")
+
+       $ Build against local directory paths and possible custom branch
        $ pwd
        /path/to/constitutive_tools
        $ mkdir build
        $ cd build
-       $ cmake .. -DFETCH_SOURCE=LOCAL -DERROR_TOOLS_PATH=${my_error_tools} -DVECTOR_TOOLS_PATH=${my_vector_tools}
+       $ cmake .. -DERROR_TOOLS_PATH=${my_error_tools} -DERROR_TOOLS_GITTAG=${error_tools_version} -DVECTOR_TOOLS_PATH=${my_vector_tools} -DVECTOR_TOOLS_GITTAG=${vector_tools_version}
 
 4) Building the library
 
