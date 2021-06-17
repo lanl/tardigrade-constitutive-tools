@@ -41,7 +41,9 @@ endif()
 # Set a variable indicating if upstream projects should come from the git repository or a local source
 include(FetchContent)
 set(ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of error_tools")
+set(ERROR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of error_tools")
 set(VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_tools")
+set(VECTOR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of vector_tools")
 
 # Find related, but external, projects in installed environment
 set(upstream_packages "error_tools" "vector_tools")
@@ -53,17 +55,24 @@ foreach(package ${upstream_packages})
     else()
         # Find related, but external, projects using FetchContent and building locally
         message(WARNING "Did not find an installed ${package} package. Attempting local build with FetchContent.")
-        # TODO: Decide how to handle master/dev build differences. bash env variables for GIT TAG?
+        # Pick repository path to build
         if(${package_upper}_PATH)
             set(PACKAGE_REPOSITORY ${${package_upper}_PATH})
         else()
             set(PACKAGE_REPOSITORY ssh://git@xcp-stash.lanl.gov:7999/mm/${package}.git)
         endif()
         message(STATUS "Building ${package} from ${PACKAGE_REPOSITORY}")
+        # Pick repository Git tag to build
+        if(${package_upper}_GITTAG)
+            set(PACKAGE_GITTAG ${${package_upper}_GITTAG})
+        else()
+            set(PACKAGE_GITTAG origin/dev)
+        endif()
+        message(STATUS "Building ${package} version ${PACKAGE_GITTAG}")
         FetchContent_Declare(
             ${package}
             GIT_REPOSITORY ${PACKAGE_REPOSITORY}
-            GIT_TAG        origin/dev
+            GIT_TAG        ${PACKAGE_GITTAG}
         )
         FetchContent_MakeAvailable(${package})
     endif()
