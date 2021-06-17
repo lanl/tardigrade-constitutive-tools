@@ -42,23 +42,9 @@ with open(settings.PROJECT_CMAKE_CACHE, 'r') as cmake_cache_file:
 project_name_regex = '(?<=CMAKE_PROJECT_NAME:STATIC=).*'
 project_name = return_group_or_error(project_name_regex, cmake_cache_contents)
 
-# Get the project fetch source type
-project_fetch_source_regex = '(?<=FETCH_SOURCE:STRING=).*'
-fetch_source = return_group_or_error(project_fetch_source_regex, cmake_cache_contents)
-
 # Get the sub-project source directories if the fetch type is local
-if fetch_source == "REPO":
-    local_libraries = [settings.CPP_BUILD_DIRECTORY]
-    library_search_string = "**/*-src*/"
-
-elif fetch_source == "LOCAL":
-    local_libraries = []
-    library_search_string = "**/"
-    for source_variable_name in settings.LIBRARY_SOURCE_VARIABLE_NAMES:
-        regex = f'(?<={source_variable_name}:PATH=).*'
-        local_libraries.append(return_group_or_error(regex, cmake_cache_contents))
-else:
-    raise ValueError(f"FETCH_SOURCE {fetch_source} not recognized")
+local_libraries = [settings.CPP_BUILD_DIRECTORY]
+library_search_string = "**/*-src*/"
 
 ###############################
 # Get the include directories #
