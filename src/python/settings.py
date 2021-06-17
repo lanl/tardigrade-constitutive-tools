@@ -48,10 +48,6 @@ PROJECT_NAME = return_group_or_error(project_name_regex, cmake_cache_contents)
 project_cxx_std_regex = '(?<=CMAKE_CXX_STANDARD)(.*)(?=\))'
 CXX_STANDARD = return_group_or_error(project_cxx_std_regex, cmake_lists_contents)
 
-# Get the project fetch source type
-project_fetch_source_regex = '(?<=FETCH_SOURCE:STRING=).*'
-FETCH_SOURCE = return_group_or_error(project_fetch_source_regex, cmake_cache_contents)
-
 # Get the Eigen header files directory
 eigen_regex = '(?<=EIGEN_DIR:PATH=).*'
 EIGEN_DIR = return_group_or_error(eigen_regex, cmake_cache_contents)
