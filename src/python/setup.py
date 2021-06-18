@@ -18,13 +18,13 @@ include_dirs = [numpy.get_include(), str(settings.CPP_SOURCE_DIRECTORY), setting
 # Get the static libraries #
 ############################
 # Find current project static library
-project_static_library = settings.CPP_BUILD_DIRECTORY / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{settings.PROJECT_NAME}.a"
+project_static_library = settings.BUILD_DIRECTORY / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{settings.PROJECT_NAME}.a"
 static_libraries = [str(project_static_library.resolve())]
 
 # Get all of the upstream static libraries
 for upstream_project in settings.STATIC_LIBRARY_LINKING_ORDER[1:]:
     upstream_installed = settings.CONDA_ENVIRONMENT / f"lib/lib{upstream_project}.a"
-    upstream_insource = settings.CPP_BUILD_DIRECTORY / f"_deps/{upstream_project}-build" / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{upstream_project}.a"
+    upstream_insource = settings.BUILD_DIRECTORY / f"_deps/{upstream_project}-build" / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{upstream_project}.a"
     if upstream_installed.exists() and upstream_installed.is_file():
         static_libraries.append(str(upstream_installed.resolve()))
     elif upstream_insource.exists() and upstream_insource.is_file():
@@ -38,10 +38,10 @@ for upstream_project in settings.STATIC_LIBRARY_LINKING_ORDER[1:]:
 
 # Get all of the possible in-source build include locations
 for upstream_project in settings.UPSTREAM_PROJECTS:
-    upstream_insource = settings.CPP_BUILD_DIRECTORY / f"_deps/{upstream_project}-src" / settings.CPP_SOURCE_SUBDIRECTORY 
+    upstream_insource = settings.BUILD_DIRECTORY / f"_deps/{upstream_project}-src" / settings.CPP_SOURCE_SUBDIRECTORY 
     if upstream_insource.exists() and upstream_insource.is_dir():
         include_dirs.append(upstream_insource.resolve())
-    upstream_insource = settings.CPP_BUILD_DIRECTORY / f"_deps/{upstream_project}-src" / settings.PYTHON_SOURCE_SUBDIRECTORY
+    upstream_insource = settings.BUILD_DIRECTORY / f"_deps/{upstream_project}-src" / settings.PYTHON_SOURCE_SUBDIRECTORY
     if upstream_insource.exists() and upstream_insource.is_dir():
         include_dirs.append(upstream_insource.resolve())
 
