@@ -42,9 +42,9 @@ endif()
 # Set a variable indicating if upstream projects should come from the git repository or a local source
 include(FetchContent)
 set(ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of error_tools")
-set(ERROR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of error_tools")
+set(ERROR_TOOLS_GITTAG "" CACHE PATH "The version to build of error_tools")
 set(VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_tools")
-set(VECTOR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of vector_tools")
+set(VECTOR_TOOLS_GITTAG "" CACHE PATH "The version to build of of vector_tools")
 
 # Find related, but external, projects in installed environment
 set(upstream_packages "error_tools" "vector_tools")
