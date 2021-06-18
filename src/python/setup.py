@@ -1,8 +1,8 @@
 import os
-import re
 from distutils.core import setup
 from distutils.extension import Extension
 import pathlib
+import warnings
 
 import numpy
 from Cython.Distutils import build_ext
@@ -22,7 +22,7 @@ project_static_library = settings.BUILD_DIRECTORY / settings.CPP_SOURCE_SUBDIREC
 static_libraries = [str(project_static_library.resolve())]
 
 # Get all of the upstream static libraries
-for upstream_project in settings.STATIC_LIBRARY_LINKING_ORDER[1:]:
+for upstream_project in settings.UPSTREAM_PROJECTS:
     upstream_installed = settings.CONDA_ENVIRONMENT / f"lib/lib{upstream_project}.a"
     upstream_insource = settings.BUILD_DIRECTORY / f"_deps/{upstream_project}-build" / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{upstream_project}.a"
     if upstream_installed.exists() and upstream_installed.is_file():
@@ -30,7 +30,7 @@ for upstream_project in settings.STATIC_LIBRARY_LINKING_ORDER[1:]:
     elif upstream_insource.exists() and upstream_insource.is_file():
         static_libraries.append(str(upstream_insource.resolve()))
     else:
-        raise RuntimeError(f"Could not find upstream static library from '{upstream_project}'")
+        warnings.warn(f"Could not find upstream static library from '{upstream_project}'", RuntimeWarning)
 
 ################################################
 # Get the upstream project include directories #
