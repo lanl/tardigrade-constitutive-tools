@@ -1,9 +1,10 @@
 set(CYTHON_SOURCE_FILES
-    main.pyx
+    conftest.py
     constitutive_tools_python.pxd
     constitutive_tools_python.pyx
+    main.pyx
+    settings.py.in
     setup.py
-    conftest.py
 )
 configure_file(settings.py.in settings.py)
 add_custom_target(CYTHON ALL
@@ -14,7 +15,9 @@ add_custom_command(TARGET CYTHON PRE_BUILD
                    COMMAND python setup.py build_ext --inplace
                    DEPENDS ${CYTHON_SOURCE_FILES}
                   )
-install(FILES "${PROJECT_SOURCE_DIR}/${PYTHON_SRC_PATH}/${PROJECT_NAME}_python.pyx"
+install(FILES 
+            "${PROJECT_SOURCE_DIR}/${PYTHON_SRC_PATH}/${PROJECT_NAME}_python.pyx"
+            "${PROJECT_SOURCE_DIR}/${PYTHON_SRC_PATH}/${PROJECT_NAME}_python.pxd"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 # Add pytests as a ctest function for automated testing under unified CMake/CTest tools
 add_test(NAME pytest
