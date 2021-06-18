@@ -21,7 +21,7 @@ def return_group_or_error(regex, contents):
 CONDA_ENVIRONMENT = pathlib.Path(os.environ['CONDA_DEFAULT_ENV'])
 CONDA_ENVIRONMENT_INCLUDE = CONDA_ENVIRONMENT / "include"
 # Root directory w.r.t. python build directory, e.g. /project/build/src/python
-ROOT_DIRECTORY = pathlib.Path(".").resolve().parent.parent.parent
+ROOT_DIRECTORY = pathlib.Path("@PROJECT_SOURCE_DIR@")
 CPP_BUILD_DIRECTORY = ROOT_DIRECTORY / "build"
 PROJECT_CMAKE_CACHE = CPP_BUILD_DIRECTORY / "CMakeCache.txt"
 PROJECT_CMAKE_FILE = ROOT_DIRECTORY / "CMakeLists.txt"
@@ -42,8 +42,7 @@ with open(PROJECT_CMAKE_CACHE, 'r') as cmake_cache_file:
     cmake_cache_contents = cmake_cache_file.read()
 
 # Get the project name
-project_name_regex = '(?<=CMAKE_PROJECT_NAME:STATIC=).*'
-PROJECT_NAME = return_group_or_error(project_name_regex, cmake_cache_contents)
+PROJECT_NAME = "@PROJECT_NAME@" 
 
 # Get the CXX standard
 project_cxx_std_regex = '(?<=CMAKE_CXX_STANDARD)(.*)(?=\))'

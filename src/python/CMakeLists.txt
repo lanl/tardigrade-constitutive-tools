@@ -5,6 +5,7 @@ set(CYTHON_SOURCE_FILES
     setup.py
     conftest.py
 )
+configure_file(settings.py.in settings.py)
 add_custom_target(CYTHON ALL
                   DEPENDS ${PROJECT_NAME})
 add_custom_command(TARGET CYTHON PRE_BUILD
