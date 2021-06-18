@@ -7,9 +7,9 @@ set(CYTHON_SOURCE_FILES
     setup.py
 )
 configure_file(settings.py.in settings.py)
-add_custom_target(CYTHON ALL
+add_custom_target(${PROJECT_NAME}_CYTHON ALL
                   DEPENDS ${PROJECT_NAME})
-add_custom_command(TARGET CYTHON PRE_BUILD
+add_custom_command(TARGET ${PROJECT_NAME}_CYTHON PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
                    "${PROJECT_SOURCE_DIR}/${PYTHON_SRC_PATH}" "${PROJECT_BINARY_DIR}/${PYTHON_SRC_PATH}"
                    COMMAND python setup.py build_ext --inplace
