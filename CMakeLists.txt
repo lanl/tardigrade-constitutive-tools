@@ -5,6 +5,7 @@ enable_testing()
 
 # Set common project paths relative to project root directory
 set(CPP_SRC_PATH "src/cpp")
+set(PYTHON_SRC_PATH "src/python")
 set(CMAKE_SRC_PATH "src/cmake")
 
 # Add installation directory variables
@@ -83,6 +84,7 @@ endforeach(package)
 # Add project source directories
 include_directories("${CPP_SRC_PATH}")
 add_subdirectory(${CPP_SRC_PATH})
+add_subdirectory(${PYTHON_SRC_PATH})
 
 # Only add tests and documentation for current project builds. Protects downstream project builds.
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
