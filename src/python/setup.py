@@ -22,6 +22,13 @@ project_static_library = settings.BUILD_DIRECTORY / settings.CPP_SOURCE_SUBDIREC
 static_libraries = [str(project_static_library.resolve())]
 
 # Get all of the upstream static libraries
+# TODO: make the static library path more robust. Does it need to be more robust or is this logic consistent with Conda
+# practices?
+if settings.CONDA_ENVIRONMENT_LIB64.exists() and settings.CONDA_ENVIRONMENT_LIB64.is_dir():
+    libdir="lib64"
+else:
+    libdir="lib"
+
 for upstream_project in settings.UPSTREAM_PROJECTS:
     upstream_installed = settings.CONDA_ENVIRONMENT / f"lib/lib{upstream_project}.a"
     upstream_insource = settings.BUILD_DIRECTORY / f"_deps/{upstream_project}-build" / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{upstream_project}.a"
