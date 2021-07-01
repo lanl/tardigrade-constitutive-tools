@@ -1,12 +1,20 @@
 #===================================================================================================== PROJECT SETUP ===
 cmake_minimum_required(VERSION 3.14)
 project(constitutive_tools VERSION 0.2.0)
-enable_testing()
 
 # Set common project paths relative to project root directory
 set(CPP_SRC_PATH "src/cpp")
 set(PYTHON_SRC_PATH "src/python")
 set(CMAKE_SRC_PATH "src/cmake")
+
+# Add the cmake folder to locate project CMake module(s)
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/${CMAKE_SRC_PATH}" ${CMAKE_MODULE_PATH})
+
+# Get version number from Git
+set(VERSION_UPDATE_FROM_GIT True)
+# FIXME: Figure out why include() doesn't pick up CMAKE_MODULE_PATH correctly
+include(${CMAKE_SRC_PATH}/GetVersionFromGitTag.cmake)
+project(${PROJECT_NAME} VERSION ${${PROJECT_NAME}_VERSION})
 
 # Add installation directory variables
 include(GNUInstallDirs)
@@ -17,6 +25,9 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Set the c++ standard
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Enable CTest
+enable_testing()
 
 #================================================================================================= FIND DEPENDENCIES ===
 # Find eigen
@@ -40,13 +51,13 @@ if(cmake_build_type_lower STREQUAL "release")
 endif()
 
 # Set a variable indicating if upstream projects should come from the git repository or a local source
-include(FetchContent)
 set(ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of error_tools")
 set(ERROR_TOOLS_GITTAG "" CACHE PATH "The version to build of error_tools")
 set(VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_tools")
 set(VECTOR_TOOLS_GITTAG "" CACHE PATH "The version to build of of vector_tools")
 
 # Find related, but external, projects in installed environment
+include(FetchContent)
 set(upstream_packages "error_tools" "vector_tools")
 foreach(package ${upstream_packages})
     string(TOUPPER "${package}" package_upper)
