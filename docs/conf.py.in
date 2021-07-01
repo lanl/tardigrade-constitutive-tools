@@ -16,15 +16,15 @@ import os
 # -- Project information -----------------------------------------------------
 # Meta data from CMake configure()
 project = '@PROJECT_NAME@'
-RECENT_GIT_TAG = '@solver_tools_RECENT_GIT_TAG@'
-VERSION_STRING_FULL = '@solver_tools_VERSION_STRING_FULL@'
-VERSION = '@solver_tools_VERSION@'
-VERSION_MAJOR = '@solver_tools_VERSION_MAJOR@'
-VERSION_MINOR = '@solver_tools_VERSION_MINOR@'
-VERSION_PATCH = '@solver_tools_VERSION_PATCH@'
-VERSION_TWEAK = '@solver_tools_VERSION_TWEAK@'
-VERSION_AHEAD = '@solver_tools_VERSION_AHEAD@'
-VERSION_GIT_SHA = '@solver_tools_VERSION_GIT_SHA@'
+RECENT_GIT_TAG = '@constitutive_tools_RECENT_GIT_TAG@'
+VERSION_STRING_FULL = '@constitutive_tools_VERSION_STRING_FULL@'
+VERSION = '@constitutive_tools_VERSION@'
+VERSION_MAJOR = '@constitutive_tools_VERSION_MAJOR@'
+VERSION_MINOR = '@constitutive_tools_VERSION_MINOR@'
+VERSION_PATCH = '@constitutive_tools_VERSION_PATCH@'
+VERSION_TWEAK = '@constitutive_tools_VERSION_TWEAK@'
+VERSION_AHEAD = '@constitutive_tools_VERSION_AHEAD@'
+VERSION_GIT_SHA = '@constitutive_tools_VERSION_GIT_SHA@'
 
 # Hardcoded project information
 copyright = '2020, Nathan A. Miller and Kyle A. Brindley'
