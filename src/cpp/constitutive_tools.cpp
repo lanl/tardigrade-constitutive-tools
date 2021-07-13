@@ -811,7 +811,7 @@ namespace constitutiveTools{
          * \param &dmacdx: The returned jacobian
          */
 
-        dmacdx = 0
+        dmacdx = 0;
         if ( x >= 0 ){ dmacdx = 1; }
         return mac( x );
     }
