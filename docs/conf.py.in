@@ -55,6 +55,9 @@ breathe_default_project = project
 
 # Links to PRs, Jira issues.
 extlinks = {
+     "merge": ("https://re-git.lanl.gov/aea/material-models/constitutive_tools/-/merge_requests/%s", "MERGE-"),
+     "issue": ("https://re-git.lanl.gov/aea/material-models/constitutive_tools/-/issues/%s", "ISSUE-"),
+     # Maintain the old Atlassian links until the servers don't exist. Required for changelog entries.
      "pull": ("https://xcp-stash.lanl.gov/projects/MM/repos/constitutive_tools/pull-requests/%s/overview", "PR"),
      "jira": ("https://xcp-jira.lanl.gov/browse/VIP-%s", "VIP-"),
 }
