@@ -773,7 +773,7 @@ BOOST_AUTO_TEST_CASE( testQuadraticThermalExpansion ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( thermalExpansion, { 27825., 33398., 38971., 44544. } ) );
 
-    floatVector thermalExpansionJp, thermalExpansionJm, thermalExpansionJacobian;
+    floatVector thermalExpansionJ, thermalExpansionJp, thermalExpansionJm, thermalExpansionJacobian;
     floatType eps = 1e-6;
     floatType delta = eps*temperature + eps;
 
@@ -798,7 +798,7 @@ BOOST_AUTO_TEST_CASE( testQuadraticThermalExpansion ){
     BOOST_CHECK( ! error );
 
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( thermalExpansionJacobian, ( thermalExpansionJp - thermalExpansionJm )/delta, 1e-6 ) );
+    BOOST_CHECK( vectorTools::fuzzyEquals( thermalExpansionJacobian, ( thermalExpansionJp - thermalExpansionJm )/(2 * delta), 1e-6 ) );
 
 }
 
