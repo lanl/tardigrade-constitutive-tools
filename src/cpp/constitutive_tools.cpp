@@ -970,8 +970,8 @@ namespace constitutiveTools{
             return new errorNode("quadraticThermalExpansion", "The linear and quadratic parameters must have the same length");
         }
 
-        floatType relativeTemperature  = temperature - referenceTemperature;
-        thermalExpansion = linearParameters*relativeTemperature + quadraticParameters * relativeTemperature * relativeTemperature;
+        thermalExpansion = linearParameters * temperature          + quadraticParameters * temperature * temperature
+                         - linearParameters * referenceTemperature - quadraticParameters * referenceTemperature * referenceTemperature;
 
         return NULL;
     }
@@ -1001,7 +1001,7 @@ namespace constitutiveTools{
             return result;
         }
 
-        thermalExpansionJacobian = linearParameters + 2 * quadraticParameters * (temperature - referenceTemperature);
+        thermalExpansionJacobian = linearParameters + 2 * quadraticParameters * temperature;
 
         return NULL;
     }
