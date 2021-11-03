@@ -795,18 +795,25 @@ namespace constitutiveTools{
          * \param &x: The incoming scalar.
          */
 
-        return 0.5*(fabs(x) + x);
+        return 0.5 * ( fabs( x ) + x );
     }
 
-    floatType mac(const floatType &x, floatType &dmacdx){
+    floatType mac( const floatType &x, floatType &dmacdx ){
         /*!
          * Compute the Macaulay brackets of the scalar x and
          * return the jacobian as well.
+         * 
+         * returns x if x>0, 0 otherwise
+         * 
+         * The Jacobian is the Heaviside function
+         * 
+         * \param &x: The incoming scalar
+         * \param &dmacdx: The returned jacobian
          */
 
-        if (x<0){ dmacdx = 0; }
-        else {dmacdx = 1;}
-        return mac(x);
+        dmacdx = 0;
+        if ( x >= 0 ){ dmacdx = 1; }
+        return mac( x );
     }
 
     errorOut computeUnitNormal(const floatVector &A, floatVector &Anorm){
@@ -963,8 +970,8 @@ namespace constitutiveTools{
             return new errorNode("quadraticThermalExpansion", "The linear and quadratic parameters must have the same length");
         }
 
-        floatType relativeTemperature  = temperature - referenceTemperature;
-        thermalExpansion = linearParameters*relativeTemperature + quadraticParameters * relativeTemperature * relativeTemperature;
+        thermalExpansion = linearParameters * temperature          + quadraticParameters * temperature * temperature
+                         - linearParameters * referenceTemperature - quadraticParameters * referenceTemperature * referenceTemperature;
 
         return NULL;
     }
@@ -994,7 +1001,7 @@ namespace constitutiveTools{
             return result;
         }
 
-        thermalExpansionJacobian = linearParameters + 2 * quadraticParameters * (temperature - referenceTemperature);
+        thermalExpansionJacobian = linearParameters + 2 * quadraticParameters * temperature;
 
         return NULL;
     }
