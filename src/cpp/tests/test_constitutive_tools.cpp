@@ -479,7 +479,7 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
                       0.4768852 , 0.93771539, 0.1056616 };
 
     //Test 1 ( mode 1 fully explicit )
-    floatVector F;
+    floatVector dF, F;
     errorOut error = constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 1, 1 );
 
     BOOST_CHECK( ! error );
@@ -489,6 +489,14 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
                            4.62070491, 3.44211354, 2.32252023 };
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
+
+    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 1, 1 );
+
+    BOOST_CHECK( ! error );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer - Fp, dF ) );
 
     //Test 2 ( mode 1 fully implicit )
     error = constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 0, 1 );
@@ -501,6 +509,14 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
+    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 0, 1 );
+
+    BOOST_CHECK( ! error );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer - Fp, dF ) );
+
     //Test 3 ( mode 1 midpoint rule )
     error = constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 0.5, 1 );
 
@@ -512,10 +528,18 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
+    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 0.5, 1 );
+
+    BOOST_CHECK( ! error );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer - Fp, dF ) );
+
+
     //Tests 4 and 5 ( mode 1 jacobian )
-    floatVector FJ;
+    floatVector dFJ, FJ;
     floatMatrix dFdL;
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, FJ, dFdL, 0.5, 1 );
+    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dFJ, FJ, dFdL, 0.5, 1 );
+    std::cerr << "past Jacobian\n";
 
     BOOST_CHECK( ! error );
 
@@ -537,6 +561,16 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
             BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dFdL[ j ][ i ], 1e-5, 1e-5 ) );
         }
 
+        error = constitutiveTools::evolveF( Dt, Fp, Lp, L + delta, dFJ, FJ, 0.5, 1 );
+
+        BOOST_CHECK( ! error );
+
+        gradCol = ( dFJ - dF )/delta[ i ];
+
+        for ( unsigned int j=0; j<gradCol.size( ); j++ ){
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dFdL[ j ][ i ], 1e-5, 1e-5 ) );
+        }
+
     }
 
     //Test 6 ( mode 2 fully explicit )
@@ -550,6 +584,13 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
+    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 1, 2 );
+
+    BOOST_CHECK( ! error );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer - Fp, dF ) );
+
+
     //Test 7 ( mode 2 fully implicit )
     error = constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 0, 2 );
 
@@ -560,6 +601,12 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
                 0.45611733, -0.45427799, -0.17799727 };
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
+
+    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 0, 2 );
+
+    BOOST_CHECK( ! error );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer - Fp, dF ) );
 
     //Test 8 ( mode 2 midpoint rule )
     error = constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 0.5, 2 );
@@ -572,8 +619,14 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
+    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 0.5, 2 );
+
+    BOOST_CHECK( ! error );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer - Fp, dF ) );
+
     //Tests 9 and 10 ( mode 2 jacobian )
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, FJ, dFdL, 0.5, 2 );
+    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dFJ, FJ, dFdL, 0.5, 2 );
 
     BOOST_CHECK( ! error );
 
@@ -589,6 +642,16 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
         BOOST_CHECK( ! error );
 
         floatVector gradCol = ( FJ - F )/delta[ i ];
+
+        for ( unsigned int j=0; j<gradCol.size( ); j++ ){
+            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dFdL[ j ][ i ], 1e-5, 1e-5 ) );
+        }
+
+        error = constitutiveTools::evolveF( Dt, Fp, Lp, L + delta, dFJ, FJ, 0.5, 2 );
+
+        BOOST_CHECK( ! error );
+
+        gradCol = ( dFJ - dF )/delta[ i ];
 
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
             BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dFdL[ j ][ i ], 1e-5, 1e-5 ) );
