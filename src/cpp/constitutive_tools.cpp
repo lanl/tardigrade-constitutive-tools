@@ -958,6 +958,12 @@ namespace constitutiveTools{
         /*!
          * Define a quadratic equation for the thermal expansion. This could be the
          * thermal strain or the value of the stretch tensor.
+         * 
+         * \f$ e^{\theta}_{ij} = a_{ij} \left(\theta - \theta_0\right) + b_{ij} \left(\theta^2 - \theta_0^2\right)\f$
+         * 
+         * Where \f$e^{\theta}_{ij}\f$ is the thermal expansion, \f$a_{ij}\f$ are the linear parameters,
+         * \f$b_{ij}\f$ are the quadratic parameters, \f$\theta\f$ is the current temperature, and \f$\theta_0\f$
+         * is the reference temperature.
          *
          * \param &temperature: The temperature
          * \param &referenceTemperature: The reference temperature
@@ -982,6 +988,12 @@ namespace constitutiveTools{
         /*!
          * Define a quadratic equation for the thermal expansion. This could be the
          * thermal strain or the value of the stretch tensor.
+         * 
+         * \f$ e^{\theta}_{ij} = a_{ij} \left(\theta - \theta_0\right) + b_{ij} \left(\theta^2 - \theta_0^2\right)\f$
+         * 
+         * Where \f$e^{\theta}_{ij}\f$ is the thermal expansion, \f$a_{ij}\f$ are the linear parameters,
+         * \f$b_{ij}\f$ are the quadratic parameters, \f$\theta\f$ is the current temperature, and \f$\theta_0\f$
+         * is the reference temperature.
          *
          * \param &temperature: The temperature
          * \param &referenceTemperature: The reference temperature
