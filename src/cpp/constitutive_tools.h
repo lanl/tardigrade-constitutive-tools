@@ -81,6 +81,12 @@ namespace constitutiveTools{
                                floatVector &A, floatMatrix &DADADt, const floatType alpha=0.5);
 
     errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
+                     floatVector &dF, floatVector &deformationGradient, const floatType alpha=0.5, const unsigned int mode = 1);
+
+    errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
+                     floatVector &dF, floatVector &deformationGradient, floatMatrix &dFdL, const floatType alpha=0.5, const unsigned int mode = 1);
+
+    errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
                      floatVector &deformationGradient, const floatType alpha=0.5, const unsigned int mode = 1);
 
     errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
