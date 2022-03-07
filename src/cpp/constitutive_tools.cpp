@@ -780,7 +780,6 @@ namespace constitutiveTools{
         floatVector invLHS = vectorTools::inverse( LHS, dim, dim );
 
         //Compute the jacobian
-        std::cout << "computing the jacobian\n";
         dFdL = floatMatrix( deformationGradient.size( ), floatVector( L.size( ), 0 ) );
         if ( mode == 1 ){
             for ( unsigned int j = 0; j < dim; j++ ){
