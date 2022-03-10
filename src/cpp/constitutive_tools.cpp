@@ -510,7 +510,7 @@ namespace constitutiveTools{
     }
 
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
-                               floatVector &A, const floatVector &alpha){
+                               floatVector &dA, floatVector &A, const floatVector &alpha){
         /*!
          * Perform midpoint rule based evolution of a vector.
          *
@@ -522,6 +522,7 @@ namespace constitutiveTools{
          * \param &Ap: The previous value of the vector
          * \param &DApDt: The previous time rate of change of the vector.
          * \param &DADt: The current time rate of change of the vector.
+         * \param &dA: The change in the vector
          * \param &A: The current value of the vector.
          * \param &alpha: The integration parameter.
          */
@@ -533,20 +534,23 @@ namespace constitutiveTools{
             return new errorNode("midpointEvolution", "The size of the alpha vector is not the same size as the previous vector value");
         }
 
+        dA = floatVector(Ap.size(), 0);
         A = floatVector(Ap.size(), 0);
         unsigned int i = 0;
         for (auto ai = alpha.begin(); ai != alpha.end(); ai++, i++){
             if (((*ai) < 0) || ((*ai) > 1)){
                 return new errorNode("midpointEvolution", "Alpha must be between 0 and 1");
             }
-            A[i] = Ap[i] + Dt * (*ai * DApDt[i] + (1 - *ai) * DADt[i]);
+            dA[i] = Dt * (*ai * DApDt[i] + (1 - *ai) * DADt[i]);
+
+            A[i]  = Ap[i] + dA[i];
         }
 
         return NULL;
     }
 
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
-                               floatVector &A, floatMatrix &DADADt, const floatVector &alpha){
+                               floatVector &dA, floatVector &A, floatMatrix &DADADt, const floatVector &alpha){
         /*!
          * Perform midpoint rule based evolution of a vector and return the jacobian.
          *
@@ -558,12 +562,13 @@ namespace constitutiveTools{
          * \param &Ap: The previous value of the vector
          * \param &DApDt: The previous time rate of change of the vector.
          * \param &DADt: The current time rate of change of the vector.
+         * \param &A: The change in value of the vector.
          * \param &A: The current value of the vector.
          * \param &DADADt: The gradient of A w.r.t. the current rate of change.
          * \param &alpha: The integration parameter.
          */
 
-        errorOut error = midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha);
+        errorOut error = midpointEvolution(Dt, Ap, DApDt, DADt, dA, A, alpha);
 
         if (error){
             errorOut result = new errorNode("midpointEvolution (jacobian)", "Error in computation of the integrated term");
@@ -580,9 +585,8 @@ namespace constitutiveTools{
         return NULL;
     }
 
-
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
-                               floatVector &A, const floatType alpha){
+                               floatVector &dA, floatVector &A, const floatType alpha){
         /*!
          * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
          *
@@ -594,15 +598,17 @@ namespace constitutiveTools{
          * \param &Ap: The previous value of the vector
          * \param &DApDt: The previous time rate of change of the vector.
          * \param &DADt: The current time rate of change of the vector.
+         * \param &dA: The change in the value of the vector.
          * \param &A: The current value of the vector.
          * \param alpha: The integration parameter.
          */
 
-        return midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha*floatVector(Ap.size(), 1));
+        return midpointEvolution(Dt, Ap, DApDt, DADt, dA, A, alpha*floatVector(Ap.size(), 1));
+
     }
 
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
-                               floatVector &A, floatMatrix &DADADt, const floatType alpha){
+                               floatVector &dA, floatVector &A, floatMatrix &DADADt, const floatType alpha){
         /*!
          * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
          *
@@ -614,12 +620,13 @@ namespace constitutiveTools{
          * \param &Ap: The previous value of the vector
          * \param &DApDt: The previous time rate of change of the vector.
          * \param *DADt: The current time rate of change of the vector.
+         * \param &dA: The change in the vector
          * \param &A: The current value of the vector.
          * \param &DADADt: The derivative of the vector w.r.t. the rate of change of the vector.
          * \param alpha: The integration parameter.
          */
 
-        return midpointEvolution(Dt, Ap, DApDt, DADt, A, DADADt, alpha*floatVector(Ap.size(), 1));
+        return midpointEvolution(Dt, Ap, DApDt, DADt, dA, A, DADADt, alpha*floatVector(Ap.size(), 1));
     }
 
     errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
