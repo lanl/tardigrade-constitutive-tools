@@ -146,6 +146,7 @@ def py_midpointEvolution(Dt, np.ndarray Ap, np.ndarray DApDt, np.ndarray DADt, n
     cdef vector[double] c_DApDt = map_1D_array_to_vector(DApDt)
     cdef vector[double] c_DADt = map_1D_array_to_vector(DADt)
     cdef vector[double] c_alpha = map_1D_array_to_vector(alpha)
+    cdef vector[double] c_dA
     cdef vector[double] c_A
     cdef error_tools_python.Node *error
 
@@ -156,7 +157,7 @@ def py_midpointEvolution(Dt, np.ndarray Ap, np.ndarray DApDt, np.ndarray DADt, n
 
     if compute_jacobians:
 
-        error = constitutive_tools_python.midpointEvolution(c_Dt, c_Ap, c_DApDt, c_DADt, c_A, c_DADADT, alpha)
+        error = constitutive_tools_python.midpointEvolution(c_Dt, c_Ap, c_DApDt, c_DADt, c_dA, c_A, c_DADADT, alpha)
 
         if error:
             error.c_print(True)
@@ -170,7 +171,7 @@ def py_midpointEvolution(Dt, np.ndarray Ap, np.ndarray DApDt, np.ndarray DADt, n
 
     else:
 
-        error = constitutive_tools_python.midpointEvolution(c_Dt, c_Ap, c_DApDt, c_DADt, c_A, alpha)
+        error = constitutive_tools_python.midpointEvolution(c_Dt, c_Ap, c_DApDt, c_DADt, c_dA, c_A, alpha)
 
         if error:
             error.c_print(True)

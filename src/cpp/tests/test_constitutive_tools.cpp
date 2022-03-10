@@ -330,54 +330,66 @@ BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
     floatVector DApDt = { 1, 2, 3, 4 };
     floatVector DADt  = { 5, 6, 7, 8 };
     floatVector alphaVec = { 0.1, 0.2, 0.3, 0.4 };
-    floatVector A;
+    floatVector dA, A;
 
     //Test implicit integration
-    errorOut error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, A, 0 );
+    errorOut error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, dA, A, 0 );
 
     BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( A, Ap + Dt*DADt ) );
+    BOOST_CHECK( vectorTools::fuzzyEquals( dA, Dt * DADt ) );
 
     //Test explicit integration
-    error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, A, 1 );
+    error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, dA, A, 1 );
 
     BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( A, Ap + Dt*DApDt ) );
+    BOOST_CHECK( vectorTools::fuzzyEquals( dA, Dt*DApDt ) );
 
     //Test midpoint integration
-    error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, A );
+    error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, dA, A );
 
     BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( A, Ap + Dt*0.5*( DApDt + DADt ) ) );
+    BOOST_CHECK( vectorTools::fuzzyEquals(  A, Ap + Dt*0.5*( DApDt + DADt ) ) );
 
-    error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, A, alphaVec );
+    BOOST_CHECK( vectorTools::fuzzyEquals( dA, Dt*0.5*( DApDt + DADt ) ) );
+
+    error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, dA, A, alphaVec );
 
     BOOST_CHECK( ! error );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( A, { 20.5, 23. , 25.5, 28. } ) );
+    BOOST_CHECK( vectorTools::fuzzyEquals( A, {20.5, 23. , 25.5, 28. } ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( dA, {11.5, 13, 14.5, 16.} ) );
 
     //Add test for the jacobian
     floatType eps = 1e-6;
-    floatVector A0, Ai;
+    floatVector A0, Ai, dA0, dAi;
     floatMatrix DADADt;
 
-    error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, A, alphaVec );
-    error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, A0, DADADt, alphaVec );
+    error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, dA, A, alphaVec );
+    error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, dA0, A0, DADADt, alphaVec );
 
     BOOST_CHECK( ! error );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( A0, A ) );
 
+    BOOST_CHECK( vectorTools::fuzzyEquals( dA0, dA ) );
+
     for ( unsigned int i=0; i<DADt.size( ); i++ ){
         floatVector delta = floatVector( DADt.size( ), 0 );
         delta[ i ] = eps*( DADt[ i ] ) + eps;
 
-        error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt + delta, Ai, alphaVec );
+        error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt + delta, dAi, Ai, alphaVec );
 
         floatVector gradCol = ( Ai - A0 )/delta[ i ];
+
+        for ( unsigned int j=0; j<gradCol.size( ); j++ ){
+            BOOST_CHECK( vectorTools::fuzzyEquals( DADADt[ j ][ i ], gradCol[ j ] ) );
+        }
+
+        gradCol = ( dAi - dA0 )/delta[ i ];
 
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
             BOOST_CHECK( vectorTools::fuzzyEquals( DADADt[ j ][ i ], gradCol[ j ] ) );
@@ -539,7 +551,6 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
     floatVector dFJ, FJ;
     floatMatrix dFdL;
     error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dFJ, FJ, dFdL, 0.5, 1 );
-    std::cerr << "past Jacobian\n";
 
     BOOST_CHECK( ! error );
 
