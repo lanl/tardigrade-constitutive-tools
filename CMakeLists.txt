@@ -7,6 +7,9 @@ set(CPP_SRC_PATH "src/cpp")
 set(PYTHON_SRC_PATH "src/python")
 set(CMAKE_SRC_PATH "src/cmake")
 
+# Add a flag for whether the python bindings should be built or not
+set(CONSTITUTIVE_TOOLS_BUILD_PYTHON_BINDINGS ON CACHE BOOL "Flag for whether the python bindings should be built for constitutive tools")
+
 # Add the cmake folder to locate project CMake module(s)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/${CMAKE_SRC_PATH}" ${CMAKE_MODULE_PATH})
 
@@ -62,6 +65,7 @@ include(FetchContent)
 set(upstream_packages "error_tools" "vector_tools")
 foreach(package ${upstream_packages})
     string(TOUPPER "${package}" package_upper)
+    set(${package_upper}_BUILD_PYTHON_BINDINGS ${CONSTITUTIVE_TOOLS_BUILD_PYTHON_BINDINGS})
     find_package(${package} ${upstream_required} CONFIG)
     if(${package}_FOUND)
         message(STATUS "Found ${package}: ${${package}_DIR}")
@@ -96,7 +100,9 @@ endforeach(package)
 # Add project source directories
 include_directories("${CPP_SRC_PATH}")
 add_subdirectory(${CPP_SRC_PATH})
-add_subdirectory(${PYTHON_SRC_PATH})
+if(CONSTITUTIVE_TOOLS_BUILD_PYTHON_BINDINGS)
+    add_subdirectory(${PYTHON_SRC_PATH})
+endif()
 
 # Only add tests and documentation for current project builds. Protects downstream project builds.
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
