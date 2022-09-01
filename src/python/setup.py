@@ -18,7 +18,7 @@ include_dirs = [numpy.get_include(), str(settings.CPP_SOURCE_DIRECTORY), setting
 # Get the static libraries #
 ############################
 # Find current project static library
-project_static_library = settings.BUILD_DIRECTORY / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{settings.PROJECT_NAME}.so"
+project_static_library = settings.BUILD_DIRECTORY / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{settings.PROJECT_NAME}.a"
 static_libraries = [str(project_static_library.resolve())]
 
 # Get all of the upstream static libraries
