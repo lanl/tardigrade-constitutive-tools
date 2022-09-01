@@ -18,8 +18,7 @@ include_dirs = [numpy.get_include(), str(settings.CPP_SOURCE_DIRECTORY), setting
 # Get the static libraries #
 ############################
 # Find current project static library
-project_static_library = settings.BUILD_DIRECTORY / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{settings.PROJECT_NAME}.a"
-static_libraries = [str(project_static_library.resolve())]
+static_libraries = []
 
 # Get all of the upstream static libraries
 # TODO: make the static library path more robust. Does it need to be more robust or is this logic consistent with Conda
@@ -39,6 +38,9 @@ for upstream_project in settings.UPSTREAM_PROJECTS:
     else:
         warnings.warn(f"Could not find upstream static library from '{upstream_project}'", RuntimeWarning)
 
+shared_libraries = [f"{settings.PROJECT_NAME}"]
+shared_library_paths = [str(settings.BUILD_DIRECTORY / settings.CPP_SOURCE_SUBDIRECTORY)]
+
 ################################################
 # Get the upstream project include directories #
 ################################################
@@ -57,6 +59,8 @@ ext_modules = [Extension(settings.PROJECT_NAME,
                      sources=["main.pyx"],
                      language='c++',
                      extra_objects=static_libraries,
+                     libraries=shared_libraries,
+                     library_dirs=shared_library_paths,
                      include_dirs=include_dirs,
                      extra_compile_args=[f"-std=c++{settings.CXX_STANDARD}"],
                      extra_link_args=[f"-std=c++{settings.CXX_STANDARD}"]
