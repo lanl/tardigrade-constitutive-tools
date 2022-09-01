@@ -104,9 +104,9 @@ endforeach(package)
 # MUST COME AFTER DEPENDENCY LOCATING
 # Add project source directories
 if(CONSTITUTIVE_TOOLS_BUILD_PYTHON_BINDINGS)
-    add_subdirectory(${PYTHON_SRC_PATH})
 endif()
 if(${not_conda_test} STREQUAL "true")
+    add_subdirectory(${PYTHON_SRC_PATH})
     include_directories(${CPP_SRC_PATH})
     add_subdirectory(${CPP_SRC_PATH})
 endif()
