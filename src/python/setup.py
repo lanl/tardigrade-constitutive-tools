@@ -30,8 +30,8 @@ else:
     libdir="lib"
 
 for upstream_project in settings.UPSTREAM_PROJECTS:
-    upstream_installed = settings.CONDA_ENVIRONMENT / f"{libdir}/lib{upstream_project}.a"
-    upstream_insource = settings.BUILD_DIRECTORY / f"_deps/{upstream_project}-build" / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{upstream_project}.a"
+    upstream_installed = settings.CONDA_ENVIRONMENT / f"{libdir}/lib{upstream_project}.so"
+    upstream_insource = settings.BUILD_DIRECTORY / f"_deps/{upstream_project}-build" / settings.CPP_SOURCE_SUBDIRECTORY / f"lib{upstream_project}.so"
     if upstream_installed.exists() and upstream_installed.is_file():
         static_libraries.append(str(upstream_installed.resolve()))
     elif upstream_insource.exists() and upstream_insource.is_file():
