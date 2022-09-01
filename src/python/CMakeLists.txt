@@ -21,6 +21,8 @@ install(FILES
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 # Add pytests as a ctest function for automated testing under unified CMake/CTest tools
 add_test(NAME pytest
-         COMMAND pytest --cov-report=xml:$(pwd)/cobertura.xml --cov=$(pwd)/. --cov-report=html:$(pwd)/htmlcov
+         COMMAND
+             ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/${CPP_SRC_PATH}:$ENV{LD_LIBRARY_PATH}
+             pytest --cov-report=xml:$(pwd)/cobertura.xml --cov=$(pwd)/. --cov-report=html:$(pwd)/htmlcov
          WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/${PYTHON_SRC_PATH}
         )
