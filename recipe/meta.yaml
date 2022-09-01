@@ -1,0 +1,58 @@
+package:
+  name: constitutive_tools
+  # TODO: setup and use pyproject.toml and a Conda build Jinja template
+  version: {{ VERSION }}
+
+source:
+  path: '..'
+
+build:
+  script:
+    - mkdir build-package
+    - cd build-package
+    - cmake .. -DCMAKE_BUILD_TYPE=Release
+    - cmake --build . --target constitutive_tools
+    - cmake --install . --prefix ${PREFIX}
+  ignore_run_exports:
+    - python_abi
+
+requirements:
+  # TODO: need to pin the Python version, or at least build a variant to match (3.8.3)
+  build:
+    - python {{ python }}
+    - {{ compiler('cxx') }}
+    - cmake >=3.18
+    - doxygen
+    - eigen >=3.3.7
+    - setuptools
+    - setuptools_scm
+    - error_tools
+    - vector_tools
+  host:
+    - python
+    - eigen >=3.3.7
+    - setuptools
+    - setuptools_scm
+  run:
+    - python
+    - {{ compiler('cxx') }}
+    - eigen >=3.3.7
+    - error_tools
+    - vector_tools
+
+test:
+  requires:
+    - cmake >=3.18
+    - boost >=1.59
+  source_files:
+    - CMakeLists.txt
+    - src/cpp/tests/CMakeLists.txt
+    - src/cpp/tests/test_constitutive_tools.cpp
+  commands:
+    - mkdir build-tests
+    - cd build-tests
+    - installed_linked_library_parent="$(dirname $(find ${PREFIX} -name libconstitutive_tools.so))"
+    - export LD_LIBRARY_PATH="${installed_linked_library_parent}:${LD_LIBRARY_PATH}"
+    - cmake .. -DCMAKE_BUILD_TYPE=conda-test
+    - cmake --build . --verbose
+    - ctest --output-on-failure

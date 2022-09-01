@@ -1,4 +1,4 @@
-add_library(${PROJECT_NAME} "${PROJECT_NAME}.cpp" "${PROJECT_NAME}.h")
+add_library(${PROJECT_NAME} SHARED "${PROJECT_NAME}.cpp" "${PROJECT_NAME}.h")
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 11
                                                  PUBLIC_HEADER ${PROJECT_NAME}.h)
 target_link_libraries(${PROJECT_NAME} error_tools)
