@@ -510,7 +510,7 @@ namespace constitutiveTools{
     }
 
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
-                               floatVector &A, const floatVector &alpha){
+                               floatVector &dA, floatVector &A, const floatVector &alpha){
         /*!
          * Perform midpoint rule based evolution of a vector.
          *
@@ -522,6 +522,7 @@ namespace constitutiveTools{
          * \param &Ap: The previous value of the vector
          * \param &DApDt: The previous time rate of change of the vector.
          * \param &DADt: The current time rate of change of the vector.
+         * \param &dA: The change in the vector
          * \param &A: The current value of the vector.
          * \param &alpha: The integration parameter.
          */
@@ -533,20 +534,23 @@ namespace constitutiveTools{
             return new errorNode("midpointEvolution", "The size of the alpha vector is not the same size as the previous vector value");
         }
 
+        dA = floatVector(Ap.size(), 0);
         A = floatVector(Ap.size(), 0);
         unsigned int i = 0;
         for (auto ai = alpha.begin(); ai != alpha.end(); ai++, i++){
             if (((*ai) < 0) || ((*ai) > 1)){
                 return new errorNode("midpointEvolution", "Alpha must be between 0 and 1");
             }
-            A[i] = Ap[i] + Dt * (*ai * DApDt[i] + (1 - *ai) * DADt[i]);
+            dA[i] = Dt * (*ai * DApDt[i] + (1 - *ai) * DADt[i]);
+
+            A[i]  = Ap[i] + dA[i];
         }
 
         return NULL;
     }
 
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
-                               floatVector &A, floatMatrix &DADADt, const floatVector &alpha){
+                               floatVector &dA, floatVector &A, floatMatrix &DADADt, const floatVector &alpha){
         /*!
          * Perform midpoint rule based evolution of a vector and return the jacobian.
          *
@@ -558,12 +562,13 @@ namespace constitutiveTools{
          * \param &Ap: The previous value of the vector
          * \param &DApDt: The previous time rate of change of the vector.
          * \param &DADt: The current time rate of change of the vector.
+         * \param &A: The change in value of the vector.
          * \param &A: The current value of the vector.
          * \param &DADADt: The gradient of A w.r.t. the current rate of change.
          * \param &alpha: The integration parameter.
          */
 
-        errorOut error = midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha);
+        errorOut error = midpointEvolution(Dt, Ap, DApDt, DADt, dA, A, alpha);
 
         if (error){
             errorOut result = new errorNode("midpointEvolution (jacobian)", "Error in computation of the integrated term");
@@ -580,9 +585,8 @@ namespace constitutiveTools{
         return NULL;
     }
 
-
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
-                               floatVector &A, const floatType alpha){
+                               floatVector &dA, floatVector &A, const floatType alpha){
         /*!
          * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
          *
@@ -594,15 +598,17 @@ namespace constitutiveTools{
          * \param &Ap: The previous value of the vector
          * \param &DApDt: The previous time rate of change of the vector.
          * \param &DADt: The current time rate of change of the vector.
+         * \param &dA: The change in the value of the vector.
          * \param &A: The current value of the vector.
          * \param alpha: The integration parameter.
          */
 
-        return midpointEvolution(Dt, Ap, DApDt, DADt, A, alpha*floatVector(Ap.size(), 1));
+        return midpointEvolution(Dt, Ap, DApDt, DADt, dA, A, alpha*floatVector(Ap.size(), 1));
+
     }
 
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
-                               floatVector &A, floatMatrix &DADADt, const floatType alpha){
+                               floatVector &dA, floatVector &A, floatMatrix &DADADt, const floatType alpha){
         /*!
          * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
          *
@@ -614,12 +620,95 @@ namespace constitutiveTools{
          * \param &Ap: The previous value of the vector
          * \param &DApDt: The previous time rate of change of the vector.
          * \param *DADt: The current time rate of change of the vector.
+         * \param &dA: The change in the vector
          * \param &A: The current value of the vector.
          * \param &DADADt: The derivative of the vector w.r.t. the rate of change of the vector.
          * \param alpha: The integration parameter.
          */
 
-        return midpointEvolution(Dt, Ap, DApDt, DADt, A, DADADt, alpha*floatVector(Ap.size(), 1));
+        return midpointEvolution(Dt, Ap, DApDt, DADt, dA, A, DADADt, alpha*floatVector(Ap.size(), 1));
+    }
+
+    errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
+                     floatVector &dF, floatVector &deformationGradient, const floatType alpha, const unsigned int mode){
+        /*!
+         * Evolve the deformation gradient ( F ) using the midpoint integration method.
+         *
+         * mode 1:
+         * \f$F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha \right) L_{ij}^{t+1} \right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t} \right]\f$
+         *
+         * mode 2:
+         * \f$F_{iI}^{t + 1} = \left[F_{iJ}^{t} + \Delta t \alpha \dot{F}_{iJ}^{t} \right] \left[\delta_{IJ} - \Delta T \left( 1- \alpha \right) L_{IJ}^{t+1} \right]^{-1}\f$
+         *
+         * \param &Dt: The change in time.
+         * \param &previousDeformationGradient: The previous value of the deformation gradient
+         * \param &Lp: The previous velocity gradient in the current configuration (mode 1) or
+         *     reference configuration (mode 2).
+         * \param &L: The current velocity gradient in the current configuration (mode 1) or
+         *     reference configuration (mode 2).
+         * \param &dF: The change in the deformation gradient \f$\Delta \bf{F}\f$ such that \f$F_{iI}^{t+1} = F_{iI}^t + \Delta F_{iI}\f$
+         * \param &deformationGradient: The computed current deformation gradient.
+         * \param alpha: The integration parameter.
+         * \param mode: The mode of the ODE. Whether the velocity gradient is known in the
+         *     current (mode 1) or reference (mode 2) configuration.
+         */
+
+        //Assumes 3D
+        const unsigned int dim = 3;
+        if ( previousDeformationGradient.size( ) != dim * dim ){
+            return new errorNode( "evolveF", "The deformation gradient doesn't have enough terms (require 9 for 3D)" );
+        }
+
+        if ( Lp.size( ) != previousDeformationGradient.size( ) ){
+            return new errorNode( "evolveF", "The previous velocity gradient and deformation gradient aren't the same size" );
+        }
+
+        if ( previousDeformationGradient.size( ) != L.size( ) ){
+            return new errorNode( "evolveF", "The previous deformation gradient and the current velocity gradient aren't the same size" );
+        }
+
+        if ( ( mode != 1 ) && ( mode != 2 ) ){
+            return new errorNode( "evolveF", "The mode of evolution is not recognized" );
+        }
+
+        //Compute L^{t + \alpha}
+        floatVector LtpAlpha = alpha * Lp + ( 1 - alpha ) * L;
+
+        //Compute the right hand side
+
+        floatVector RHS;
+        if ( mode == 1 ){
+            RHS = vectorTools::matrixMultiply( LtpAlpha, previousDeformationGradient, dim, dim, dim, dim );
+        }
+        if ( mode == 2 ){
+            RHS = vectorTools::matrixMultiply( previousDeformationGradient, LtpAlpha, dim, dim, dim, dim );
+        }
+
+        RHS *= Dt;
+
+        //Compute the left-hand side
+        floatVector eye( dim * dim );
+
+        vectorTools::eye( eye );
+
+        floatVector LHS = eye - Dt * ( 1 - alpha ) * L;
+        floatVector invLHS = vectorTools::inverse( LHS, dim, dim );
+
+        if ( mode == 1 ){
+
+            dF = vectorTools::matrixMultiply( invLHS, RHS, dim, dim, dim, dim );
+
+        }
+        if ( mode == 2 ){
+
+            dF = vectorTools::matrixMultiply( RHS, invLHS, dim, dim, dim, dim );
+
+        }
+
+        deformationGradient = previousDeformationGradient + dF;
+
+        return NULL;
+
     }
 
     errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
@@ -645,57 +734,14 @@ namespace constitutiveTools{
          *     current (mode 1) or reference (mode 2) configuration.
          */
 
-        //Assumes 3D
-        const unsigned int dim = 3;
-        if ( previousDeformationGradient.size( ) != dim * dim ){
-            return new errorNode( "evolveF", "The deformation gradient doesn't have enough terms (require 9 for 3D)" );
-        }
+        floatVector dF;
 
-        if ( Lp.size( ) != previousDeformationGradient.size( ) ){
-            return new errorNode( "evolveF", "The previous velocity gradient and deformation gradient aren't the same size" );
-        }
+        return evolveF( Dt, previousDeformationGradient, Lp, L, dF, deformationGradient, alpha, mode );
 
-        if ( previousDeformationGradient.size( ) != L.size( ) ){
-            return new errorNode( "evolveF", "The previous deformation gradient and the current velocity gradient aren't the same size" );
-        }
-
-        if ( ( mode != 1 ) && ( mode != 2 ) ){
-            return new errorNode( "evolveF", "The mode of evolution is not recognized" );
-        }
-
-        //Compute the time-rate of change of the previous deformation gradient from the velocity gradient.
-        floatVector DFpDt;
-        if ( mode == 1 ){
-            DFpDt = vectorTools::matrixMultiply( Lp, previousDeformationGradient, dim, dim, dim, dim );
-        }
-        if ( mode == 2 ){
-            DFpDt = vectorTools::matrixMultiply(previousDeformationGradient, Lp, dim, dim, dim, dim);
-        }
-
-        //Compute the left-hand side
-        floatVector eye( dim * dim );
-        vectorTools::eye( eye );
-        floatVector LHS = eye - Dt * ( 1 - alpha ) * L;
-
-        //Compute the inverse of the left-hand side
-        floatVector invLHS = vectorTools::inverse( LHS, dim, dim );
-
-        //Compute the right-hand side
-        floatVector RHS = previousDeformationGradient + Dt * alpha * DFpDt;
-        deformationGradient = floatVector( dim * dim, 0 );
-
-        //Compute the new value of F
-        if ( mode == 1 ){
-            deformationGradient = vectorTools::matrixMultiply( invLHS, RHS, dim, dim, dim, dim );
-        }
-        if ( mode == 2 ){
-            deformationGradient = vectorTools::matrixMultiply(RHS, invLHS, dim, dim, dim, dim);
-        }
-        return NULL;
     }
 
     errorOut evolveF( const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
-                      floatVector &deformationGradient, floatMatrix &dFdL, const floatType alpha, const unsigned int mode ){
+                      floatVector &dF, floatVector &deformationGradient, floatMatrix &dFdL, const floatType alpha, const unsigned int mode ){
         /*!
          * Evolve the deformation gradient ( F ) using the midpoint integration method and return the jacobian w.r.t. L.
          *
@@ -711,6 +757,7 @@ namespace constitutiveTools{
          * \param &previousDeformationGradient: The previous value of the deformation gradient
          * \param &Lp: The previous velocity gradient.
          * \param &L: The current velocity gradient.
+         * \param &dF: The change in the deformation gradient \f$\Delta \bf{F}\f$ such that \f$F_{iI}^{t+1} = F_{iI}^t + \Delta F_{iI}\f$
          * \param &deformationGradient: The computed current deformation gradient.
          * \param &dFdL: The derivative of the deformation gradient w.r.t. the velocity gradient
          * \param alpha: The integration parameter ( 0 for implicit, 1 for explicit )
@@ -719,45 +766,25 @@ namespace constitutiveTools{
 
         //Assumes 3D
         const unsigned int dim = 3;
-        if ( previousDeformationGradient.size( ) != dim * dim ){
-            return new errorNode( "evolveF", "The deformation gradient doesn't have enough terms (require 9 for 3D)" );
+        errorOut error = evolveF( Dt, previousDeformationGradient, Lp, L, dF, deformationGradient, alpha, mode);
+
+        if ( error ){
+
+            errorOut result = new errorNode( __func__, "Error when computing the evolved deformation gradient" );
+            result->addNext( error );
+            return result;
+
         }
 
-        if ( Lp.size( ) != previousDeformationGradient.size( ) ){
-             return new errorNode( "evolveF", "The previous velocity gradient and deformation gradient aren't the same size" );
-        }
-
-        if ( previousDeformationGradient.size( ) != L.size( ) ){
-            return new errorNode( "evolveF", "The previous deformation gradient and the current velocity gradient aren't the same size" );
-        }
-
-        //Compute the time-rate of change of the previous deformation gradient from the velocity gradient.
-        floatVector DFpDt;
-        if ( mode == 1 ){
-             DFpDt = vectorTools::matrixMultiply( Lp, previousDeformationGradient, dim, dim, dim, dim );
-        }
-        if ( mode == 2 ){
-             DFpDt = vectorTools::matrixMultiply( previousDeformationGradient, Lp, dim, dim, dim, dim );
-        }
-
-        //Compute the left-hand side
+        //Compute the left hand side
         floatVector eye( dim * dim );
+
         vectorTools::eye( eye );
+
         floatVector LHS = eye - Dt * ( 1 - alpha ) * L;
 
         //Compute the inverse of the left-hand side
         floatVector invLHS = vectorTools::inverse( LHS, dim, dim );
-
-        //Compute the right-hand side
-        floatVector RHS = previousDeformationGradient + Dt * alpha * DFpDt;
-
-        //Evolve the deformation gradient
-        if ( mode == 1 ){
-            deformationGradient = vectorTools::matrixMultiply( invLHS, RHS, dim, dim, dim, dim );
-        }
-        if ( mode == 2 ){
-            deformationGradient = vectorTools::matrixMultiply( RHS, invLHS, dim, dim, dim, dim );
-        }
 
         //Compute the jacobian
         dFdL = floatMatrix( deformationGradient.size( ), floatVector( L.size( ), 0 ) );
@@ -786,6 +813,35 @@ namespace constitutiveTools{
         return NULL;
     }
 
+    errorOut evolveF( const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
+                      floatVector &deformationGradient, floatMatrix &dFdL, const floatType alpha, const unsigned int mode ){
+        /*!
+         * Evolve the deformation gradient ( F ) using the midpoint integration method and return the jacobian w.r.t. L.
+         *
+         * mode 1:
+         * \f$F_{iI}^{t + 1} = \left[\delta_{ij} - \Delta t \left(1 - \alpha \right) L_{ij}^{t+1} \right]^{-1} \left[F_{iI}^{t} + \Delta t \alpha \dot{F}_{iI}^{t} \right]\f$
+         * \f$\frac{\partial F_{jI}^{t + 1}}{\partial L_{kl}^{t+1}} = \left[\delta_{kj} - \Delta t \left(1 - \alpha\right) L_{kj}\right]^{-1} \Delta t \left(1 - \alpha\right) F_{lI}^{t + 1}\f$
+         *
+         * mode 2:
+         * \f$F_{iI}^{t + 1} = \left[F_{iJ}^{t} + \Delta t \alpha \dot{F}_{iJ}^{t} \right] \left[\delta_{IJ} - \Delta T \left( 1- \alpha \right) L_{IJ}^{t+1} \right]^{-1}\f$
+         * \f$\frac{\partial F_{iJ}^{t + 1}}{\partial L_{KL}} = \Delta t (1 - \alpha) F_{iK}^{t + 1} \left[\delta_{JL} - \right ]\f$
+         *
+         * \param &Dt: The change in time.
+         * \param &previousDeformationGradient: The previous value of the deformation gradient
+         * \param &Lp: The previous velocity gradient.
+         * \param &L: The current velocity gradient.
+         * \param &deformationGradient: The computed current deformation gradient.
+         * \param &dFdL: The derivative of the deformation gradient w.r.t. the velocity gradient
+         * \param alpha: The integration parameter ( 0 for implicit, 1 for explicit )
+         * \param mode: The form of the ODE. See above for details.
+         */
+
+        floatVector dF;
+
+        return evolveF( Dt, previousDeformationGradient, Lp, L, dF, deformationGradient, dFdL, alpha, mode );
+
+    }
+
     floatType mac(const floatType &x){
         /*!
          * Compute the Macaulay brackets of a scalar x
@@ -795,18 +851,25 @@ namespace constitutiveTools{
          * \param &x: The incoming scalar.
          */
 
-        return 0.5*(fabs(x) + x);
+        return 0.5 * ( fabs( x ) + x );
     }
 
-    floatType mac(const floatType &x, floatType &dmacdx){
+    floatType mac( const floatType &x, floatType &dmacdx ){
         /*!
          * Compute the Macaulay brackets of the scalar x and
          * return the jacobian as well.
+         * 
+         * returns x if x>0, 0 otherwise
+         * 
+         * The Jacobian is the Heaviside function
+         * 
+         * \param &x: The incoming scalar
+         * \param &dmacdx: The returned jacobian
          */
 
-        if (x<0){ dmacdx = 0; }
-        else {dmacdx = 1;}
-        return mac(x);
+        dmacdx = 0;
+        if ( x >= 0 ){ dmacdx = 1; }
+        return mac( x );
     }
 
     errorOut computeUnitNormal(const floatVector &A, floatVector &Anorm){
@@ -951,6 +1014,12 @@ namespace constitutiveTools{
         /*!
          * Define a quadratic equation for the thermal expansion. This could be the
          * thermal strain or the value of the stretch tensor.
+         * 
+         * \f$ e^{\theta}_{ij} = a_{ij} \left(\theta - \theta_0\right) + b_{ij} \left(\theta^2 - \theta_0^2\right)\f$
+         * 
+         * Where \f$e^{\theta}_{ij}\f$ is the thermal expansion, \f$a_{ij}\f$ are the linear parameters,
+         * \f$b_{ij}\f$ are the quadratic parameters, \f$\theta\f$ is the current temperature, and \f$\theta_0\f$
+         * is the reference temperature.
          *
          * \param &temperature: The temperature
          * \param &referenceTemperature: The reference temperature
@@ -963,8 +1032,8 @@ namespace constitutiveTools{
             return new errorNode("quadraticThermalExpansion", "The linear and quadratic parameters must have the same length");
         }
 
-        floatType relativeTemperature  = temperature - referenceTemperature;
-        thermalExpansion = linearParameters*relativeTemperature + quadraticParameters * relativeTemperature * relativeTemperature;
+        thermalExpansion = linearParameters * temperature          + quadraticParameters * temperature * temperature
+                         - linearParameters * referenceTemperature - quadraticParameters * referenceTemperature * referenceTemperature;
 
         return NULL;
     }
@@ -975,6 +1044,12 @@ namespace constitutiveTools{
         /*!
          * Define a quadratic equation for the thermal expansion. This could be the
          * thermal strain or the value of the stretch tensor.
+         * 
+         * \f$ e^{\theta}_{ij} = a_{ij} \left(\theta - \theta_0\right) + b_{ij} \left(\theta^2 - \theta_0^2\right)\f$
+         * 
+         * Where \f$e^{\theta}_{ij}\f$ is the thermal expansion, \f$a_{ij}\f$ are the linear parameters,
+         * \f$b_{ij}\f$ are the quadratic parameters, \f$\theta\f$ is the current temperature, and \f$\theta_0\f$
+         * is the reference temperature.
          *
          * \param &temperature: The temperature
          * \param &referenceTemperature: The reference temperature
@@ -994,7 +1069,7 @@ namespace constitutiveTools{
             return result;
         }
 
-        thermalExpansionJacobian = linearParameters + 2 * quadraticParameters * (temperature - referenceTemperature);
+        thermalExpansionJacobian = linearParameters + 2 * quadraticParameters * temperature;
 
         return NULL;
     }

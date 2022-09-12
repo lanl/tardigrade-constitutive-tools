@@ -32,10 +32,7 @@ author = 'Nathan A. Miller and Kyle A. Brindley'
 
 # Set version to clean Git tag or else use meta data in version
 release = VERSION
-if int(VERSION_AHEAD) == 0:  # Git tag describes current commit
-    version = release
-else:
-    version = VERSION_STRING_FULL
+version = VERSION_STRING_FULL
 
 # -- Project Variables -------------------------------------------------------
 rst_prolog = f'.. |project| replace:: {project}'
