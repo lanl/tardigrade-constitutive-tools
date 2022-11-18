@@ -509,8 +509,8 @@ namespace constitutiveTools{
         return NULL;
     }
 
-    errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
-                               floatVector &dA, floatVector &A, const floatVector &alpha){
+    errorOut midpointEvolution( const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
+                                floatVector &dA, floatVector &A, const floatVector &alpha ){
         /*!
          * Perform midpoint rule based evolution of a vector.
          *
@@ -527,30 +527,30 @@ namespace constitutiveTools{
          * \param &alpha: The integration parameter.
          */
 
-        if ((Ap.size() != DApDt.size()) || (Ap.size() != DADt.size())){
-            return new errorNode("midpointEvolution", "The size of the previous value of the vector and the two rates are not equal");
+        if ( ( Ap.size( ) != DApDt.size( ) ) || ( Ap.size( ) != DADt.size( ) ) ){
+            return new errorNode( __func__, "The size of the previous value of the vector and the two rates are not equal" );
         }
-        if (Ap.size() != alpha.size()){
-            return new errorNode("midpointEvolution", "The size of the alpha vector is not the same size as the previous vector value");
+        if ( Ap.size( ) != alpha.size( ) ){
+            return new errorNode( __func__, "The size of the alpha vector is not the same size as the previous vector value" );
         }
 
-        dA = floatVector(Ap.size(), 0);
-        A = floatVector(Ap.size(), 0);
+        dA = floatVector( Ap.size( ), 0 );
+        A = floatVector( Ap.size( ), 0 );
         unsigned int i = 0;
-        for (auto ai = alpha.begin(); ai != alpha.end(); ai++, i++){
-            if (((*ai) < 0) || ((*ai) > 1)){
-                return new errorNode("midpointEvolution", "Alpha must be between 0 and 1");
+        for ( auto ai = alpha.begin( ); ai != alpha.end( ); ai++, i++ ){
+            if ( ( ( *ai ) < 0) || ( ( *ai ) > 1 ) ){
+                return new errorNode( __func__, "Alpha must be between 0 and 1" );
             }
-            dA[i] = Dt * (*ai * DApDt[i] + (1 - *ai) * DADt[i]);
+            dA[ i ] = Dt * ( *ai * DApDt[ i ] + ( 1 - *ai ) * DADt[ i ] );
 
-            A[i]  = Ap[i] + dA[i];
+            A[ i ]  = Ap[ i ] + dA[ i ];
         }
 
         return NULL;
     }
 
-    errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
-                               floatVector &dA, floatVector &A, floatMatrix &DADADt, const floatVector &alpha){
+    errorOut midpointEvolution( const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
+                                floatVector &dA, floatVector &A, floatMatrix &DADADt, const floatVector &alpha ){
         /*!
          * Perform midpoint rule based evolution of a vector and return the jacobian.
          *
@@ -568,25 +568,25 @@ namespace constitutiveTools{
          * \param &alpha: The integration parameter.
          */
 
-        errorOut error = midpointEvolution(Dt, Ap, DApDt, DADt, dA, A, alpha);
+        errorOut error = midpointEvolution( Dt, Ap, DApDt, DADt, dA, A, alpha );
 
-        if (error){
-            errorOut result = new errorNode("midpointEvolution (jacobian)", "Error in computation of the integrated term");
-            result->addNext(error);
+        if ( error ){
+            errorOut result = new errorNode( __func__, "Error in computation of the integrated term" );
+            result->addNext( error );
             return result;
         }
 
-        DADADt = floatMatrix(A.size(), floatVector(A.size(), 0));
-        unsigned int i=0;
-        for (auto ai = alpha.begin(); ai != alpha.end(); ai++, i++){
-            DADADt[i][i] = Dt * (1 - *ai);
+        DADADt = floatMatrix( A.size( ), floatVector( A.size( ), 0 ) );
+        unsigned int i = 0;
+        for ( auto ai = alpha.begin( ); ai != alpha.end( ); ai++, i++ ){
+            DADADt[ i ][ i ] = Dt * ( 1 - *ai );
         }
 
         return NULL;
     }
 
-    errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
-                               floatVector &dA, floatVector &A, const floatType alpha){
+    errorOut midpointEvolution( const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
+                                floatVector &dA, floatVector &A, const floatType alpha ){
         /*!
          * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
          *
@@ -603,12 +603,12 @@ namespace constitutiveTools{
          * \param alpha: The integration parameter.
          */
 
-        return midpointEvolution(Dt, Ap, DApDt, DADt, dA, A, alpha*floatVector(Ap.size(), 1));
+        return midpointEvolution( Dt, Ap, DApDt, DADt, dA, A, alpha * floatVector( Ap.size( ), 1 ) );
 
     }
 
-    errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
-                               floatVector &dA, floatVector &A, floatMatrix &DADADt, const floatType alpha){
+    errorOut midpointEvolution( const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
+                                floatVector &dA, floatVector &A, floatMatrix &DADADt, const floatType alpha ){
         /*!
          * Perform midpoint rule based evolution of a vector. Defaults to the trapezoidal rule.
          *
@@ -626,7 +626,7 @@ namespace constitutiveTools{
          * \param alpha: The integration parameter.
          */
 
-        return midpointEvolution(Dt, Ap, DApDt, DADt, dA, A, DADADt, alpha*floatVector(Ap.size(), 1));
+        return midpointEvolution( Dt, Ap, DApDt, DADt, dA, A, DADADt, alpha * floatVector( Ap.size( ), 1 ) );
     }
 
     errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
