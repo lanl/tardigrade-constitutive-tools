@@ -326,10 +326,15 @@ BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
      */
 
     floatType Dt = 2.5;
+
     floatVector Ap    = { 9, 10, 11, 12 };
+
     floatVector DApDt = { 1, 2, 3, 4 };
+
     floatVector DADt  = { 5, 6, 7, 8 };
+
     floatVector alphaVec = { 0.1, 0.2, 0.3, 0.4 };
+
     floatVector dA, A;
 
     //Test implicit integration
@@ -365,10 +370,13 @@ BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
 
     //Add test for the jacobian
     floatType eps = 1e-6;
+
     floatVector A0, Ai, dA0, dAi;
+
     floatMatrix DADADt;
 
     error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, dA, A, alphaVec );
+
     error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, dA0, A0, DADADt, alphaVec );
 
     BOOST_CHECK( ! error );
@@ -378,7 +386,9 @@ BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
     BOOST_CHECK( vectorTools::fuzzyEquals( dA0, dA ) );
 
     for ( unsigned int i=0; i<DADt.size( ); i++ ){
+
         floatVector delta = floatVector( DADt.size( ), 0 );
+
         delta[ i ] = eps*( DADt[ i ] ) + eps;
 
         error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt + delta, dAi, Ai, alphaVec );
@@ -386,16 +396,60 @@ BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
         floatVector gradCol = ( Ai - A0 )/delta[ i ];
 
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
+
             BOOST_CHECK( vectorTools::fuzzyEquals( DADADt[ j ][ i ], gradCol[ j ] ) );
+
         }
 
         gradCol = ( dAi - dA0 )/delta[ i ];
 
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
+
             BOOST_CHECK( vectorTools::fuzzyEquals( DADADt[ j ][ i ], gradCol[ j ] ) );
+
         }
 
     }
+
+    floatVector dA1, A1;
+
+    floatMatrix DADADt1, DADADtp;
+
+    BOOST_CHECK( !constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, dA1, A1, DADADt1, DADADtp, alphaVec ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( A1, A ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( dA1, dA ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( DADADt1, DADADt ) );
+
+    floatMatrix DADADtp_answer( Ap.size( ), floatVector( DApDt.size( ), 0 ) );
+
+    for ( unsigned int i = 0; i < DApDt.size( ); i++ ){
+
+        floatVector delta = floatVector( DApDt.size( ), 0 );
+
+        delta[ i ] = eps * std::fabs( DApDt[ i ] ) + eps;
+
+        floatVector _dAp, _dAm;
+
+        floatVector _Ap, _Am;
+
+        BOOST_CHECK( !constitutiveTools::midpointEvolution( Dt, Ap, DApDt + delta, DADt, _dAp, _Ap, alphaVec ) );
+
+        BOOST_CHECK( !constitutiveTools::midpointEvolution( Dt, Ap, DApDt - delta, DADt, _dAm, _Am, alphaVec ) );
+
+        for ( unsigned int j = 0; j < Ap.size( ); j++ ){
+
+            DADADtp_answer[ j ][ i ] = ( _Ap[ j ] - _Am[ j ] ) / ( 2 * delta[ i ] );
+
+            BOOST_CHECK( vectorTools::fuzzyEquals( DADADtp_answer[ j ][ i ], ( _dAp[ j ] - _dAm[ j ] ) / ( 2 * delta[ i ] ) ) );
+
+        }
+
+    }
+
+    BOOST_TEST( vectorTools::fuzzyEquals( DADADtp, DADADtp_answer ) );
 
 }
 
