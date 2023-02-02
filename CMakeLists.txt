@@ -103,12 +103,12 @@ endforeach(package)
 #=============================================================================================== ADD PROJECT TARGETS ===
 # MUST COME AFTER DEPENDENCY LOCATING
 # Add project source directories
-if(CONSTITUTIVE_TOOLS_BUILD_PYTHON_BINDINGS)
-endif()
 if(${not_conda_test} STREQUAL "true")
-    add_subdirectory(${PYTHON_SRC_PATH})
     include_directories(${CPP_SRC_PATH})
     add_subdirectory(${CPP_SRC_PATH})
+    if(CONSTITUTIVE_TOOLS_BUILD_PYTHON_BINDINGS)
+        add_subdirectory(${PYTHON_SRC_PATH})
+    endif()
 endif()
 
 # Only add tests and documentation for current project builds. Protects downstream project builds.
@@ -134,14 +134,14 @@ if(${not_conda_test} STREQUAL "true")
           "${PROJECT_BINARY_DIR}/${package}Config.cmake"
           INSTALL_DESTINATION
           ${CMAKE_INSTALL_DATAROOTDIR}/${package}/cmake)
-        
+
         # CMake won't build the targets for local builds of upstream projects
         if(cmake_build_type_lower STREQUAL release)
             install(EXPORT ${package}_Targets
                     FILE ${package}Targets.cmake
                     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${package}/cmake)
         endif()
-        
+
         install(FILES "${PROJECT_BINARY_DIR}/${package}Config.cmake"
                       "${PROJECT_BINARY_DIR}/${package}ConfigVersion.cmake"
                 DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${package}/cmake)
