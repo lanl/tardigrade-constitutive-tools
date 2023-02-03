@@ -26,7 +26,7 @@ elseif(cmake_build_type_lower STREQUAL "conda-test")
     set(not_conda_test "false")
     # Find the installed project library
     find_file(installed_linked_library
-              "lib${PROJECT_NAME}.so"
+              "lib${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}"
               PATHS "$ENV{CONDA_PREFIX}/lib64" "$ENV{CONDA_PREFIX}/lib"
               NO_CACHE
               REQUIRED)
