@@ -17,7 +17,6 @@ build:
     - python_abi
 
 requirements:
-  # TODO: need to pin the Python version, or at least build a variant to match (3.8.3)
   build:
     - eigen >=3.3.7
     - error_tools
