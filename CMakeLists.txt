@@ -26,7 +26,7 @@ elseif(cmake_build_type_lower STREQUAL "conda-test")
     set(not_conda_test "false")
     # Find the installed project library
     find_file(installed_linked_library
-              "lib${PROJECT_NAME}.so"
+              "lib${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}"
               PATHS "$ENV{CONDA_PREFIX}/lib64" "$ENV{CONDA_PREFIX}/lib"
               NO_CACHE
               REQUIRED)
@@ -52,7 +52,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Set the c++ standard
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -ansi -pedantic -lrt")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -ansi -pedantic")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lrt")
+endif()
 
 # Enable CTest
 enable_testing()
@@ -103,12 +106,12 @@ endforeach(package)
 #=============================================================================================== ADD PROJECT TARGETS ===
 # MUST COME AFTER DEPENDENCY LOCATING
 # Add project source directories
-if(CONSTITUTIVE_TOOLS_BUILD_PYTHON_BINDINGS)
-endif()
 if(${not_conda_test} STREQUAL "true")
-    add_subdirectory(${PYTHON_SRC_PATH})
     include_directories(${CPP_SRC_PATH})
     add_subdirectory(${CPP_SRC_PATH})
+    if(CONSTITUTIVE_TOOLS_BUILD_PYTHON_BINDINGS)
+        add_subdirectory(${PYTHON_SRC_PATH})
+    endif()
 endif()
 
 # Only add tests and documentation for current project builds. Protects downstream project builds.
@@ -134,14 +137,14 @@ if(${not_conda_test} STREQUAL "true")
           "${PROJECT_BINARY_DIR}/${package}Config.cmake"
           INSTALL_DESTINATION
           ${CMAKE_INSTALL_DATAROOTDIR}/${package}/cmake)
-        
+
         # CMake won't build the targets for local builds of upstream projects
         if(cmake_build_type_lower STREQUAL release)
             install(EXPORT ${package}_Targets
                     FILE ${package}Targets.cmake
                     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${package}/cmake)
         endif()
-        
+
         install(FILES "${PROJECT_BINARY_DIR}/${package}Config.cmake"
                       "${PROJECT_BINARY_DIR}/${package}ConfigVersion.cmake"
                 DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${package}/cmake)

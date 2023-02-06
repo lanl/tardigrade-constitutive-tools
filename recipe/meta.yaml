@@ -17,24 +17,19 @@ build:
     - python_abi
 
 requirements:
-  # TODO: need to pin the Python version, or at least build a variant to match (3.8.3)
   build:
-    - python {{ python }}
-    - {{ compiler('cxx') }}
-    - cmake >=3.18
-    - doxygen
     - eigen >=3.3.7
-    - setuptools
-    - setuptools_scm
     - error_tools
     - vector_tools
+    - boost >=1.59  # TODO: Separate the package/test configuration to make BOOST an optional build dependency
+    - setuptools_scm >=6.2
   host:
     - python
-    - eigen >=3.3.7
-    - setuptools
-    - setuptools_scm
+    - cmake >=3.18
+    - {{ compiler('cxx') }}
+    - doxygen  # TODO: Separate the package/documentation configuration to make Doxygen an optional build dependency
+    - sphinx  # TODO: Separate the package/documentation configuration to make Sphinx an optional build dependency
   run:
-    - python
     - {{ compiler('cxx') }}
     - eigen >=3.3.7
     - error_tools
@@ -44,14 +39,18 @@ test:
   requires:
     - cmake >=3.18
     - boost >=1.59
+    - doxygen  # TODO: Separate the package/documentation configuration to make Doxygen an optional build dependency
+    - sphinx  # TODO: Separate the package/documentation configuration to make Sphinx an optional build dependency
   source_files:
     - CMakeLists.txt
     - src/cpp/tests/CMakeLists.txt
     - src/cpp/tests/test_constitutive_tools.cpp
   commands:
+    - dylib='so'
+    - if [ $(uname) = 'Darwin' ]; then dylib='dylib'; fi
     - mkdir build-tests
     - cd build-tests
-    - installed_linked_library_parent="$(dirname $(find ${PREFIX} -name libconstitutive_tools.so))"
+    - installed_linked_library_parent="$(dirname $(find ${PREFIX} -name libconstitutive_tools.${dylib}))"
     - export LD_LIBRARY_PATH="${installed_linked_library_parent}:${LD_LIBRARY_PATH}"
     - cmake .. -DCMAKE_BUILD_TYPE=conda-test
     - cmake --build . --verbose

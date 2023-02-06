@@ -1,6 +1,7 @@
 # Project files
 # Managed by GetVersionFromGitTag.cmake
 VERSION
+_version.py
 
 # Temp files
 *.swp
