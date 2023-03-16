@@ -6,7 +6,7 @@ cython
 doxygen
 eigen>=3.3.7
 error_tools
-gxx_linux-64>=7.3.0
+compilers
 setuptools_scm>=6.2
 pip
 pytest
