@@ -5,7 +5,7 @@ cmake>=3.18
 cython
 doxygen
 eigen>=3.3.7
-error_tools
+error_tools>=0.4.1
 compilers
 setuptools_scm>=6.2
 pip
@@ -14,4 +14,4 @@ pytest-cov
 sphinx>=3.0.4
 sphinx_rtd_theme>=0.4.3
 sphinxcontrib-bibtex
-vector_tools
+vector_tools>=0.4.1
