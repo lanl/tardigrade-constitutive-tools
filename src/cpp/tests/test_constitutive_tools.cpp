@@ -326,10 +326,15 @@ BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
      */
 
     floatType Dt = 2.5;
+
     floatVector Ap    = { 9, 10, 11, 12 };
+
     floatVector DApDt = { 1, 2, 3, 4 };
+
     floatVector DADt  = { 5, 6, 7, 8 };
+
     floatVector alphaVec = { 0.1, 0.2, 0.3, 0.4 };
+
     floatVector dA, A;
 
     //Test implicit integration
@@ -365,10 +370,13 @@ BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
 
     //Add test for the jacobian
     floatType eps = 1e-6;
+
     floatVector A0, Ai, dA0, dAi;
+
     floatMatrix DADADt;
 
     error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, dA, A, alphaVec );
+
     error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, dA0, A0, DADADt, alphaVec );
 
     BOOST_CHECK( ! error );
@@ -378,7 +386,9 @@ BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
     BOOST_CHECK( vectorTools::fuzzyEquals( dA0, dA ) );
 
     for ( unsigned int i=0; i<DADt.size( ); i++ ){
+
         floatVector delta = floatVector( DADt.size( ), 0 );
+
         delta[ i ] = eps*( DADt[ i ] ) + eps;
 
         error = constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt + delta, dAi, Ai, alphaVec );
@@ -386,16 +396,60 @@ BOOST_AUTO_TEST_CASE( testMidpointEvolution ){
         floatVector gradCol = ( Ai - A0 )/delta[ i ];
 
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
+
             BOOST_CHECK( vectorTools::fuzzyEquals( DADADt[ j ][ i ], gradCol[ j ] ) );
+
         }
 
         gradCol = ( dAi - dA0 )/delta[ i ];
 
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
+
             BOOST_CHECK( vectorTools::fuzzyEquals( DADADt[ j ][ i ], gradCol[ j ] ) );
+
         }
 
     }
+
+    floatVector dA1, A1;
+
+    floatMatrix DADADt1, DADADtp;
+
+    BOOST_CHECK( !constitutiveTools::midpointEvolution( Dt, Ap, DApDt, DADt, dA1, A1, DADADt1, DADADtp, alphaVec ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( A1, A ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( dA1, dA ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( DADADt1, DADADt ) );
+
+    floatMatrix DADADtp_answer( Ap.size( ), floatVector( DApDt.size( ), 0 ) );
+
+    for ( unsigned int i = 0; i < DApDt.size( ); i++ ){
+
+        floatVector delta = floatVector( DApDt.size( ), 0 );
+
+        delta[ i ] = eps * std::fabs( DApDt[ i ] ) + eps;
+
+        floatVector _dAp, _dAm;
+
+        floatVector _Ap, _Am;
+
+        BOOST_CHECK( !constitutiveTools::midpointEvolution( Dt, Ap, DApDt + delta, DADt, _dAp, _Ap, alphaVec ) );
+
+        BOOST_CHECK( !constitutiveTools::midpointEvolution( Dt, Ap, DApDt - delta, DADt, _dAm, _Am, alphaVec ) );
+
+        for ( unsigned int j = 0; j < Ap.size( ); j++ ){
+
+            DADADtp_answer[ j ][ i ] = ( _Ap[ j ] - _Am[ j ] ) / ( 2 * delta[ i ] );
+
+            BOOST_CHECK( vectorTools::fuzzyEquals( DADADtp_answer[ j ][ i ], ( _dAp[ j ] - _dAm[ j ] ) / ( 2 * delta[ i ] ) ) );
+
+        }
+
+    }
+
+    BOOST_TEST( vectorTools::fuzzyEquals( DADADtp, DADADtp_answer ) );
 
 }
 
@@ -492,9 +546,7 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     //Test 1 ( mode 1 fully explicit )
     floatVector dF, F;
-    errorOut error = constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 1, 1 );
-
-    BOOST_CHECK( ! error );
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 1, 1 ) );
 
     floatVector answer = { 4.39551129, 2.53782698, 1.84614498,
                            4.81201673, 3.75047725, 2.48674399,
@@ -502,18 +554,14 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 1, 1 );
-
-    BOOST_CHECK( ! error );
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 1, 1 ) );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer - Fp, dF ) );
 
     //Test 2 ( mode 1 fully implicit )
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 0, 1 );
-
-    BOOST_CHECK( ! error );
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 0, 1 ) );
 
     answer = {  0.63522182, -0.1712192 , -0.00846781,
                -0.81250979, -0.19375022, -0.20193394,
@@ -521,18 +569,14 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 0, 1 );
-
-    BOOST_CHECK( ! error );
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 0, 1 ) );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer - Fp, dF ) );
 
     //Test 3 ( mode 1 midpoint rule )
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 0.5, 1 );
-
-    BOOST_CHECK( ! error );
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 0.5, 1 ) );
 
     answer = {  0.20004929, -0.4409338 , -0.18955924,
                -3.59005736, -2.17210401, -1.55661536,
@@ -540,54 +584,117 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 0.5, 1 );
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 0.5, 1 ) );
 
-    BOOST_CHECK( ! error );
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer - Fp, dF ) );
-
 
     //Tests 4 and 5 ( mode 1 jacobian )
     floatVector dFJ, FJ;
     floatMatrix dFdL;
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dFJ, FJ, dFdL, 0.5, 1 );
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, dFJ, FJ, dFdL, 0.5, 1 ) );
 
-    BOOST_CHECK( ! error );
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer, FJ ) );
 
-    BOOST_CHECK( vectorTools::fuzzyEquals( F, FJ ) );
+    floatMatrix dFdL_alt, ddFdFp, dFdFp, dFdLp;
+
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, dFJ, FJ, dFdL_alt, ddFdFp, dFdFp, dFdLp, 0.5, 1 ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer, FJ ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer - Fp, dFJ ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( dFdL, dFdL_alt ) );
 
     floatType eps = 1e-6;
+
+    floatMatrix dFdL_answer( L.size( ), floatVector( L.size( ), 0 ) );
+
     for ( unsigned int i=0; i<L.size( ); i++ ){
 
         floatVector delta( L.size( ), 0 );
-        delta[ i ] = eps*fabs( L[ i ] ) + eps;
+        delta[ i ] = eps * std::fabs( L[ i ] ) + eps;
 
-        error = constitutiveTools::evolveF( Dt, Fp, Lp, L + delta, FJ, 0.5, 1 );
+        floatVector _Fp, _Fm;
 
-        BOOST_CHECK( ! error );
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L + delta, _Fp, 0.5, 1 ) );
 
-        floatVector gradCol = ( FJ - F )/delta[ i ];
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L - delta, _Fm, 0.5, 1 ) );
 
-        for ( unsigned int j=0; j<gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dFdL[ j ][ i ], 1e-5, 1e-5 ) );
-        }
+        for ( unsigned int j = 0; j < L.size( ); j++ ){
 
-        error = constitutiveTools::evolveF( Dt, Fp, Lp, L + delta, dFJ, FJ, 0.5, 1 );
+            dFdL_answer[ j ][ i ] = ( _Fp[ j ] - _Fm[ j ] ) / ( 2 * delta[ i ] );
 
-        BOOST_CHECK( ! error );
-
-        gradCol = ( dFJ - dF )/delta[ i ];
-
-        for ( unsigned int j=0; j<gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dFdL[ j ][ i ], 1e-5, 1e-5 ) );
         }
 
     }
 
-    //Test 6 ( mode 2 fully explicit )
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 1, 2 );
+    BOOST_CHECK( vectorTools::fuzzyEquals( dFdL, dFdL_answer ) );
 
-    BOOST_CHECK( ! error );
+    floatMatrix dFdFp_answer( answer.size( ), floatVector( Fp.size( ), 0 ) );
+    floatMatrix ddFdFp_answer( answer.size( ), floatVector( Fp.size( ), 0 ) );
+
+    for ( unsigned int i=0; i<Fp.size( ); i++ ){
+
+        floatVector delta( Fp.size( ), 0 );
+        delta[ i ] = eps * std::fabs( Fp[ i ] ) + eps;
+
+        floatVector _Fp, _Fm;
+
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp + delta, Lp, L, _Fp, 0.5, 1 ) );
+
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp - delta, Lp, L, _Fm, 0.5, 1 ) );
+
+        for ( unsigned int j = 0; j < L.size( ); j++ ){
+
+            dFdFp_answer[ j ][ i ] = ( _Fp[ j ] - _Fm[ j ] ) / ( 2 * delta[ i ] );
+
+        }
+
+        floatVector _dFp, _dFm;
+
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp + delta, Lp, L, _dFp, _Fp, 0.5, 1 ) );
+
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp - delta, Lp, L, _dFm, _Fm, 0.5, 1 ) );
+
+        for ( unsigned int j = 0; j < L.size( ); j++ ){
+
+            ddFdFp_answer[ j ][ i ] = ( _dFp[ j ] - _dFm[ j ] ) / ( 2 * delta[ i ] );
+
+        }
+
+    }
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( dFdFp, dFdFp_answer ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( ddFdFp, ddFdFp_answer ) );
+
+    floatMatrix dFdLp_answer( answer.size( ), floatVector( Lp.size( ), 0 ) );
+
+    for ( unsigned int i=0; i<Lp.size( ); i++ ){
+
+        floatVector delta( Lp.size( ), 0 );
+        delta[ i ] = eps * std::fabs( Lp[ i ] ) + eps;
+
+        floatVector _Fp, _Fm;
+
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp + delta, L, _Fp, 0.5, 1 ) );
+
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp - delta, L, _Fm, 0.5, 1 ) );
+
+        for ( unsigned int j = 0; j < L.size( ); j++ ){
+
+            dFdLp_answer[ j ][ i ] = ( _Fp[ j ] - _Fm[ j ] ) / ( 2 * delta[ i ] );
+
+        }
+
+    }
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( dFdLp, dFdLp_answer ) );
+
+    //Test 6 ( mode 2 fully explicit )
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 1, 2 ) );
 
     answer = { 3.03173544, 1.1881084 , 2.77327313,
                3.92282144, 2.58424672, 3.75584617,
@@ -595,17 +702,13 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 1, 2 );
-
-    BOOST_CHECK( ! error );
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 1, 2 ) );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer - Fp, dF ) );
 
 
     //Test 7 ( mode 2 fully implicit )
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 0, 2 );
-
-    BOOST_CHECK( ! error );
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 0, 2 ) );
 
     answer = {  0.65045472, -0.42475879, -0.09274688,
                -0.25411831, -0.08867872, -0.16467241,
@@ -613,16 +716,12 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 0, 2 );
-
-    BOOST_CHECK( ! error );
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 0, 2 ) );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer - Fp, dF ) );
 
     //Test 8 ( mode 2 midpoint rule )
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 0.5, 2 );
-
-    BOOST_CHECK( ! error );
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, F, 0.5, 2 ) );
 
     answer = { -0.02066217, -1.43862233, -0.42448874,
                -0.96426544, -1.72139966, -0.83831629,
@@ -630,45 +729,108 @@ BOOST_AUTO_TEST_CASE( testEvolveF ){
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 0.5, 2 );
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, dF, F, 0.5, 2 ) );
 
-    BOOST_CHECK( ! error );
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer, F ) );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( answer - Fp, dF ) );
 
     //Tests 9 and 10 ( mode 2 jacobian )
-    error = constitutiveTools::evolveF( Dt, Fp, Lp, L, dFJ, FJ, dFdL, 0.5, 2 );
-
-    BOOST_CHECK( ! error );
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, dFJ, FJ, dFdL, 0.5, 2 ) );
 
     BOOST_CHECK( vectorTools::fuzzyEquals( F, FJ ) );
+
+    BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L, dFJ, FJ, dFdL_alt, ddFdFp, dFdFp, dFdLp, 0.5, 2 ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer, FJ ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( answer - Fp, dFJ ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( dFdL, dFdL_alt ) );
+
+    dFdL_answer = floatMatrix( Fp.size( ), floatVector( L.size( ), 0 ) );
 
     for ( unsigned int i=0; i<L.size( ); i++ ){
 
         floatVector delta( L.size( ), 0 );
-        delta[ i ] = eps*fabs( L[ i ] ) + eps;
+        delta[ i ] = eps * std::fabs( L[ i ] ) + eps;
 
-        error = constitutiveTools::evolveF( Dt, Fp, Lp, L + delta, FJ, 0.5, 2 );
+        floatVector _Fp, _Fm;
 
-        BOOST_CHECK( ! error );
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L + delta, _Fp, 0.5, 2 ) );
 
-        floatVector gradCol = ( FJ - F )/delta[ i ];
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp, L - delta, _Fm, 0.5, 2 ) );
 
-        for ( unsigned int j=0; j<gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dFdL[ j ][ i ], 1e-5, 1e-5 ) );
-        }
+        for ( unsigned int j = 0; j < L.size( ); j++ ){
 
-        error = constitutiveTools::evolveF( Dt, Fp, Lp, L + delta, dFJ, FJ, 0.5, 2 );
+            dFdL_answer[ j ][ i ] = ( _Fp[ j ] - _Fm[ j ] ) / ( 2 * delta[ i ] );
 
-        BOOST_CHECK( ! error );
-
-        gradCol = ( dFJ - dF )/delta[ i ];
-
-        for ( unsigned int j=0; j<gradCol.size( ); j++ ){
-            BOOST_CHECK( vectorTools::fuzzyEquals( gradCol[ j ], dFdL[ j ][ i ], 1e-5, 1e-5 ) );
         }
 
     }
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( dFdL, dFdL_answer ) );
+
+    dFdFp_answer = floatMatrix( answer.size( ), floatVector( Fp.size( ), 0 ) );
+    ddFdFp_answer = floatMatrix( answer.size( ), floatVector( Fp.size( ), 0 ) );
+
+    for ( unsigned int i=0; i<Fp.size( ); i++ ){
+
+        floatVector delta( Fp.size( ), 0 );
+        delta[ i ] = eps * std::fabs( Fp[ i ] ) + eps;
+
+        floatVector _Fp, _Fm;
+
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp + delta, Lp, L, _Fp, 0.5, 2 ) );
+
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp - delta, Lp, L, _Fm, 0.5, 2 ) );
+
+        for ( unsigned int j = 0; j < L.size( ); j++ ){
+
+            dFdFp_answer[ j ][ i ] = ( _Fp[ j ] - _Fm[ j ] ) / ( 2 * delta[ i ] );
+
+        }
+
+        floatVector _dFp, _dFm;
+
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp + delta, Lp, L, _dFp, _Fp, 0.5, 2 ) );
+
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp - delta, Lp, L, _dFm, _Fm, 0.5, 2 ) );
+
+        for ( unsigned int j = 0; j < L.size( ); j++ ){
+
+            ddFdFp_answer[ j ][ i ] = ( _dFp[ j ] - _dFm[ j ] ) / ( 2 * delta[ i ] );
+
+        }
+
+    }
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( dFdFp, dFdFp_answer ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( ddFdFp, ddFdFp_answer ) );
+
+    dFdLp_answer = floatMatrix( answer.size( ), floatVector( Lp.size( ), 0 ) );
+
+    for ( unsigned int i=0; i<Lp.size( ); i++ ){
+
+        floatVector delta( Lp.size( ), 0 );
+        delta[ i ] = eps * std::fabs( Lp[ i ] ) + eps;
+
+        floatVector _Fp, _Fm;
+
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp + delta, L, _Fp, 0.5, 2 ) );
+
+        BOOST_CHECK( !constitutiveTools::evolveF( Dt, Fp, Lp - delta, L, _Fm, 0.5, 2 ) );
+
+        for ( unsigned int j = 0; j < L.size( ); j++ ){
+
+            dFdLp_answer[ j ][ i ] = ( _Fp[ j ] - _Fm[ j ] ) / ( 2 * delta[ i ] );
+
+        }
+
+    }
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( dFdLp, dFdLp_answer ) );
 
 }
 

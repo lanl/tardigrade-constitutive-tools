@@ -75,10 +75,18 @@ namespace constitutiveTools{
                                floatVector &dA, floatVector &A, floatMatrix &DADADt, const floatVector &alpha);
 
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
+                               floatVector &dA, floatVector &A, floatMatrix &DADADt, floatMatrix &DADADtp,
+                               const floatVector &alpha);
+
+    errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
                                floatVector &dA, floatVector &A, const floatType alpha=0.5);
 
     errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
                                floatVector &dA, floatVector &A, floatMatrix &DADADt, const floatType alpha=0.5);
+
+    errorOut midpointEvolution(const floatType &Dt, const floatVector &Ap, const floatVector &DApDt, const floatVector &DADt,
+                               floatVector &dA, floatVector &A, floatMatrix &DADADt, floatMatrix &DADADtp,
+                               const floatType alpha=0.5);
 
     errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
                      floatVector &dF, floatVector &deformationGradient, const floatType alpha=0.5, const unsigned int mode = 1);
@@ -87,10 +95,16 @@ namespace constitutiveTools{
                      floatVector &dF, floatVector &deformationGradient, floatMatrix &dFdL, const floatType alpha=0.5, const unsigned int mode = 1);
 
     errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
-                     floatVector &deformationGradient, const floatType alpha=0.5, const unsigned int mode = 1);
+                     floatVector &deformationGradient, floatType alpha=0.5, const unsigned int mode = 1);
 
     errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
                      floatVector &deformationGradient, floatMatrix &dFdL, const floatType alpha=0.5, const unsigned int mode = 1);
+
+    errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
+                     floatVector &deformationGradient, floatMatrix &dFdL, floatMatrix &dFdFp, floatMatrix &dFdLp, const floatType alpha=0.5, const unsigned int mode = 1);
+
+    errorOut evolveF(const floatType &Dt, const floatVector &previousDeformationGradient, const floatVector &Lp, const floatVector &L,
+                     floatVector &dF, floatVector &deformationGradient, floatMatrix &dFdL, floatMatrix &ddFdFp, floatMatrix &dFdFp, floatMatrix &dFdLp, const floatType alpha=0.5, const unsigned int mode = 1);
 
     floatType mac(const floatType &x);
 
