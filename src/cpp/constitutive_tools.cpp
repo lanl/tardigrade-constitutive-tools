@@ -1566,4 +1566,120 @@ namespace constitutiveTools{
         
         return NULL;
     }
+
+    errorOut pushForwardPK2Stress( const floatVector &PK2, const floatVector &F, floatVector &cauchyStress ){
+        /*!
+         * Push the Second Piola-Kirchhoff stress forward to the current configuration resulting in the Cauchy stress
+         * 
+         * \f$ \sigma_{ij} = J F_{iI} S_{IJ} F_{jJ} \f$
+         * 
+         * \param &PK2: The Second Piola-Kirchhoff stress \f$ S_{IJ} \f$
+         * \param &F: The deformation gradient \f$ F_{iI} \f$
+         * \param &cauchyStress: The Cauchy stress \f$ \sigma_{ij} \f$
+         */
+
+        unsigned int dim = ( unsigned int )( std::sqrt( ( double )PK2.size( ) ) + 0.5 );
+        
+        if ( dim * dim != PK2.size( ) ){
+
+            return new errorNode( "The PK2 stress must have a size of " + std::to_string( dim * dim ) + " and has a size of " + std::to_string( PK2.size( ) ) );
+
+        }
+
+        if ( PK2.size( ) != F.size( ) ){
+
+            return new errorNode( "The deformation gradient must have a size of " + std::to_string( PK2.size( ) ) + " and has a size of " + std::to_string( F.size( ) ) );
+
+        }
+
+        cauchyStress = floatVector( dim * dim, 0 );
+
+        floatType J = vectorTools::determinant( F, dim, dim );
+
+        cauchyStress = vectorTools::matrixMultiply( F, PK2, dim, dim, dim, dim );
+
+        cauchyStress = vectorTools::matrixMultiply( cauchyStress, F, dim, dim, dim, dim, false, true );
+
+        cauchyStress *= J;
+
+        return NULL;
+
+    }
+
+    errorOut pushForwardPK2Stress( const floatVector &PK2, const floatVector &F, floatVector &cauchyStress,
+                                   floatMatrix &dCauchyStressdPK2, floatMatrix &dCauchyStressdF ){
+        /*!
+         * Push the Second Piola-Kirchhoff stress forward to the current configuration resulting in the Cauchy stress
+         * 
+         * \f$ \sigma_{ij} = J F_{iI} S_{IJ} F_{jJ} \f$
+         * 
+         * \param &PK2: The Second Piola-Kirchhoff stress \f$ S_{IJ} \f$
+         * \param &F: The deformation gradient \f$ F_{iI} \f$
+         * \param &cauchyStress: The Cauchy stress \f$ \sigma_{ij} \f$
+         * \param &dCauchyStressdPK2: The gradient of the Cauchy stress w.r.t. the PK2 stress
+         * \param &dCauchyStressdF: The gradient of the Cauchy stress w.r.t. the deformation gradient
+         */
+
+        unsigned int dim = ( unsigned int )( std::sqrt( ( double )PK2.size( ) ) + 0.5 );
+        
+        if ( dim * dim != PK2.size( ) ){
+
+            return new errorNode( "The PK2 stress must have a size of " + std::to_string( dim * dim ) + " and has a size of " + std::to_string( PK2.size( ) ) );
+
+        }
+
+        if ( PK2.size( ) != F.size( ) ){
+
+            return new errorNode( "The deformation gradient must have a size of " + std::to_string( PK2.size( ) ) + " and has a size of " + std::to_string( F.size( ) ) );
+
+        }
+
+        cauchyStress = floatVector( dim * dim, 0 );
+
+        floatType J = vectorTools::determinant( F, dim, dim );
+
+        floatVector dJdF = vectorTools::computeDDetAdJ( F, dim, dim );
+
+        cauchyStress = vectorTools::matrixMultiply( F, PK2, dim, dim, dim, dim );
+
+        cauchyStress = vectorTools::matrixMultiply( cauchyStress, F, dim, dim, dim, dim, false, true );
+
+        dCauchyStressdF = vectorTools::dyadic( cauchyStress, dJdF );
+
+        cauchyStress *= J;
+
+        dCauchyStressdPK2 = floatMatrix( dim * dim, floatVector( dim * dim, 0 ) );
+
+        floatVector eye( dim * dim, 0 );
+        vectorTools::eye( eye );
+
+        for ( unsigned int i = 0; i < dim; i++ ){
+
+            for ( unsigned int j = 0; j < dim; j++ ){
+
+                for ( unsigned int A = 0; A < dim; A++ ){
+
+                    for ( unsigned int B = 0; B < dim; B++ ){
+
+                        dCauchyStressdPK2[ dim * i + j ][ dim * A + B ] += J * F[ dim * i + A ] * F[ dim * j + B ];
+
+                        for ( unsigned int I = 0; I < dim; I++ ){
+
+                            dCauchyStressdF[ dim * i + j ][ dim * A + B ] += J * eye[ dim * i + A ] * PK2[ dim * B + I ] * F[ dim * j + I ]
+                                                                           + J * F[ dim * i + I ] * PK2[ dim * I + B ] * eye[ dim * j + A ];
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        } 
+
+        return NULL;
+
+    }
+
 }
