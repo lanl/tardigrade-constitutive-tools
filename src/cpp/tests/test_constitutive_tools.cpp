@@ -1281,7 +1281,9 @@ BOOST_AUTO_TEST_CASE( testPushForwardPK2Stress ){
 
     floatVector F = { 1, 4, 2, 5, 2, 1, 3, 4, 1 };
 
-    floatVector cauchyStressAnswer = { 4914., 4968., 5220., 3672., 3456., 3744., 4428., 4320., 4608. };
+    floatVector cauchyStressAnswer = { 15.16666667, 15.33333333, 16.11111111,
+                                       11.33333333, 10.66666667, 11.55555556,
+                                       13.66666667, 13.33333333, 14.22222222 };
 
     floatVector result;
 
