@@ -1571,7 +1571,7 @@ namespace constitutiveTools{
         /*!
          * Push the Second Piola-Kirchhoff stress forward to the current configuration resulting in the Cauchy stress
          * 
-         * \f$ \sigma_{ij} = J F_{iI} S_{IJ} F_{jJ} \f$
+         * \f$ \sigma_{ij} = \frac{1}{J} F_{iI} S_{IJ} F_{jJ} \f$
          * 
          * \param &PK2: The Second Piola-Kirchhoff stress \f$ S_{IJ} \f$
          * \param &F: The deformation gradient \f$ F_{iI} \f$
@@ -1600,7 +1600,7 @@ namespace constitutiveTools{
 
         cauchyStress = vectorTools::matrixMultiply( cauchyStress, F, dim, dim, dim, dim, false, true );
 
-        cauchyStress *= J;
+        cauchyStress /= J;
 
         return NULL;
 
@@ -1611,7 +1611,7 @@ namespace constitutiveTools{
         /*!
          * Push the Second Piola-Kirchhoff stress forward to the current configuration resulting in the Cauchy stress
          * 
-         * \f$ \sigma_{ij} = J F_{iI} S_{IJ} F_{jJ} \f$
+         * \f$ \sigma_{ij} = \frac{1}{J} F_{iI} S_{IJ} F_{jJ} \f$
          * 
          * \param &PK2: The Second Piola-Kirchhoff stress \f$ S_{IJ} \f$
          * \param &F: The deformation gradient \f$ F_{iI} \f$
@@ -1644,9 +1644,9 @@ namespace constitutiveTools{
 
         cauchyStress = vectorTools::matrixMultiply( cauchyStress, F, dim, dim, dim, dim, false, true );
 
-        dCauchyStressdF = vectorTools::dyadic( cauchyStress, dJdF );
+        dCauchyStressdF = vectorTools::dyadic( -cauchyStress / ( J * J ), dJdF );
 
-        cauchyStress *= J;
+        cauchyStress /= J;
 
         dCauchyStressdPK2 = floatMatrix( dim * dim, floatVector( dim * dim, 0 ) );
 
@@ -1665,8 +1665,8 @@ namespace constitutiveTools{
 
                         for ( unsigned int I = 0; I < dim; I++ ){
 
-                            dCauchyStressdF[ dim * i + j ][ dim * A + B ] += J * eye[ dim * i + A ] * PK2[ dim * B + I ] * F[ dim * j + I ]
-                                                                           + J * F[ dim * i + I ] * PK2[ dim * I + B ] * eye[ dim * j + A ];
+                            dCauchyStressdF[ dim * i + j ][ dim * A + B ] += eye[ dim * i + A ] * PK2[ dim * B + I ] * F[ dim * j + I ] / J
+                                                                           + F[ dim * i + I ] * PK2[ dim * I + B ] * eye[ dim * j + A ] / J;
 
                         }
 
