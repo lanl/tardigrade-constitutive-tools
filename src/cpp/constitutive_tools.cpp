@@ -1638,7 +1638,7 @@ namespace constitutiveTools{
 
         floatType J = vectorTools::determinant( F, dim, dim );
 
-        floatVector dJdF = vectorTools::computeDDetAdJ( F, dim, dim );
+        floatVector dJdF = vectorTools::computeDDetADA( F, dim, dim );
 
         cauchyStress = vectorTools::matrixMultiply( F, PK2, dim, dim, dim, dim );
 
