@@ -1661,7 +1661,7 @@ namespace constitutiveTools{
 
                     for ( unsigned int B = 0; B < dim; B++ ){
 
-                        dCauchyStressdPK2[ dim * i + j ][ dim * A + B ] += J * F[ dim * i + A ] * F[ dim * j + B ];
+                        dCauchyStressdPK2[ dim * i + j ][ dim * A + B ] += F[ dim * i + A ] * F[ dim * j + B ] / J;
 
                         for ( unsigned int I = 0; I < dim; I++ ){
 
