@@ -1271,3 +1271,80 @@ BOOST_AUTO_TEST_CASE( testComputeSymmetricPart ){
     }
 
 }
+
+BOOST_AUTO_TEST_CASE( testPushForwardPK2Stress ){
+    /*!
+     * Test the push forward the PK2 stress to the current configuration
+     */
+
+    floatVector PK2 = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+    floatVector F = { 1, 4, 2, 5, 2, 1, 3, 4, 1 };
+
+    floatVector cauchyStressAnswer = { 4914., 4968., 5220., 3672., 3456., 3744., 4428., 4320., 4608. };
+
+    floatVector result;
+
+    BOOST_CHECK( !constitutiveTools::pushForwardPK2Stress( PK2, F, result ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( result, cauchyStressAnswer ) );
+
+    floatVector result2;
+
+    floatMatrix dCauchyStressdPK2, dCauchyStressdF;
+
+    BOOST_CHECK( !constitutiveTools::pushForwardPK2Stress( PK2, F, result2, dCauchyStressdPK2, dCauchyStressdF ) );
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( result2, cauchyStressAnswer ) );
+
+    floatMatrix dCauchyStressdPK2Answer( cauchyStressAnswer.size( ), floatVector( PK2.size( ), 0 ) );
+
+    floatMatrix dCauchyStressdFAnswer( cauchyStressAnswer.size( ), floatVector( F.size( ), 0 ) );
+
+    floatType eps = 1e-6;
+
+    for ( unsigned int i = 0; i < PK2.size( ); i++ ){
+
+        floatVector delta( PK2.size( ), 0 );
+
+        delta[ i ] = eps * std::fabs( PK2[ i ] ) + eps;
+
+        floatVector cp, cm;
+
+        BOOST_CHECK( !constitutiveTools::pushForwardPK2Stress( PK2 + delta, F, cp ) );
+
+        BOOST_CHECK( !constitutiveTools::pushForwardPK2Stress( PK2 - delta, F, cm ) );
+
+        for ( unsigned int j = 0; j < PK2.size( ); j++ ){
+
+            dCauchyStressdPK2Answer[ j ][ i ] = ( cp[ j ] - cm[ j ] ) / ( 2 * delta[ i ] );
+
+        }
+
+    }
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( dCauchyStressdPK2, dCauchyStressdPK2Answer ) );
+
+    for ( unsigned int i = 0; i < F.size( ); i++ ){
+
+        floatVector delta( F.size( ), 0 );
+
+        delta[ i ] = eps * std::fabs( F[ i ] ) + eps;
+
+        floatVector cp, cm;
+
+        BOOST_CHECK( !constitutiveTools::pushForwardPK2Stress( PK2, F + delta, cp ) );
+
+        BOOST_CHECK( !constitutiveTools::pushForwardPK2Stress( PK2, F - delta, cm ) );
+
+        for ( unsigned int j = 0; j < F.size( ); j++ ){
+
+            dCauchyStressdFAnswer[ j ][ i ] = ( cp[ j ] - cm[ j ] ) / ( 2 * delta[ i ] );
+
+        }
+
+    }
+
+    BOOST_CHECK( vectorTools::fuzzyEquals( dCauchyStressdF, dCauchyStressdFAnswer ) );
+
+}
