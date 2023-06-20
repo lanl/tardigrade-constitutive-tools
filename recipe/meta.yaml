@@ -10,7 +10,7 @@ build:
   script:
     - mkdir build-package
     - cd build-package
-    - cmake .. -DCMAKE_BUILD_TYPE=Release
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_LIBDIR=lib
     - cmake --build . --target constitutive_tools
     - cmake --install . --prefix ${PREFIX}
   ignore_run_exports:
@@ -19,24 +19,24 @@ build:
 requirements:
   build:
     - {{ compiler('cxx') }}
-    - eigen >=3.3.7
-    - error_tools >=0.4.1
-    - vector_tools >=0.5.4
-    - boost >=1.59  # TODO: Separate the package/test configuration to make BOOST an optional build dependency
     - setuptools_scm >=6.2
     - libcxx <16  # [osx]
   host:
     - {{ compiler('cxx') }}
     - python
     - cmake >=3.18
+    - eigen >=3.3.7
+    - error_tools >=0.6
+    - vector_tools >=0.6
+    - boost >=1.59  # TODO: Separate the package/test configuration to make BOOST an optional build dependency
     - doxygen  # TODO: Separate the package/documentation configuration to make Doxygen an optional build dependency
     - sphinx  # TODO: Separate the package/documentation configuration to make Sphinx an optional build dependency
     - libcxx <16  # [osx]
   run:
     - {{ compiler('cxx') }}
     - eigen >=3.3.7
-    - error_tools >=0.4.1
-    - vector_tools >=0.5.4
+    - error_tools >=0.6
+    - vector_tools >=0.6
 
 test:
   requires:
@@ -49,12 +49,8 @@ test:
     - src/cpp/tests/CMakeLists.txt
     - src/cpp/tests/test_constitutive_tools.cpp
   commands:
-    - dylib='so'
-    - if [ $(uname) = 'Darwin' ]; then dylib='dylib'; fi
     - mkdir build-tests
     - cd build-tests
-    - installed_linked_library_parent="$(dirname $(find ${PREFIX} -name libconstitutive_tools.${dylib}))"
-    - export LD_LIBRARY_PATH="${installed_linked_library_parent}:${LD_LIBRARY_PATH}"
-    - cmake .. -DCMAKE_BUILD_TYPE=conda-test
+    - cmake .. -DCMAKE_BUILD_TYPE=conda-test -DCMAKE_INSTALL_LIBDIR=lib
     - cmake --build . --verbose
     - ctest --output-on-failure
