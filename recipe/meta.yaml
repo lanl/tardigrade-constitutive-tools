@@ -53,8 +53,6 @@ test:
     - if [ $(uname) = 'Darwin' ]; then dylib='dylib'; fi
     - mkdir build-tests
     - cd build-tests
-    - installed_linked_library_parent="$(dirname $(find ${PREFIX} -name libconstitutive_tools.${dylib}))"
-    - export LD_LIBRARY_PATH="${installed_linked_library_parent}:${LD_LIBRARY_PATH}"
     - cmake .. -DCMAKE_BUILD_TYPE=conda-test -DCMAKE_INSTALL_LIBDIR=lib
     - cmake --build . --verbose
     - ctest --output-on-failure
