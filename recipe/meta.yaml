@@ -1,5 +1,5 @@
 package:
-  name: constitutive_tools
+  name: tardigrade_constitutive_tools
   # TODO: setup and use pyproject.toml and a Conda build Jinja template
   version: {{ VERSION }}
 
@@ -27,7 +27,7 @@ build:
     - mkdir build-package
     - cd build-package
     - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_LIBDIR=lib
-    - cmake --build . --target constitutive_tools
+    - cmake --build . --target tardigrade_constitutive_tools
     - cmake --install . --prefix ${PREFIX}
   ignore_run_exports:
     - python_abi
@@ -41,15 +41,15 @@ requirements:
     - setuptools_scm >=6.2
     - cmake >=3.18
     - eigen >=3.3.7
-    - error_tools >=0.6
-    - vector_tools >=0.6
+    - tardigrade_error_tools >=0.7
+    - tardigrade_vector_tools >=0.7
     - boost >=1.59  # TODO: Separate the package/test configuration to make BOOST an optional build dependency
     - doxygen  # TODO: Separate the package/documentation configuration to make Doxygen an optional build dependency
     - sphinx  # TODO: Separate the package/documentation configuration to make Sphinx an optional build dependency
   run:
     - eigen >=3.3.7
-    - error_tools >=0.6
-    - vector_tools >=0.6
+    - tardigrade_error_tools >=0.7
+    - tardigrade_vector_tools >=0.7
     - libgcc-ng     # [linux]
     - libstdcxx-ng  # [linux]
     - libcxx        # [osx]
@@ -66,7 +66,7 @@ test:
   source_files:
     - CMakeLists.txt
     - src/cpp/tests/CMakeLists.txt
-    - src/cpp/tests/test_constitutive_tools.cpp
+    - src/cpp/tests/test_tardigrade_constitutive_tools.cpp
   commands:
     - mkdir build-tests
     - cd build-tests

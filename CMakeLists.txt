@@ -1,6 +1,6 @@
 #===================================================================================================== PROJECT SETUP ===
 cmake_minimum_required(VERSION 3.18)
-project(constitutive_tools)
+project(tardigrade_constitutive_tools)
 
 # Set common project paths relative to project root directory
 set(CPP_SRC_PATH "src/cpp")
@@ -9,7 +9,7 @@ set(PYTHON_SRC_PATH "src/python")
 set(CMAKE_SRC_PATH "src/cmake")
 
 # Add a flag for whether the python bindings should be built or not
-set(CONSTITUTIVE_TOOLS_BUILD_PYTHON_BINDINGS ON CACHE BOOL "Flag for whether the python bindings should be built for constitutive tools")
+set(TARDIGRADE_CONSTITUTIVE_TOOLS_BUILD_PYTHON_BINDINGS ON CACHE BOOL "Flag for whether the python bindings should be built for constitutive tools")
 
 # Add the cmake folder to locate project CMake module(s)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/${CMAKE_SRC_PATH}" ${CMAKE_MODULE_PATH})
@@ -88,10 +88,10 @@ endif()
 
 # Find related, but external, projects in installed environment
 include(FetchContent)
-set(upstream_packages "error_tools" "vector_tools")
+set(upstream_packages "tardigrade_error_tools" "tardigrade_vector_tools")
 foreach(package ${upstream_packages})
     string(TOUPPER "${package}" package_upper)
-    set(${package_upper}_BUILD_PYTHON_BINDINGS ${CONSTITUTIVE_TOOLS_BUILD_PYTHON_BINDINGS})
+    set(${package_upper}_BUILD_PYTHON_BINDINGS ${TARDIGRADE_CONSTITUTIVE_TOOLS_BUILD_PYTHON_BINDINGS})
     find_package(${package} ${upstream_required} CONFIG)
     if(${package}_FOUND)
         message(STATUS "Found ${package}: ${${package}_DIR}")
@@ -114,7 +114,7 @@ endforeach(package)
 if(${not_conda_test} STREQUAL "true")
     include_directories(${CPP_SRC_PATH})
     add_subdirectory(${CPP_SRC_PATH})
-    if(CONSTITUTIVE_TOOLS_BUILD_PYTHON_BINDINGS)
+    if(TARDIGRADE_CONSTITUTIVE_TOOLS_BUILD_PYTHON_BINDINGS)
         add_subdirectory(${PYTHON_SRC_PATH})
     endif()
 endif()

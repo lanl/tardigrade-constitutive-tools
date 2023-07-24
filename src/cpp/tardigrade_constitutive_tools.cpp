@@ -1,6 +1,6 @@
 /**
   *****************************************************************************
-  * \file constitutive_tools.cpp
+  * \file tardigrade_constitutive_tools.cpp
   *****************************************************************************
   * A collection of tools useful for constitutive models. These tools are
   * intended to be generalized expressions which perform operations commonly
@@ -8,7 +8,7 @@
   * users to develop new models quickly and (in principle) with less errors
   * resulting in delays.
   *
-  * Developers should use vector_tools to perform vector multiplications and
+  * Developers should use tardigrade_vector_tools to perform vector multiplications and
   * matrix solves since this library can be independently checked. Also using
   * templates and typedef for the data is strongly encouraged so that single
   * and double precision values (in addition to other types) can be used
@@ -18,9 +18,9 @@
   *****************************************************************************
   */
 
-#include<constitutive_tools.h>
+#include<tardigrade_constitutive_tools.h>
 
-namespace constitutiveTools{
+namespace tardigradeConstitutiveTools{
 
     floatType deltaDirac(const unsigned int i, const unsigned int j){
         /*!
@@ -101,7 +101,7 @@ namespace constitutiveTools{
 			          "The deformation gradient must be 3D" );
         }
 
-        C = vectorTools::matrixMultiply( deformationGradient, deformationGradient, dim, dim, dim, dim, 1, 0 );
+        C = tardigradeVectorTools::matrixMultiply( deformationGradient, deformationGradient, dim, dim, dim, dim, 1, 0 );
 
         return NULL;
     }
@@ -136,7 +136,7 @@ namespace constitutiveTools{
         
         //Assemble the Jacobian
         floatVector eye( dim * dim );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
         
         dCdF = floatMatrix( C.size( ), floatVector( deformationGradient.size( ), 0 ) );
         
@@ -277,7 +277,7 @@ namespace constitutiveTools{
         //Construct the identity tensor
         floatVector eye = {1, 0, 0, 0, 1, 0, 0, 0, 1};
 
-        floatType Jsq = vectorTools::determinant(2*E + eye, 3, 3);
+        floatType Jsq = tardigradeVectorTools::determinant(2*E + eye, 3, 3);
         if (Jsq<=0){
             return new errorNode("decomposeGreenLagrangeStrain", "the determinant of the Green-Lagrange strain is negative");
         }
@@ -315,15 +315,15 @@ namespace constitutiveTools{
 
         //Compute the derivative of the jacobian of deformation w.r.t. the Green-Lagrange strain
         floatVector eye = {1, 0, 0, 0, 1, 0, 0, 0, 1};
-        dJdE = J * vectorTools::inverse(2*E + eye, 3, 3);
+        dJdE = J * tardigradeVectorTools::inverse(2*E + eye, 3, 3);
 
         //Compute the derivative of the isochoric part of the Green-Lagrange strain w.r.t. the Green-Lagrange strain
-        floatMatrix EYE = vectorTools::eye<floatType>(9);
+        floatMatrix EYE = tardigradeVectorTools::eye<floatType>(9);
 
         floatType invJ23 = 1./pow(J, 2./3);
         floatType invJ53 = 1./pow(J, 5./3);
 
-        dEbardE = invJ23*EYE - (2./3)*invJ53*vectorTools::dyadic(E, dJdE) - (1./3)*invJ53*vectorTools::dyadic(eye, dJdE);
+        dEbardE = invJ23*EYE - (2./3)*invJ53*tardigradeVectorTools::dyadic(E, dJdE) - (1./3)*invJ53*tardigradeVectorTools::dyadic(eye, dJdE);
 
         return NULL;
     }
@@ -350,7 +350,7 @@ namespace constitutiveTools{
         }
 
         //Compute the determinant of the deformation gradient
-        floatType detF = vectorTools::determinant(deformationGradient, 3, 3);
+        floatType detF = tardigradeVectorTools::determinant(deformationGradient, 3, 3);
 
         //Initialize the Cauchy stress
         cauchyStress = floatVector(PK2Stress.size(), 0);
@@ -388,7 +388,7 @@ namespace constitutiveTools{
         floatType C1 = WLFParameters[1];
         floatType C2 = WLFParameters[2];
 
-        if (vectorTools::fuzzyEquals(C2 + (temperature - Tr), 0.)){
+        if (tardigradeVectorTools::fuzzyEquals(C2 + (temperature - Tr), 0.)){
             return new errorNode("WLF", "Zero in the denominator");
         }
 
@@ -489,7 +489,7 @@ namespace constitutiveTools{
 
         //Form the identity tensor
         floatVector eye(dim*dim, 0);
-        vectorTools::eye(eye);
+        tardigradeVectorTools::eye(eye);
 
         //Form the partial w.r.t. L and F
         dDFDtdL = floatMatrix(dim*dim, floatVector(dim*dim, 0));
@@ -778,10 +778,10 @@ namespace constitutiveTools{
 
         floatVector RHS;
         if ( mode == 1 ){
-            RHS = vectorTools::matrixMultiply( LtpAlpha, previousDeformationGradient, dim, dim, dim, dim );
+            RHS = tardigradeVectorTools::matrixMultiply( LtpAlpha, previousDeformationGradient, dim, dim, dim, dim );
         }
         if ( mode == 2 ){
-            RHS = vectorTools::matrixMultiply( previousDeformationGradient, LtpAlpha, dim, dim, dim, dim );
+            RHS = tardigradeVectorTools::matrixMultiply( previousDeformationGradient, LtpAlpha, dim, dim, dim, dim );
         }
 
         RHS *= Dt;
@@ -789,19 +789,19 @@ namespace constitutiveTools{
         //Compute the left-hand side
         floatVector eye( dim * dim );
 
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
         floatVector LHS = eye - Dt * ( 1 - alpha ) * L;
-        floatVector invLHS = vectorTools::inverse( LHS, dim, dim );
+        floatVector invLHS = tardigradeVectorTools::inverse( LHS, dim, dim );
 
         if ( mode == 1 ){
 
-            dF = vectorTools::matrixMultiply( invLHS, RHS, dim, dim, dim, dim );
+            dF = tardigradeVectorTools::matrixMultiply( invLHS, RHS, dim, dim, dim, dim );
 
         }
         if ( mode == 2 ){
 
-            dF = vectorTools::matrixMultiply( RHS, invLHS, dim, dim, dim, dim );
+            dF = tardigradeVectorTools::matrixMultiply( RHS, invLHS, dim, dim, dim, dim );
 
         }
 
@@ -879,12 +879,12 @@ namespace constitutiveTools{
         //Compute the left hand side
         floatVector eye( dim * dim );
 
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
         floatVector LHS = eye - Dt * ( 1 - alpha ) * L;
 
         //Compute the inverse of the left-hand side
-        floatVector invLHS = vectorTools::inverse( LHS, dim, dim );
+        floatVector invLHS = tardigradeVectorTools::inverse( LHS, dim, dim );
 
         //Compute the jacobian
         dFdL = floatMatrix( deformationGradient.size( ), floatVector( L.size( ), 0 ) );
@@ -987,12 +987,12 @@ namespace constitutiveTools{
         //Compute the left hand side
         floatVector eye( dim * dim );
 
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
         floatVector LHS = eye - Dt * ( 1 - alpha ) * L;
 
         //Compute the inverse of the left-hand side
-        floatVector invLHS = vectorTools::inverse( LHS, dim, dim );
+        floatVector invLHS = tardigradeVectorTools::inverse( LHS, dim, dim );
 
         //Compute the jacobian
         dFdL   = floatMatrix( deformationGradient.size( ), floatVector( previousDeformationGradient.size( ), 0 ) ); 
@@ -1029,7 +1029,7 @@ namespace constitutiveTools{
             }
         }
 
-        dFdFp = ddFdFp + vectorTools::eye< floatType >( previousDeformationGradient.size( ) );
+        dFdFp = ddFdFp + tardigradeVectorTools::eye< floatType >( previousDeformationGradient.size( ) );
 
         return NULL;
     }
@@ -1105,9 +1105,9 @@ namespace constitutiveTools{
          * \param &Anorm: The unit normal in the direction of A
          */
 
-        floatType norm = sqrt(vectorTools::inner(A, A));
+        floatType norm = sqrt(tardigradeVectorTools::inner(A, A));
 
-        if ( vectorTools::fuzzyEquals( norm, 0. ) ){
+        if ( tardigradeVectorTools::fuzzyEquals( norm, 0. ) ){
             Anorm = floatVector( A.size(), 0 );
         }
         else {
@@ -1127,18 +1127,18 @@ namespace constitutiveTools{
          * \param &dAnormdA: The gradient of the unit normal w.r.t. A
          */
 
-        floatType norm = sqrt(vectorTools::inner(A, A));
+        floatType norm = sqrt(tardigradeVectorTools::inner(A, A));
 
-        if ( vectorTools::fuzzyEquals( norm, 0. ) ){
+        if ( tardigradeVectorTools::fuzzyEquals( norm, 0. ) ){
             Anorm = floatVector( A.size(), 0 );
         }
         else {
             Anorm = A/norm;
         }
 
-        floatMatrix eye = vectorTools::eye<floatType>(A.size());
+        floatMatrix eye = tardigradeVectorTools::eye<floatType>(A.size());
 
-        dAnormdA = (eye - vectorTools::dyadic(Anorm, Anorm))/norm;
+        dAnormdA = (eye - tardigradeVectorTools::dyadic(Anorm, Anorm))/norm;
 
         return NULL;
     }
@@ -1164,11 +1164,11 @@ namespace constitutiveTools{
         unsigned int dim = 3;
 
         //Invert the deformation gradient
-        floatVector inverseDeformationGradient = vectorTools::inverse(deformationGradient, dim, dim);
+        floatVector inverseDeformationGradient = tardigradeVectorTools::inverse(deformationGradient, dim, dim);
 
         //Pull back the velocity gradient
-        pullBackVelocityGradient = vectorTools::matrixMultiply(inverseDeformationGradient, velocityGradient, dim, dim, dim, dim);
-        pullBackVelocityGradient = vectorTools::matrixMultiply(pullBackVelocityGradient, deformationGradient, dim, dim, dim, dim);
+        pullBackVelocityGradient = tardigradeVectorTools::matrixMultiply(inverseDeformationGradient, velocityGradient, dim, dim, dim, dim);
+        pullBackVelocityGradient = tardigradeVectorTools::matrixMultiply(pullBackVelocityGradient, deformationGradient, dim, dim, dim, dim);
 
         return NULL;
     }
@@ -1199,20 +1199,20 @@ namespace constitutiveTools{
         unsigned int dim = 3;
 
         //Invert the deformation gradient
-        floatVector inverseDeformationGradient = vectorTools::inverse(deformationGradient, dim, dim);
+        floatVector inverseDeformationGradient = tardigradeVectorTools::inverse(deformationGradient, dim, dim);
 
         //Pull back the velocity gradient
-        pullBackVelocityGradient = vectorTools::matrixMultiply(inverseDeformationGradient, velocityGradient, dim, dim, dim, dim);
-        pullBackVelocityGradient = vectorTools::matrixMultiply(pullBackVelocityGradient, deformationGradient, dim, dim, dim, dim);
+        pullBackVelocityGradient = tardigradeVectorTools::matrixMultiply(inverseDeformationGradient, velocityGradient, dim, dim, dim, dim);
+        pullBackVelocityGradient = tardigradeVectorTools::matrixMultiply(pullBackVelocityGradient, deformationGradient, dim, dim, dim, dim);
 
         //Construct the gradients
         dPullBackLdL = floatMatrix(pullBackVelocityGradient.size(), floatVector( velocityGradient.size(), 0));
         dPullBackLdF = floatMatrix(pullBackVelocityGradient.size(), floatVector( deformationGradient.size(), 0));
 
-        floatVector term1 = vectorTools::matrixMultiply(inverseDeformationGradient, velocityGradient, dim, dim, dim, dim);
-        term1 = vectorTools::matrixMultiply(term1, deformationGradient, dim, dim, dim, dim);
+        floatVector term1 = tardigradeVectorTools::matrixMultiply(inverseDeformationGradient, velocityGradient, dim, dim, dim, dim);
+        term1 = tardigradeVectorTools::matrixMultiply(term1, deformationGradient, dim, dim, dim, dim);
 
-        floatVector term2 = vectorTools::matrixMultiply(inverseDeformationGradient, velocityGradient, dim, dim, dim, dim);
+        floatVector term2 = tardigradeVectorTools::matrixMultiply(inverseDeformationGradient, velocityGradient, dim, dim, dim, dim);
 
         for (unsigned int I=0; I<dim; I++){
             for (unsigned int J=0; J<dim; J++){
@@ -1317,12 +1317,12 @@ namespace constitutiveTools{
         unsigned int dim = 3;
 
         //Compute the inverse deformation gradient
-        floatVector inverseDeformationGradient = vectorTools::inverse(deformationGradient, dim, dim);
+        floatVector inverseDeformationGradient = tardigradeVectorTools::inverse(deformationGradient, dim, dim);
 
         //Map the Green-Lagrange strain to the current configuration
-        almansiStrain = vectorTools::matrixMultiply(greenLagrangeStrain, inverseDeformationGradient,
+        almansiStrain = tardigradeVectorTools::matrixMultiply(greenLagrangeStrain, inverseDeformationGradient,
                                                     dim, dim, dim, dim, 0, 0);
-        almansiStrain = vectorTools::matrixMultiply(inverseDeformationGradient, almansiStrain,
+        almansiStrain = tardigradeVectorTools::matrixMultiply(inverseDeformationGradient, almansiStrain,
                                                     dim, dim, dim, dim, 1, 0);
         return NULL;
     }
@@ -1353,7 +1353,7 @@ namespace constitutiveTools{
         unsigned int dim = 3;
 
         //Compute the inverse deformation gradient
-        floatVector inverseDeformationGradient = vectorTools::inverse(deformationGradient, dim, dim);
+        floatVector inverseDeformationGradient = tardigradeVectorTools::inverse(deformationGradient, dim, dim);
 
         //Compute the jacobian of the inverse deformation gradient
         floatMatrix dFinvdF(dim*dim, floatVector(dim*dim, 0));
@@ -1369,9 +1369,9 @@ namespace constitutiveTools{
         }
 
         //Map the Green-Lagrange strain to the current configuration
-        almansiStrain = vectorTools::matrixMultiply(greenLagrangeStrain, inverseDeformationGradient,
+        almansiStrain = tardigradeVectorTools::matrixMultiply(greenLagrangeStrain, inverseDeformationGradient,
                                                     dim, dim, dim, dim, 0, 0);
-        almansiStrain = vectorTools::matrixMultiply(inverseDeformationGradient, almansiStrain,
+        almansiStrain = tardigradeVectorTools::matrixMultiply(inverseDeformationGradient, almansiStrain,
                                                     dim, dim, dim, dim, 1, 0);
 
         //Compute the jacobians
@@ -1388,9 +1388,9 @@ namespace constitutiveTools{
         }
 
         dalmansiStraindF = floatMatrix(dim*dim, floatVector(dim*dim, 0));
-        floatVector term1 = vectorTools::matrixMultiply(greenLagrangeStrain, inverseDeformationGradient,
+        floatVector term1 = tardigradeVectorTools::matrixMultiply(greenLagrangeStrain, inverseDeformationGradient,
                                                         dim, dim, dim, dim, 0, 0);
-        floatVector term2 = vectorTools::matrixMultiply(inverseDeformationGradient, greenLagrangeStrain,
+        floatVector term2 = tardigradeVectorTools::matrixMultiply(inverseDeformationGradient, greenLagrangeStrain,
                                                         dim, dim, dim, dim, 1, 0);
 
         for (unsigned int i=0; i<dim; i++){
@@ -1423,8 +1423,8 @@ namespace constitutiveTools{
         //Assume 3d
         unsigned int dim = 3;
 
-        greenLagrangeStrain = vectorTools::matrixMultiply( deformationGradient, almansiStrain, dim, dim, dim, dim, 1, 0 );
-        greenLagrangeStrain = vectorTools::matrixMultiply( greenLagrangeStrain, deformationGradient, dim, dim, dim, dim, 0, 0 );
+        greenLagrangeStrain = tardigradeVectorTools::matrixMultiply( deformationGradient, almansiStrain, dim, dim, dim, dim, 1, 0 );
+        greenLagrangeStrain = tardigradeVectorTools::matrixMultiply( greenLagrangeStrain, deformationGradient, dim, dim, dim, dim, 0, 0 );
 
         return NULL;
     }
@@ -1457,7 +1457,7 @@ namespace constitutiveTools{
         }
 
         floatVector eye( dim * dim );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
         dEde = floatMatrix( dim * dim, floatVector( dim * dim, 0 ) );
         dEdF = floatMatrix( dim * dim, floatVector( dim * dim, 0 ) );
@@ -1550,7 +1550,7 @@ namespace constitutiveTools{
         }
         
         floatVector eye( A.size( ) );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
         
         dSymmAdA = floatMatrix( symmA.size( ), floatVector( A.size( ), 0 ) );
         
@@ -1594,11 +1594,11 @@ namespace constitutiveTools{
 
         cauchyStress = floatVector( dim * dim, 0 );
 
-        floatType J = vectorTools::determinant( F, dim, dim );
+        floatType J = tardigradeVectorTools::determinant( F, dim, dim );
 
-        cauchyStress = vectorTools::matrixMultiply( F, PK2, dim, dim, dim, dim );
+        cauchyStress = tardigradeVectorTools::matrixMultiply( F, PK2, dim, dim, dim, dim );
 
-        cauchyStress = vectorTools::matrixMultiply( cauchyStress, F, dim, dim, dim, dim, false, true );
+        cauchyStress = tardigradeVectorTools::matrixMultiply( cauchyStress, F, dim, dim, dim, dim, false, true );
 
         cauchyStress /= J;
 
@@ -1636,22 +1636,22 @@ namespace constitutiveTools{
 
         cauchyStress = floatVector( dim * dim, 0 );
 
-        floatType J = vectorTools::determinant( F, dim, dim );
+        floatType J = tardigradeVectorTools::determinant( F, dim, dim );
 
-        floatVector dJdF = vectorTools::computeDDetADA( F, dim, dim );
+        floatVector dJdF = tardigradeVectorTools::computeDDetADA( F, dim, dim );
 
-        cauchyStress = vectorTools::matrixMultiply( F, PK2, dim, dim, dim, dim );
+        cauchyStress = tardigradeVectorTools::matrixMultiply( F, PK2, dim, dim, dim, dim );
 
-        cauchyStress = vectorTools::matrixMultiply( cauchyStress, F, dim, dim, dim, dim, false, true );
+        cauchyStress = tardigradeVectorTools::matrixMultiply( cauchyStress, F, dim, dim, dim, dim, false, true );
 
-        dCauchyStressdF = vectorTools::dyadic( -cauchyStress / ( J * J ), dJdF );
+        dCauchyStressdF = tardigradeVectorTools::dyadic( -cauchyStress / ( J * J ), dJdF );
 
         cauchyStress /= J;
 
         dCauchyStressdPK2 = floatMatrix( dim * dim, floatVector( dim * dim, 0 ) );
 
         floatVector eye( dim * dim, 0 );
-        vectorTools::eye( eye );
+        tardigradeVectorTools::eye( eye );
 
         for ( unsigned int i = 0; i < dim; i++ ){
 

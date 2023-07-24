@@ -1,7 +1,7 @@
 set(CYTHON_SOURCE_FILES
     conftest.py
-    constitutive_tools_python.pxd
-    constitutive_tools_python.pyx
+    tardigrade_constitutive_tools_python.pxd
+    tardigrade_constitutive_tools_python.pyx
     main.pyx
     settings.py.in
     setup.py
