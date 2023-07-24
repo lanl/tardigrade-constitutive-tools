@@ -5,7 +5,7 @@ cmake>=3.18
 cython
 doxygen
 eigen>=3.3.7
-tardigrade_error_tools>=0.6
+tardigrade_error_tools>=0.7
 compilers
 setuptools_scm>=6.2
 pip
@@ -14,4 +14,4 @@ pytest-cov
 sphinx>=3.0.4
 sphinx_rtd_theme>=0.4.3
 sphinxcontrib-bibtex
-tardigrade_vector_tools>=0.6
+tardigrade_vector_tools>=0.7
