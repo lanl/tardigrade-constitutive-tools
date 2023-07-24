@@ -3,8 +3,8 @@ from libcpp.vector cimport vector
 import numpy as np
 cimport numpy as np
 
-cimport error_tools_python
-cimport constitutive_tools_python
+cimport tardigrade_error_tools_python
+cimport tardigrade_constitutive_tools_python
 
 
 cdef map_1D_array_to_vector(np.ndarray array):
@@ -96,7 +96,7 @@ cdef map_matrix_to_2D_array(vector[vector[double]] matrix):
 
 def py_decomposeGreenLagrangeStrain(np.ndarray greenLagrangeStrain):
     """
-    Wrapper for the C++ function constitutiveTools::decomposeGreenLagrangeStrain
+    Wrapper for the C++ function tardigradeConstitutiveTools::decomposeGreenLagrangeStrain
     that breaks the strain into isochoric and volumetric parts.
 
     :param np.ndarray greenLagrangeStrain: The Green-Lagrange strain in vector
@@ -106,13 +106,13 @@ def py_decomposeGreenLagrangeStrain(np.ndarray greenLagrangeStrain):
     cdef vector[double] c_greenLagrangeStrain
     cdef vector[double] c_isochoricGreenLagrangeStrain
     cdef double c_volumetricGreenLagrangeStrain = 0
-    cdef error_tools_python.Node *error
+    cdef tardigrade_error_tools_python.Node *error
 
     cdef np.ndarray isochoricGreenLagrangeStrain
 
     c_greenLagrangeStrain = map_1D_array_to_vector(greenLagrangeStrain)
 
-    error = constitutive_tools_python.decomposeGreenLagrangeStrain(c_greenLagrangeStrain, c_isochoricGreenLagrangeStrain, c_volumetricGreenLagrangeStrain)
+    error = tardigrade_constitutive_tools_python.decomposeGreenLagrangeStrain(c_greenLagrangeStrain, c_isochoricGreenLagrangeStrain, c_volumetricGreenLagrangeStrain)
 
     if error:
         error.c_print(True)
@@ -125,7 +125,7 @@ def py_decomposeGreenLagrangeStrain(np.ndarray greenLagrangeStrain):
 def py_midpointEvolution(Dt, np.ndarray Ap, np.ndarray DApDt, np.ndarray DADt, np.ndarray alpha,
                          compute_jacobians=False):
     """
-    Wrapper for the c++ function constitutiveTools::midpointEvolution that computes the integration of a
+    Wrapper for the c++ function tardigradeConstitutiveTools::midpointEvolution that computes the integration of a
     function using an implicit midpoint rule
 
     :param float Dt: The change in time
@@ -148,7 +148,7 @@ def py_midpointEvolution(Dt, np.ndarray Ap, np.ndarray DApDt, np.ndarray DADt, n
     cdef vector[double] c_alpha = map_1D_array_to_vector(alpha)
     cdef vector[double] c_dA
     cdef vector[double] c_A
-    cdef error_tools_python.Node *error
+    cdef tardigrade_error_tools_python.Node *error
 
     cdef vector[vector[double]] c_DADADT
 
@@ -157,7 +157,7 @@ def py_midpointEvolution(Dt, np.ndarray Ap, np.ndarray DApDt, np.ndarray DADt, n
 
     if compute_jacobians:
 
-        error = constitutive_tools_python.midpointEvolution(c_Dt, c_Ap, c_DApDt, c_DADt, c_dA, c_A, c_DADADT, alpha)
+        error = tardigrade_constitutive_tools_python.midpointEvolution(c_Dt, c_Ap, c_DApDt, c_DADt, c_dA, c_A, c_DADADT, alpha)
 
         if error:
             error.c_print(True)
@@ -171,7 +171,7 @@ def py_midpointEvolution(Dt, np.ndarray Ap, np.ndarray DApDt, np.ndarray DADt, n
 
     else:
 
-        error = constitutive_tools_python.midpointEvolution(c_Dt, c_Ap, c_DApDt, c_DADt, c_dA, c_A, alpha)
+        error = tardigrade_constitutive_tools_python.midpointEvolution(c_Dt, c_Ap, c_DApDt, c_DADt, c_dA, c_A, alpha)
 
         if error:
             error.c_print(True)

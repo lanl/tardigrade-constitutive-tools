@@ -1,45 +1,64 @@
 package:
-  name: constitutive_tools
+  name: tardigrade_constitutive_tools
   # TODO: setup and use pyproject.toml and a Conda build Jinja template
   version: {{ VERSION }}
+
+about:
+  home: https://github.com/lanl/tardigrade-constitutive-tools
+  license: BSD-3-Clause
+  license_file: LICENSE
+  summary: 'Tools for use in building constitutive equations'
+  description: |
+    tardigrade-constitutive-tools (C20048 Tardigrade) A collection of tools useful for constitutive modeling. These
+    tools are intended to reduce the burden in creating a new constitutive model from scratch enabling a faster turn-around
+    for model development. These tools should be as general as possible to avoid cluttering the database with extraneous
+    things.
+  doc_url: https://lanl.github.io/tardigrade-constitutive-tools
+  dev_url: https://github.com/lanl/tardigrade-constitutive-tools
 
 source:
   path: '..'
 
 build:
+  number: 0
+  script_env:
+    - SETUPTOOLS_SCM_PRETEND_VERSION={{ VERSION }}
   script:
     - mkdir build-package
     - cd build-package
     - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_LIBDIR=lib
-    - cmake --build . --target constitutive_tools
+    - cmake --build . --target tardigrade_constitutive_tools
     - cmake --install . --prefix ${PREFIX}
   ignore_run_exports:
     - python_abi
 
 requirements:
-  build:
-    - {{ compiler('cxx') }}
-    - setuptools_scm >=6.2
-    - libcxx <16  # [osx]
   host:
     - {{ compiler('cxx') }}
+    - libgcc-ng {{ libstdcxx }}     # [linux]
+    - libstdcxx-ng {{ libstdcxx }}  # [linux]
     - python
+    - setuptools_scm >=6.2
     - cmake >=3.18
     - eigen >=3.3.7
-    - error_tools >=0.6
-    - vector_tools >=0.6
+    - tardigrade_error_tools >=0.7
+    - tardigrade_vector_tools >=0.7
     - boost >=1.59  # TODO: Separate the package/test configuration to make BOOST an optional build dependency
     - doxygen  # TODO: Separate the package/documentation configuration to make Doxygen an optional build dependency
     - sphinx  # TODO: Separate the package/documentation configuration to make Sphinx an optional build dependency
-    - libcxx <16  # [osx]
   run:
-    - {{ compiler('cxx') }}
     - eigen >=3.3.7
-    - error_tools >=0.6
-    - vector_tools >=0.6
+    - tardigrade_error_tools >=0.7
+    - tardigrade_vector_tools >=0.7
+    - libgcc-ng     # [linux]
+    - libstdcxx-ng  # [linux]
+    - libcxx        # [osx]
 
 test:
   requires:
+    - {{ compiler('cxx') }}
+    - {{ pin_compatible('libgcc-ng') }}     # [linux]
+    - {{ pin_compatible('libstdcxx-ng') }}  # [linux]
     - cmake >=3.18
     - boost >=1.59
     - doxygen  # TODO: Separate the package/documentation configuration to make Doxygen an optional build dependency
@@ -47,7 +66,7 @@ test:
   source_files:
     - CMakeLists.txt
     - src/cpp/tests/CMakeLists.txt
-    - src/cpp/tests/test_constitutive_tools.cpp
+    - src/cpp/tests/test_tardigrade_constitutive_tools.cpp
   commands:
     - mkdir build-tests
     - cd build-tests
