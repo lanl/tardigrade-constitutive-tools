@@ -1,6 +1,6 @@
-###################
-constitutive\_tools
-###################
+###############################
+tardigrade\_constitutive\_tools
+###############################
 
 *******************
 Project Description
@@ -15,8 +15,8 @@ extraneous things.
 Information
 ===========
 
-* Documentation: https://aea.re-pages.lanl.gov/material-models/constitutive_tools
-* Wiki: https://re-git.lanl.gov/aea/material-models/constitutive_tools/-/wikis/home
+* Documentation: https://aea.re-pages.lanl.gov/material-models/tardigrade_constitutive_tools
+* Wiki: https://re-git.lanl.gov/aea/material-models/tardigrade_constitutive_tools/-/wikis/home
 
 Developers
 ==========
@@ -54,7 +54,7 @@ packages.
 .. code-block:: bash
 
    $ pwd
-   path/to/constitutive_tools/
+   path/to/tardigrade_constitutive_tools/
    $ pipreqs --use-local --print --no-pin .
 
 A minimal anaconda environment for building the documentation can be created
@@ -79,8 +79,8 @@ C++ Libraries
 
 * [Eigen](https://eigen.tuxfamily.org/dox/) >= 3.3.7
 * [BOOST](https://www.boost.org/doc/libs/1_59_0/) >= 1.59.0
-* error\_tools: https://re-git.lanl.gov/aea/material-models/error_tools
-* vector\_tools: https://re-git.lanl.gov/aea/material-models/vector_tools
+* error\_tools: https://re-git.lanl.gov/aea/material-models/tardigrade_error_tools
+* vector\_tools: https://re-git.lanl.gov/aea/material-models/tardigrade_vector_tools
 
 If not found on the current system or active Conda environment, all of the
 ``*_tools`` libraries are pulled from their git repos by branch name and built
@@ -120,7 +120,7 @@ sstelmo
    .. code-block:: bash
 
       $ pwd
-      /path/to/constitutive_tools/
+      /path/to/tardigrade_constitutive_tools/
 
       # Just perform the build. Usage arguments are "cmake_build_type"
       ./new_build.sh None
@@ -169,10 +169,10 @@ build minimal working Conda environments from the Python Modules discussion.
 
    .. code-block:: bash
 
-      $ error_tools=/path/to/my/error_tools
-      $ error_tools_version=origin/dev
-      $ vector_tools=/path/to/my/vector_tools
-      $ vector_tools_version=origin/dev
+      $ tardigrade_error_tools=/path/to/my/tardigrade_error_tools
+      $ tardigrade_error_tools_version=origin/dev
+      $ tardigrade_vector_tools=/path/to/my/tardigrade_vector_tools
+      $ tardigrade_vector_tools_version=origin/dev
 
 3) Perform the initial configuration. Note that the environment variables are mutually independent. Each variable can be
    used alone or in arbitrary combinations. The default values are found in the root ``CMakeLists.txt`` file. The ``PATH``
@@ -185,24 +185,24 @@ build minimal working Conda environments from the Python Modules discussion.
 
       # View the defaults
       $ grep _TOOLS_ CMakeLists.txt
-      set(ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of error_tools")
-      set(ERROR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of error_tools")
-      set(VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of vector_tools")
-      set(VECTOR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of vector_tools")
+      set(TARDIGRADE_ERROR_TOOLS_PATH "" CACHE PATH "The path to the local version of tardigrade_error_tools")
+      set(TARDIGRADE_ERROR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of tardigrade_error_tools")
+      set(TARDIGRADE_VECTOR_TOOLS_PATH "" CACHE PATH "The path to the local version of tardigrade_vector_tools")
+      set(TARDIGRADE_VECTOR_TOOLS_GITTAG "" CACHE PATH "The path to the local version of tardigrade_vector_tools")
 
       $ Build against local directory paths and possible custom branch
       $ pwd
-      /path/to/constitutive_tools
+      /path/to/tardigrade_constitutive_tools
       $ mkdir build
       $ cd build
-      $ cmake .. -DERROR_TOOLS_PATH=${my_error_tools} -DERROR_TOOLS_GITTAG=${error_tools_version} -DVECTOR_TOOLS_PATH=${my_vector_tools} -DVECTOR_TOOLS_GITTAG=${vector_tools_version}
+      $ cmake .. -DTARDIGRADE_ERROR_TOOLS_PATH=${my_tardigrade_error_tools} -DTARDIGRADE_ERROR_TOOLS_GITTAG=${tardigrade_error_tools_version} -DTARDIGRADE_VECTOR_TOOLS_PATH=${my_tardigrade_vector_tools} -DTARDIGRADE_VECTOR_TOOLS_GITTAG=${tardigrade_vector_tools_version}
 
 4) Building the library
 
    .. code-block:: bash
 
       $ pwd
-      /path/to/constitutive_tools/build
+      /path/to/tardigrade_constitutive_tools/build
       $ make
 
 Building the documentation
@@ -215,7 +215,7 @@ To build just the documentation pick up the steps here:
    .. code-block:: bash
 
       $ pwd
-      /path/to/constitutive_tools/
+      /path/to/tardigrade_constitutive_tools/
       $ mkdir build/
       $ cd build/
 
@@ -224,7 +224,7 @@ To build just the documentation pick up the steps here:
    .. code-block:: bash
 
       $ pwd
-      /path/to/constitutive_tools/build/
+      /path/to/tardigrade_constitutive_tools/build/
       $ cmake3 ..
 
 4) Build the docs
@@ -237,14 +237,14 @@ To build just the documentation pick up the steps here:
 
    .. code-block:: bash
 
-      constitutive_tools/build/docs/sphinx/index.html
+      tardigrade_constitutive_tools/build/docs/sphinx/index.html
 
 6) Display docs
 
    .. code-block:: bash
 
       $ pwd
-      /path/to/constitutive_tools/build/
+      /path/to/tardigrade_constitutive_tools/build/
       $ firefox docs/sphinx/index.html &
 
 7) While the Sphinx API is still a WIP, try the doxygen API
@@ -252,7 +252,7 @@ To build just the documentation pick up the steps here:
    .. code-block:: bash
 
       $ pwd
-      /path/to/constitutive_tools/build/
+      /path/to/tardigrade_constitutive_tools/build/
       $ firefox docs/doxygen/html/index.html &
 
 *******************
@@ -266,7 +266,7 @@ Build the entire before performing the installation.
    .. code-block:: bash
 
       $ pwd
-      /path/to/constitutive_tools/build
+      /path/to/tardigrade_constitutive_tools/build
       $ cmake3 --build .
 
 5) Install the library
@@ -274,7 +274,7 @@ Build the entire before performing the installation.
    .. code-block:: bash
 
       $ pwd
-      /path/to/constitutive_tools/build
+      /path/to/tardigrade_constitutive_tools/build
       $ cmake --install . --prefix path/to/root/install
 
       # Example local user (non-admin) Linux install

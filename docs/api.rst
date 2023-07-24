@@ -6,13 +6,13 @@
     :maxdepth: 2
 
 **********************
-constitutive_tools.cpp
+tardigrade_constitutive_tools.cpp
 **********************
 
-.. doxygenfile:: constitutive_tools.cpp
+.. doxygenfile:: tardigrade_constitutive_tools.cpp
 
 ********************
-constitutive_tools.h
+tardigrade_constitutive_tools.h
 ********************
 
-.. doxygenfile:: constitutive_tools.h
+.. doxygenfile:: tardigrade_constitutive_tools.h

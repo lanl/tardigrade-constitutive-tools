@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-import constitutive_tools
+import tardigrade_constitutive_tools
 
 
 # Implement a numeric calculation of the Jacobian of a vector function
@@ -64,7 +64,7 @@ def test_decomposeGreenLagrangeStrain(greenLagrangeStrain, answers):
         'isochoric' and 'volumetric'
     """
 
-    isochoric_result, volumetric_result = constitutive_tools.py_decomposeGreenLagrangeStrain(greenLagrangeStrain)
+    isochoric_result, volumetric_result = tardigrade_constitutive_tools.py_decomposeGreenLagrangeStrain(greenLagrangeStrain)
 
     assert np.allclose(isochoric_result, answers['isochoric'])
 
@@ -101,11 +101,11 @@ def test_midpointEvolution(Dt, Ap, DApDt, DADt, alphaVec, answers):
     :param dict answers: The answer dictionary
     """
 
-    A = constitutive_tools.py_midpointEvolution(Dt, Ap, DApDt, DADt, alphaVec, False)
+    A = tardigrade_constitutive_tools.py_midpointEvolution(Dt, Ap, DApDt, DADt, alphaVec, False)
 
     assert np.allclose(A, answers['A'])
 
-    A, DADADT = constitutive_tools.py_midpointEvolution(Dt, Ap, DApDt, DADt, alphaVec, True)
+    A, DADADT = tardigrade_constitutive_tools.py_midpointEvolution(Dt, Ap, DApDt, DADt, alphaVec, True)
 
     def function_wrapper(x0, *args, **kwargs):
         """
@@ -118,7 +118,7 @@ def test_midpointEvolution(Dt, Ap, DApDt, DADt, alphaVec, answers):
 
         DADt = x0
         
-        return constitutive_tools.py_midpointEvolution(Dt, Ap, DApDt, DADt, alphaVec, False)
+        return tardigrade_constitutive_tools.py_midpointEvolution(Dt, Ap, DApDt, DADt, alphaVec, False)
 
     assert np.allclose(A, answers['A'])
 
