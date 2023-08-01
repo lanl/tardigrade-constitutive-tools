@@ -1350,3 +1350,82 @@ BOOST_AUTO_TEST_CASE( testPushForwardPK2Stress ){
     BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( dCauchyStressdF, dCauchyStressdFAnswer ) );
 
 }
+
+BOOST_AUTO_TEST_CASE( testPullBackCauchyStress ){
+
+    floatVector cauchyStress = { 0.69646919, 0.28613933, 0.22685145,
+                                 0.55131477, 0.71946897, 0.42310646,
+                                 0.9807642 , 0.68482974, 0.4809319 };
+
+    floatVector F = { 0.39211752, 0.34317802, 0.72904971,
+                      0.43857224, 0.0596779 , 0.39804426,
+                      0.73799541, 0.18249173, 0.17545176 };
+
+    floatVector answer = { 0.09712486, -0.22265266,  0.17348893,
+                          -0.28540852,  1.00439495, -0.24683974,
+                           0.08027086, -0.27916041,  0.08903243 };
+
+    floatVector result, result2;
+
+    BOOST_CHECK( !tardigradeConstitutiveTools::pullBackCauchyStress( cauchyStress, F, result ) );
+
+    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( result, answer ) );
+
+    floatMatrix dPK2dCauchyStress, dPK2dF;
+
+    floatMatrix dPK2dCauchyStress_answer( answer.size( ), floatVector( cauchyStress.size( ), 0 ) );
+
+    floatMatrix dPK2dF_answer( answer.size( ), floatVector( F.size( ), 0 ) );
+
+    floatType eps = 1e-6;
+
+    BOOST_CHECK( !tardigradeConstitutiveTools::pullBackCauchyStress( cauchyStress, F, result2,
+                                                                     dPK2dCauchyStress, dPK2dF ) );
+
+    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( result2, answer ) );
+
+    for ( unsigned int i = 0; i < cauchyStress.size( ); i++ ){
+
+        floatVector delta( cauchyStress.size( ), 0 );
+
+        delta[ i ] = eps * std::fabs( cauchyStress[ i ] ) + eps;
+
+        floatVector resultP, resultM;
+
+        BOOST_CHECK( !tardigradeConstitutiveTools::pullBackCauchyStress( cauchyStress + delta, F, resultP ) );
+
+        BOOST_CHECK( !tardigradeConstitutiveTools::pullBackCauchyStress( cauchyStress - delta, F, resultM ) );
+
+        for ( unsigned int j = 0; j < answer.size( ); j++ ){
+
+            dPK2dCauchyStress_answer[ j ][ i ] = ( resultP[ j ] - resultM[ j ] ) / ( 2 * delta[ i ] );
+
+        }
+
+    }
+
+    for ( unsigned int i = 0; i < F.size( ); i++ ){
+
+        floatVector delta( F.size( ), 0 );
+
+        delta[ i ] = eps * std::fabs( F[ i ] ) + eps;
+
+        floatVector resultP, resultM;
+
+        BOOST_CHECK( !tardigradeConstitutiveTools::pullBackCauchyStress( cauchyStress, F + delta, resultP ) );
+
+        BOOST_CHECK( !tardigradeConstitutiveTools::pullBackCauchyStress( cauchyStress, F - delta, resultM ) );
+
+        for ( unsigned int j = 0; j < answer.size( ); j++ ){
+
+            dPK2dF_answer[ j ][ i ] = ( resultP[ j ] - resultM[ j ] ) / ( 2 * delta[ i ] );
+
+        }
+
+    }
+
+    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( dPK2dCauchyStress, dPK2dCauchyStress_answer ) );
+
+    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( dPK2dF, dPK2dF_answer ) );
+
+}
