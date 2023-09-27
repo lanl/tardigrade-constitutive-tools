@@ -1682,4 +1682,130 @@ namespace tardigradeConstitutiveTools{
 
     }
 
+    errorOut pullBackCauchyStress( const floatVector &cauchyStress, const floatVector &F, floatVector &PK2 ){
+        /*!
+         * Pull back the Cauchy stress to an earlier configuration resulting in the second Piola-Kirchhoff stress
+         * 
+         * \f$ S_{IJ} = J F^{-1}_{Ii} \sigma_{ij} F^{-1}_{Jj} \f$
+         * 
+         * where \f$S_{IJ}\f$ are the components of the second Piola-Kirchhoff stress tensor, \f$J \f$ is the
+         * determinant of the deformation gradient \f$\bf{F}\f$ which has components \f$F_{iI}\f$, and
+         * \f$ \sigma_{ij} \f$ are the components of the Cauchy stress.
+         *
+         * \param &cauchyStress: The cauchy stress tensor in row-major form (all nine components)
+         * \param &F: The deformation gradient
+         * \param &PK2: The resulting second Piola-Kirchhoff stress
+         */
+
+        unsigned int dim = ( unsigned int )( std::sqrt( ( double )cauchyStress.size( ) ) + 0.5 );
+
+        if ( cauchyStress.size( ) != dim * dim ){
+
+            std::string message = "The Cauchy stress size is not consistent with the computed dimension\n";
+            message            += "    cauchyStress.size( ): " + std::to_string( cauchyStress.size( ) ) + "\n";
+            message            += "    dim * dim           : " + std::to_string( dim * dim ) + "\n";
+
+            return new errorNode( __func__, message );
+
+        }
+
+        if ( cauchyStress.size( ) != F.size( ) ){
+
+            std::string message = "The Cauchy stress and the deformation gradient have inconsistent sizes\n";
+            message            += "    cauchyStress.size( ): " + std::to_string( cauchyStress.size( ) ) + "\n";
+            message            += "    F.size( )           : " + std::to_string( F.size( ) ) + "\n";
+
+            return new errorNode( __func__, message );
+
+        }
+
+        floatType J = tardigradeVectorTools::determinant( F, dim, dim );
+
+        floatVector Finv = tardigradeVectorTools::inverse( F, dim, dim );
+
+        PK2 = J * tardigradeVectorTools::matrixMultiply( tardigradeVectorTools::matrixMultiply( Finv, cauchyStress, dim, dim, dim, dim, false, false ),
+                                                         Finv, dim, dim, dim, dim, false, true );
+
+        return NULL;
+
+    }
+    
+    errorOut pullBackCauchyStress( const floatVector &cauchyStress, const floatVector &F, floatVector &PK2, 
+                                   floatMatrix &dPK2dCauchyStress, floatMatrix &dPK2dF ){
+        /*!
+         * Pull back the Cauchy stress to an earlier configuration resulting in the second Piola-Kirchhoff stress
+         * 
+         * \f$ S_{IJ} = J F^{-1}_{Ii} \sigma_{ij} F^{-1}_{Jj} \f$
+         * 
+         * where \f$S_{IJ}\f$ are the components of the second Piola-Kirchhoff stress tensor, \f$J \f$ is the
+         * determinant of the deformation gradient \f$\bf{F}\f$ which has components \f$F_{iI}\f$, and
+         * \f$ \sigma_{ij} \f$ are the components of the Cauchy stress.
+         *
+         * \param &cauchyStress: The cauchy stress tensor in row-major form (all nine components)
+         * \param &F: The deformation gradient
+         * \param &PK2: The resulting second Piola-Kirchhoff stress
+         * \param &dPK2dCauchyStress: The directional derivative of the second Piola-Kirchhoff stress tensor w.r.t.
+         *     the Cauchy stress
+         * \param &dPK2dF: The directional derivative of the second Piola-Kirchhoff stress tensor w.r.t. the
+         *     deformation gradient
+         */
+
+        unsigned int dim = ( unsigned int )( std::sqrt( ( double )cauchyStress.size( ) ) + 0.5 );
+
+        if ( cauchyStress.size( ) != dim * dim ){
+
+            std::string message = "The Cauchy stress size is not consistent with the computed dimension\n";
+            message            += "    cauchyStress.size( ): " + std::to_string( cauchyStress.size( ) ) + "\n";
+            message            += "    dim * dim           : " + std::to_string( dim * dim ) + "\n";
+
+            return new errorNode( __func__, message );
+
+        }
+
+        if ( cauchyStress.size( ) != F.size( ) ){
+
+            std::string message = "The Cauchy stress and the deformation gradient have inconsistent sizes\n";
+            message            += "    cauchyStress.size( ): " + std::to_string( cauchyStress.size( ) ) + "\n";
+            message            += "    F.size( )           : " + std::to_string( F.size( ) ) + "\n";
+
+            return new errorNode( __func__, message );
+
+        }
+
+        floatType J = tardigradeVectorTools::determinant( F, dim, dim );
+
+        floatVector Finv = tardigradeVectorTools::inverse( F, dim, dim );
+
+        PK2 = J * tardigradeVectorTools::matrixMultiply( tardigradeVectorTools::matrixMultiply( Finv, cauchyStress, dim, dim, dim, dim, false, false ),
+                                                         Finv, dim, dim, dim, dim, false, true );
+
+        dPK2dCauchyStress = floatMatrix( dim * dim, floatVector( dim * dim, 0 ) );
+        dPK2dF            = floatMatrix( dim * dim, floatVector( dim * dim, 0 ) );
+
+        for ( unsigned int A = 0; A < dim; A++ ){
+
+            for ( unsigned int B = 0; B < dim; B++ ){
+
+                for ( unsigned int k = 0; k < dim; k++ ){
+
+                    for ( unsigned int l = 0; l < dim; l++ ){
+
+                        dPK2dCauchyStress[ dim * A + B ][ dim * k + l ] = J * Finv[ dim * A + k ] * Finv[ dim * B + l ];
+
+                        dPK2dF[ dim * A + B ][ dim * k + l ] = Finv[ dim * l + k ] * PK2[ dim * A + B ]
+                                                             - Finv[ dim * A + k ] * PK2[ dim * l + B ]
+                                                             - Finv[ dim * B + k ] * PK2[ dim * A + l ];
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        return NULL;
+
+    }
+
 }

@@ -152,6 +152,11 @@ namespace tardigradeConstitutiveTools{
     errorOut pushForwardPK2Stress( const floatVector &PK2, const floatVector &F, floatVector &cauchyStress,
                                    floatMatrix &dCauchyStressdPK2, floatMatrix &dCauchyStressdF );
 
+    errorOut pullBackCauchyStress( const floatVector &cauchyStress, const floatVector &F, floatVector &PK2 );
+
+    errorOut pullBackCauchyStress( const floatVector &cauchyStress, const floatVector &F, floatVector &PK2,
+                                   floatMatrix &dPK2dCauchyStress, floatMatrix &dPK2dF );
+
 }
 
 #endif
